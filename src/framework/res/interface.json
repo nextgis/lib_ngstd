@@ -1,0 +1,41 @@
+{
+    "menus" : [
+        {
+            "name": "&File",
+            "actions": [
+                {
+                    "key": "file.open",
+                    "type": "action"
+                },
+                {
+                    "type": "separator"
+                },
+                {
+                    "key": "file.quit",
+                    "type": "action"
+                }
+            ]
+        },
+        {
+            "name": "&Help",
+            "actions": [
+                {
+                    "key": "help.about",
+                    "type": "action"
+                }
+            ]
+        }
+    ],
+    "toolbars" : [
+        {
+            "name": "File",
+            "allowedAreas": ["top", "bottom"],
+            "actions": [
+                {
+                    "key": "file.open",
+                    "type": "action"
+                }
+            ]
+        }
+    ]
+}

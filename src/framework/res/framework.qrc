@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/themes">
+        <file alias="dark.theme">themes/dark.theme</file>
+        <file alias="light.theme">themes/light.theme</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="splash.svg">images/sp_bk.svg</file>
+        <file alias="ng_logo_bw.svg">images/ng_logo_bw.svg</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="save.svg">icons/content-save.svg</file>
+        <file alias="open.svg">icons/folder-open.svg</file>
+        <file alias="redo.svg">icons/redo-variant.svg</file>
+        <file alias="undo.svg">icons/undo-variant.svg</file>
+        <file alias="pagebreak.svg">icons/pagebreak.svg</file>
+        <file alias="multiply.svg">icons/multiply.svg</file>
+        <file alias="bookmark.svg">icons/bookmark.svg</file>
+        <file alias="book.svg">icons/office-book.svg</file>
+        <file alias="document.svg">icons/office-document.svg</file>
+        <file alias="drawing.svg">icons/office-drawing.svg</file>
+        <file alias="text.svg">icons/text-generic.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="interface.json">interface.json</file>
+    </qresource>
+</RCC>
