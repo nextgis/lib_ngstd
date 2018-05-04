@@ -55,6 +55,8 @@ else()
     set(INSTALL_TRANSLATIONS_DIR "${CMAKE_INSTALL_DATADIR}/translations" CACHE INTERNAL "Installation directory for translations" FORCE)
 endif()
 
+cmake_policy(SET CMP0071 NEW)
+
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
@@ -75,6 +77,12 @@ report_version(${PROJECT_NAME} ${VERSION})
 configure_file(cmake/cmake_uninstall.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 
+set(PACKAGE_NAME ${PROJECT_NAME})
+string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
+
+option(BUILD_QT5 "Build qt5 library" ON)
+option(BUILD_QT4 "Build qt4 library" OFF)
+
 set(NGSTD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(NGLIBS
     core
@@ -83,7 +91,5 @@ set(NGLIBS
 
 add_subdirectory(src)
 add_subdirectory(translations)
-
-# export (TARGETS ${EXPORT_TARGETS} FILE ${EXPORT_TARGET_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

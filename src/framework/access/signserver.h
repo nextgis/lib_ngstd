@@ -17,46 +17,41 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef NGFRAMEWORK_MAINWINDOW_H
-#define NGFRAMEWORK_MAINWINDOW_H
+#ifndef NGFRAMEWORK_SIGNSERVER_H
+#define NGFRAMEWORK_SIGNSERVER_H
 
-#include "framework/framework.h"
+#include <QProgressDialog>
+#include <QTcpServer>
 
-#include <QAction>
-#include <QJsonArray>
-#include <QHash>
-#include <QMainWindow>
-
-/**
- * @brief The NGMainWindow class
- */
-class NGFRAMEWORK_EXPORT NGMainWindow : public QMainWindow
+class NGSignServer : public QProgressDialog
 {
     Q_OBJECT
 public:
-    explicit NGMainWindow(QWidget *parent = nullptr );
-    virtual void init();
+    explicit NGSignServer(const QString &clientId, const QString &scope,
+                          QWidget *parent = nullptr);
+    ~NGSignServer();
 
-//signals:
+    QString code() const;
+    QString redirectUri() const;
 
-protected slots:
-    virtual void open();
-    virtual void about();
-    virtual void quit();
+signals:
 
-protected:
-    void closeEvent(QCloseEvent *event);
-    QAction* commandByKey(const QString &key) const;
-    virtual bool maybeSave();
-    virtual void writeSettings();
-    virtual void readSettings();
-    virtual void createCommands();
-    virtual void loadInterface();
-    virtual void loadMenus(const QJsonArray &array);
-    virtual void loadToolbars(const QJsonArray &array);
+public slots:
 
-protected:
-    QHash<QString, QAction*> m_commands;
+private slots:
+    void onIncomingConnection();
+    void onGetReply();
+
+private:
+    QString m_code;
+    QString m_redirectUri;
+    QString m_replyContent;
+    QString m_clientId, m_scope;
+    QTcpServer *m_listenServer;
+
+    // QDialog interface
+public slots:
+    virtual int exec() override;
 };
 
-#endif // NGFRAMEWORK_MAINWINDOW_H
+#endif // NGFRAMEWORK_SIGNSERVER_H

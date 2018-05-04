@@ -30,3 +30,17 @@ C:/Program Files/nextgis/share/translations/ngstd_core_ru.qm
 /usr/bin/manuscript
 C:/Program Files/nextgis/bin/manuscript
 ~/Applications/NextGIS/Applications/manuscript.app
+
+# User settings
+
+## Linux
+
+~/.config/NextGIS
+
+## Windows
+
+C:/Users/<USER>/AppData/Local/NextGIS/<APPNAME>
+
+## Mac OS X
+
+~/.config/NextGIS

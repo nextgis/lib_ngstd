@@ -3,7 +3,7 @@
 # Purpose:  cmake script
 # Author:   Dmitry Baryshnikov, bishop.dev@gmail.com
 #***************************************************************************
-#   Copyright (C) 2015-2016 NextGIS, info@nextgis.ru
+#   Copyright (C) 2015-2018 NextGIS, info@nextgis.ru
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,48 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 project(ngstd_core)
 
-# Widgets finds its own dependencies.
-find_package(Qt5 REQUIRED COMPONENTS Core LinguistTools)
+include(FindAnyProject)
+
+if(BUILD_QT5)
+    # Widgets finds its own dependencies.
+    find_anyproject(Qt5 REQUIRED COMPONENTS Core LinguistTools)
+endif()
+if(BUILD_QT4)
+    message(FATAL_ERROR "Not implemented yet")
+endif()
+
+if(NOT GDAL_FOUND)
+    find_anyproject(GDAL REQUIRED)
+endif()
 
 set(PUBLIC_HEADERS
     core.h
     application.h
     version.h
+    request.h
 )
 
 set(PROJECT_SOURCES
     core.cpp
     application.cpp
+    request.cpp
 )
+
+if(GDAL_VERSION VERSION_LESS "2.3")
+    find_anyproject(JSONC REQUIRED
+        NAMES json-c jsonc json_c
+    )
+    if(JSONC_FOUND)
+        include_directories(${JSONC_INCLUDE_DIRS}/json-c)
+    endif()
+
+    set(PUBLIC_HEADERS ${PUBLIC_HEADERS}
+        cpl_json.h
+    )
+    set(PROJECT_SOURCES ${PROJECT_SOURCES}
+        cpl_json.cpp
+    )
+endif()
 
 set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_ru.ts
@@ -45,7 +74,12 @@ set(TRANSLATIONS
 unset(QM_FILES)
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
-        qt5_add_translation(QM_FILES ${TRANSLATION})
+        if(BUILD_QT5)
+            qt5_add_translation(QM_FILES ${TRANSLATION})
+        endif()
+        if(BUILD_QT4 AND NOT BUILD_QT5)
+            qt4_add_translation(QM_FILES ${TRANSLATION})
+        endif()
     endif()
 endforeach()
 
@@ -56,53 +90,80 @@ endif()
 
 string(TOUPPER ${PROJECT_NAME} PROJECT_UPPER_NAME)
 
-if(BUILD_SHARED_LIBS)
-    add_library(${PROJECT_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_SOURCES})
-    if(MSVC)
-        set_target_properties(${PROJECT_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+macro(ADD_NGSTDCORE_LIB NAME QT_VER)
+    set(LIB_NAME ${NAME}${QT_VER})
+    if(BUILD_SHARED_LIBS)
+        add_library(${LIB_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_SOURCES})
+        if(MSVC)
+            set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+        endif()
+        set_target_properties(${LIB_NAME} PROPERTIES
+            DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
+            VERSION ${VERSION}
+            SOVERSION ${NGLIB_MAJOR_VERSION}
+        )
+    elseif(OSX_FRAMEWORK)
+        add_library(${LIB_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_SOURCES} ${QM_FILES})
+        set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
+        set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/core")
+        set_target_properties(${LIB_NAME} PROPERTIES
+            DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
+            FRAMEWORK TRUE
+            FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
+            MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
+            MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
+            VERSION ${VERSION}
+            SOVERSION ${NGLIB_MAJOR_VERSION}
+            MACOSX_FRAMEWORK_IDENTIFIER com.nextgis.${PROJECT_NAME}
+            XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+        #    PUBLIC_HEADER "${PUBLIC_HEADERS}"
+        )
+    else()
+        add_library(${LIB_NAME} STATIC ${PUBLIC_HEADERS} ${PROJECT_SOURCES})
+        add_definitions(-DNGSTD_STATIC)
+        if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+            set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
+            set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
+        endif()
     endif()
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
-        VERSION ${VERSION}
-        SOVERSION ${NGLIB_MAJOR_VERSION}
+
+    if(${QT_VER} EQUAL 5)
+        target_link_libraries(${LIB_NAME} Qt5::Core gdal)
+        if(JSONC_FOUND)
+            target_link_libraries(${LIB_NAME} json-c)
+        endif()
+    elseif(${QT_VER} EQUAL 4)
+        message(FATAL_ERROR "Not implemented yet")
+    else()
+        message(FATAL_ERROR "Unexpected qt version")
+    endif()
+
+    target_include_directories(${LIB_NAME} INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
-elseif(OSX_FRAMEWORK)
-    add_library(${PROJECT_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_SOURCES} ${QM_FILES})
-    set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
-        FRAMEWORK TRUE
-        FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
-        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
-        MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
-        VERSION ${VERSION}
-        SOVERSION ${NGLIB_MAJOR_VERSION}
-        MACOSX_FRAMEWORK_IDENTIFIER com.nextgis.${PROJECT_NAME}
-        XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-        PUBLIC_HEADER "${PUBLIC_HEADERS}")
-else()
-    add_library(${PROJECT_NAME} STATIC ${PUBLIC_HEADERS} ${PROJECT_SOURCES})
-    add_definitions(-DNGSTD_STATIC)
-    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
+
+    # Install
+    if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+        install(TARGETS ${LIB_NAME}
+            EXPORT ${PACKAGE_UPPER_NAME}Targets
+            RUNTIME DESTINATION ${INSTALL_BIN_DIR}
+            LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+            ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
+            INCLUDES DESTINATION ${INSTALL_INC_DIR}
+            FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
+        )
     endif()
+endmacro()
+
+if(BUILD_QT5)
+    add_ngstdcore_lib(${PROJECT_NAME} 5)
 endif()
-
-target_link_libraries(${PROJECT_NAME} Qt5::Core)
-
-# Install
-if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-    install(TARGETS ${PROJECT_NAME}
-        #EXPORT targets
-        RUNTIME DESTINATION ${INSTALL_BIN_DIR} # at least for dlls
-        ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
-        LIBRARY DESTINATION ${INSTALL_LIB_DIR}
-        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR})
+if(BUILD_QT4)
+    add_ngstdcore_lib(${PROJECT_NAME} 4)
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR})
+    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR}/core)
 endif()
 
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)

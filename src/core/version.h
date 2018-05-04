@@ -25,6 +25,7 @@
 #define VENDOR "NextGIS"
 #define VENDOR_DOMAIN "nextgis.com"
 #define LIB_COMMENT "Standart NextGIS library for desktop applications."
+#define LIB_NAME "ngstd" // for settings
 
 #define NGLIB_MAJOR_VERSION     0
 #define NGLIB_MINOR_VERSION     8

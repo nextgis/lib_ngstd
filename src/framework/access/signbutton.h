@@ -17,46 +17,32 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef NGFRAMEWORK_MAINWINDOW_H
-#define NGFRAMEWORK_MAINWINDOW_H
+#ifndef NGFRAMEWORK_SIGNINBUTTON_H
+#define NGFRAMEWORK_SIGNINBUTTON_H
 
 #include "framework/framework.h"
 
-#include <QAction>
-#include <QJsonArray>
-#include <QHash>
-#include <QMainWindow>
+#include <QToolButton>
 
-/**
- * @brief The NGMainWindow class
- */
-class NGFRAMEWORK_EXPORT NGMainWindow : public QMainWindow
+#include "framework/access/signdialog.h"
+
+class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
 {
     Q_OBJECT
 public:
-    explicit NGMainWindow(QWidget *parent = nullptr );
-    virtual void init();
+    NGSignInButton(const QString &clientId, const QString &scope = "user_info.read",
+                   QWidget * parent = nullptr);
 
-//signals:
+signals:
+    void userInfoUpdated();
+    void supportInfoUpdated();
 
-protected slots:
-    virtual void open();
-    virtual void about();
-    virtual void quit();
+public slots:
+    void onClick();
+    void onUserInfoUpdated();
 
-protected:
-    void closeEvent(QCloseEvent *event);
-    QAction* commandByKey(const QString &key) const;
-    virtual bool maybeSave();
-    virtual void writeSettings();
-    virtual void readSettings();
-    virtual void createCommands();
-    virtual void loadInterface();
-    virtual void loadMenus(const QJsonArray &array);
-    virtual void loadToolbars(const QJsonArray &array);
-
-protected:
-    QHash<QString, QAction*> m_commands;
+private:
+    NGSignDialog *m_signDialog;
 };
 
-#endif // NGFRAMEWORK_MAINWINDOW_H
+#endif // NGFRAMEWORK_SIGNINBUTTON_H

@@ -283,4 +283,3 @@ protected:
 };
 
 #endif // QNGSTYLE_H
-

@@ -20,13 +20,23 @@
 #***************************************************************************
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_policy(SET CMP0071 NEW)
 
 project(ngstd_framework)
 
-# Widgets finds its own dependencies.
-find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
+include(FindAnyProject)
 
-qt5_add_resources(RESOURCES res/framework.qrc)
+if(BUILD_QT5)
+    # Widgets finds its own dependencies.
+    find_anyproject(Qt5 REQUIRED COMPONENTS Widgets Network LinguistTools)
+    qt5_add_resources(RESOURCES_QT5 res/framework.qrc)
+endif()
+
+if(BUILD_QT4)
+    qt4_add_resources(RESOURCES_QT4 res/framework.qrc)
+endif()
+
+find_anyproject(OpenSSL REQUIRED)
 
 set(PUBLIC_HEADERS
     framework.h
@@ -36,6 +46,7 @@ set(PUBLIC_HEADERS
     navigationwidget.h
     navigationpane.h
     styledbar.h
+    updater.h
 )
 
 set(PROJECT_HEADERS
@@ -50,11 +61,40 @@ set(PROJECT_SOURCES
     navigationwidget.cpp
     navigationpane.cpp
     styledbar.cpp
+    updater.cpp
 )
 
-#qt5_wrap_ui(UIS_HDRS
-#    res/ui/projpropwidget.ui
-#)
+set(ACCESS_HHEADERS
+    access/access.h
+    access/signbutton.h
+    access/signdialog.h
+    access/signserver.h
+)
+
+set(ACCESS_CSOURCES
+    access/access.cpp
+    access/signbutton.cpp
+    access/signdialog.cpp
+    access/signserver.cpp
+)
+
+set(ACCESS_UIS
+    access/signdialog.ui
+)
+
+set(PROJECT_HEADERS ${PROJECT_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
+set(PROJECT_SOURCES ${PROJECT_SOURCES} ${ACCESS_CSOURCES})
+
+if(BUILD_QT5)
+    qt5_wrap_ui(UIS_HDRS_QT5
+        ${ACCESS_UIS}
+    )
+endif()
+if(BUILD_QT4)
+    qt4_wrap_ui(UIS_HDRS_QT4
+        ${ACCESS_UIS}
+    )
+endif()
 
 set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_ru.ts
@@ -64,7 +104,12 @@ set(TRANSLATIONS
 unset(QM_FILES)
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
-        qt5_add_translation(QM_FILES ${TRANSLATION})
+        if(BUILD_QT5)
+            qt5_add_translation(QM_FILES ${TRANSLATION})
+        endif()
+        if(BUILD_QT4 AND NOT BUILD_QT5)
+            qt4_add_translation(QM_FILES ${TRANSLATION})
+        endif()
     endif()
 endforeach()
 
@@ -75,53 +120,80 @@ endif()
 
 string(TOUPPER ${PROJECT_NAME} PROJECT_UPPER_NAME)
 
-if(BUILD_SHARED_LIBS)
-    add_library(${PROJECT_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES})
-    if(MSVC)
-        set_target_properties(${PROJECT_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+macro(ADD_NGSTDFRW_LIB NAME QT_VER)
+    set(LIB_NAME ${NAME}${QT_VER})
+    if(BUILD_SHARED_LIBS)
+        add_library(${LIB_NAME} SHARED ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} )
+        if(MSVC)
+            set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+        endif()
+        set_target_properties(${LIB_NAME} PROPERTIES
+            DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
+            VERSION ${VERSION}
+            SOVERSION ${NGLIB_MAJOR_VERSION}
+        )
+    elseif(OSX_FRAMEWORK)
+        add_library(${LIB_NAME} SHARED ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
+        set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
+        set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework")
+        set_property(SOURCE ${ACCESS_HHEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/access")
+        set_target_properties(${LIB_NAME} PROPERTIES
+            DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
+            FRAMEWORK TRUE
+            FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
+            MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
+            MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
+            VERSION ${VERSION}
+            SOVERSION ${NGLIB_MAJOR_VERSION}
+            MACOSX_FRAMEWORK_IDENTIFIER com.nextgis.${LIB_NAME}
+            XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+            # PUBLIC_HEADER "${PUBLIC_HEADERS}"
+        )
+    else()
+        add_library(${LIB_NAME} STATIC ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
+        add_definitions(-DNGSTD_STATIC)
+        if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+            set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
+            set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
+        endif()
     endif()
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
-        VERSION ${VERSION}
-        SOVERSION ${NGLIB_MAJOR_VERSION}
+
+    if(${QT_VER} EQUAL 5)
+        target_link_libraries(${LIB_NAME} Qt5::Widgets Qt5::Network openssl ngstd_core${QT_VER})
+    elseif(${QT_VER} EQUAL 4)
+        message(FATAL_ERROR "Not implemented yet")
+    else()
+        message(FATAL_ERROR "Unexpected qt version")
+    endif()
+
+
+    target_include_directories(${LIB_NAME} INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
-elseif(OSX_FRAMEWORK)
-    add_library(${PROJECT_NAME} SHARED ${PUBLIC_HEADERS} ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES})
-    set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
-        FRAMEWORK TRUE
-        FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
-        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${VERSION}
-        MACOSX_FRAMEWORK_BUNDLE_VERSION ${VERSION}
-        VERSION ${VERSION}
-        SOVERSION ${NGLIB_MAJOR_VERSION}
-        MACOSX_FRAMEWORK_IDENTIFIER com.nextgis.${PROJECT_NAME}
-        XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-        PUBLIC_HEADER "${PUBLIC_HEADERS}")
-else()
-    add_library(${PROJECT_NAME} STATIC ${PUBLIC_HEADERS} ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES})
-    add_definitions(-DNGSTD_STATIC)
-    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
+
+    # Install
+    if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+        install(TARGETS ${LIB_NAME}
+            EXPORT ${PACKAGE_UPPER_NAME}Targets
+            RUNTIME DESTINATION ${INSTALL_BIN_DIR}
+            LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+            ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
+            INCLUDES DESTINATION ${INSTALL_INC_DIR}
+            FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
+        )
     endif()
+endmacro()
+
+if(BUILD_QT5)
+    add_ngstdfrw_lib(${PROJECT_NAME} 5)
 endif()
-
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets ngstd_core)
-
-# Install
-if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-    install(TARGETS ${PROJECT_NAME}
-        #EXPORT targets
-        RUNTIME DESTINATION ${INSTALL_BIN_DIR} # at least for dlls
-        ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
-        LIBRARY DESTINATION ${INSTALL_LIB_DIR}
-        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR})
+if(BUILD_QT4)
+    add_ngstdfrw_lib(${PROJECT_NAME} 4)
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR})
+    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR}/framework)
+    install(FILES ${ACCESS_HHEADERS} DESTINATION ${INSTALL_INC_DIR}/framework/access)
 endif()
 
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)

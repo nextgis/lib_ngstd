@@ -5,7 +5,8 @@
     </qresource>
     <qresource prefix="/images">
         <file alias="splash.svg">images/sp_bk.svg</file>
-        <file alias="ng_logo_bw.svg">images/ng_logo_bw.svg</file>
+        <file alias="ng_logo_bw_light.svg">images/ng_logo_bw_light.svg</file>
+        <file alias="ng_logo_bw_dark.svg">images/ng_logo_bw_dark.svg</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="save.svg">icons/content-save.svg</file>
@@ -19,6 +20,7 @@
         <file alias="document.svg">icons/office-document.svg</file>
         <file alias="drawing.svg">icons/office-drawing.svg</file>
         <file alias="text.svg">icons/text-generic.svg</file>
+        <file alias="person-blue.svg">icons/person-blue.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="interface.json">interface.json</file>

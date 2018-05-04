@@ -17,46 +17,44 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef NGFRAMEWORK_MAINWINDOW_H
-#define NGFRAMEWORK_MAINWINDOW_H
+#ifndef NGFRAMEWORK_UPDATER_H
+#define NGFRAMEWORK_UPDATER_H
 
 #include "framework/framework.h"
 
-#include <QAction>
-#include <QJsonArray>
-#include <QHash>
-#include <QMainWindow>
+#include <QObject>
+#include <QProcess>
+#include <QString>
 
-/**
- * @brief The NGMainWindow class
- */
-class NGFRAMEWORK_EXPORT NGMainWindow : public QMainWindow
+
+class NGFRAMEWORK_EXPORT NGUpdater : public QObject
 {
     Q_OBJECT
 public:
-    explicit NGMainWindow(QWidget *parent = nullptr );
-    virtual void init();
+    explicit NGUpdater( QWidget *parent = nullptr );
 
-//signals:
+    void checkUpdates();
+    void startUpdate(const QString &projectPath);
+
+protected:
+    virtual const QStringList ignorePackages();
+    virtual const QString updaterPath();
+
+signals:
+    virtual void checkUpdatesStarted();
+    virtual void checkUpdatesFinished(bool updatesAvailable);
+
+private:
+    QProcess *m_maintainerProcess;
+    bool m_updatesAvailable;
 
 protected slots:
-    virtual void open();
-    virtual void about();
-    virtual void quit();
-
-protected:
-    void closeEvent(QCloseEvent *event);
-    QAction* commandByKey(const QString &key) const;
-    virtual bool maybeSave();
-    virtual void writeSettings();
-    virtual void readSettings();
-    virtual void createCommands();
-    virtual void loadInterface();
-    virtual void loadMenus(const QJsonArray &array);
-    virtual void loadToolbars(const QJsonArray &array);
-
-protected:
-    QHash<QString, QAction*> m_commands;
+    virtual void maintainerStrated();
+    virtual void maintainerErrored(QProcess::ProcessError);
+    virtual void maintainerStateChanged(QProcess::ProcessState);
+    virtual void maintainerFinished(int code, QProcess::ExitStatus status);
+    virtual void maintainerReadyReadStandardOutput();
+    virtual void maintainerReadyReadStandardError();
 };
 
-#endif // NGFRAMEWORK_MAINWINDOW_H
+#endif // NGFRAMEWORK_UPDATER_H
