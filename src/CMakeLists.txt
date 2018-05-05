@@ -21,6 +21,45 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+include(FindAnyProject)
+
+if(WITH_ZLIB_EXTERNAL)
+    # ZLIB needed for uic, rcc, lrelease and lupdate
+    find_anyproject(ZLIB REQUIRED)
+endif()
+
+if(BUILD_QT5)
+    # Widgets finds its own dependencies.
+    find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Network LinguistTools)
+
+    if(WITH_ZLIB_EXTERNAL)
+        get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
+        get_target_property(RCC_PATH Qt5::rcc IMPORTED_LOCATION)
+        get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
+        if(WIN32)
+            get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+            set(ENV{PATH} "$ENV{PATH};${PATH_DIR}")
+            file(COPY ${ZLIB_IMPORTED_LOCATION} DESTINATION ${QT_BIN_DIR})
+        elseif(OSX_FRAMEWORK)
+            get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+            get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+            get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+            file(COPY ${PATH_DIR} DESTINATION ${QT_BIN_DIR}/Frameworks)
+        endif()
+    endif()
+endif()
+
+# Create the <Package>Config.cmake file
+configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfigFull.cmake.in
+    ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
+
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
+    # Install the <Package>Config.cmake
+    install(FILES
+      ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
+      DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
+endif()
+
 foreach(NGLIB ${NGLIBS})
     add_subdirectory(${NGLIB})
 endforeach()

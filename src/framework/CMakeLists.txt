@@ -24,11 +24,7 @@ cmake_policy(SET CMP0071 NEW)
 
 project(ngstd_framework)
 
-include(FindAnyProject)
-
 if(BUILD_QT5)
-    # Widgets finds its own dependencies.
-    find_anyproject(Qt5 REQUIRED COMPONENTS Widgets Network LinguistTools)
     qt5_add_resources(RESOURCES_QT5 res/framework.qrc)
 endif()
 
@@ -49,7 +45,7 @@ set(PUBLIC_HEADERS
     updater.h
 )
 
-set(PROJECT_HEADERS
+set(PRIVATE_HEADERS
     style.h
 )
 
@@ -67,6 +63,9 @@ set(PROJECT_SOURCES
 set(ACCESS_HHEADERS
     access/access.h
     access/signbutton.h
+)
+
+set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     access/signdialog.h
     access/signserver.h
 )
@@ -82,7 +81,7 @@ set(ACCESS_UIS
     access/signdialog.ui
 )
 
-set(PROJECT_HEADERS ${PROJECT_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
+set(PRIVATE_HEADERS ${PRIVATE_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
 set(PROJECT_SOURCES ${PROJECT_SOURCES} ${ACCESS_CSOURCES})
 
 if(BUILD_QT5)
@@ -122,8 +121,10 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_UPPER_NAME)
 
 macro(ADD_NGSTDFRW_LIB NAME QT_VER)
     set(LIB_NAME ${NAME}${QT_VER})
+    set(PACKAGE_NAME ${PROJECT_NAME}${QT_VER})
+    string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
     if(BUILD_SHARED_LIBS)
-        add_library(${LIB_NAME} SHARED ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} )
+        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} )
         if(MSVC)
             set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
         endif()
@@ -133,7 +134,8 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             SOVERSION ${NGLIB_MAJOR_VERSION}
         )
     elseif(OSX_FRAMEWORK)
-        add_library(${LIB_NAME} SHARED ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
+        set(INSTALL_CMAKECONF_DIR ${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Resources/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
+        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
         set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
         set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework")
         set_property(SOURCE ${ACCESS_HHEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/access")
@@ -150,7 +152,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             # PUBLIC_HEADER "${PUBLIC_HEADERS}"
         )
     else()
-        add_library(${LIB_NAME} STATIC ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
+        add_library(${LIB_NAME} STATIC ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}})
         add_definitions(-DNGSTD_STATIC)
         if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
             set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
@@ -181,6 +183,24 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             INCLUDES DESTINATION ${INSTALL_INC_DIR}
             FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
         )
+    endif()
+
+    # Add all targets to the build-tree export set
+    export(TARGETS ${LIB_NAME}
+        FILE ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Targets.cmake)
+
+    # Create the <Package>Config.cmake file
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
+        ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
+
+    if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
+        # Install the <Package>Config.cmake
+        install(FILES
+          ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
+          DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
+
+        # Install the export set for use with the install-tree
+        install(EXPORT ${PACKAGE_UPPER_NAME}Targets DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
     endif()
 endmacro()
 
