@@ -71,9 +71,11 @@ NGNavigationPaneHolder::NGNavigationPaneHolder(NGNavigationWidget *parent) :
     setLayout(layout);
     layout->addWidget(toolBar);
 
+#if QT_VERSION >= 0x050900
     connect(m_navigationComboBox,
             QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
             this, &NGNavigationPaneHolder::comboBoxIndexChanged);
+#endif
     connect(closeButton, &QAbstractButton::clicked, this,
             &NGNavigationPaneHolder::onClose);
 
@@ -142,4 +144,3 @@ QString NGNavigationPaneHolder::currentWidgetName() const
 {
     return m_currentWidgetName;
 }
-

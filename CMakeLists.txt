@@ -89,6 +89,12 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 option(BUILD_QT5 "Build qt5 library" ON)
 option(BUILD_QT4 "Build qt4 library" OFF)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 set(NGSTD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(NGLIBS
     core

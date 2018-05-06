@@ -75,14 +75,14 @@ BEGIN
 #else
             VALUE "FileDescription", LIB_NAME " (x86) for Windows\0"
 #endif
-            VALUE "FileVersion", NGLIB_VERSION_NUM_DOT_STRING "\0"
+            VALUE "FileVersion", NGLIB_VERSION_STRING "\0"
             VALUE "InternalName", LIB_NAME "\0"
             VALUE "LegalCopyright", "Copyright NextGIS\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", LIB_NAME ".dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", LIB_NAME "\0"
-            VALUE "ProductVersion", NGLIB_VERSION_NUM_DOT_STRING "\0"
+            VALUE "ProductVersion", NGLIB_VERSION_STRING "\0"
             VALUE "SpecialBuild", "\0"
         END
     END
