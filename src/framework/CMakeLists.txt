@@ -114,7 +114,7 @@ endforeach()
 
 if(MSVC)
     add_definitions(-DLIB_NAME=${PROJECT_NAME})
-    set(PROJECT_SOURCES ${PROJECT_SOURCES} "${PROJECT_SOURCE_DIR}/res/ngstd.rc")
+    set(PROJECT_SOURCES ${PROJECT_SOURCES} "${CMAKE_SOURCE_DIR}/res/ngstd.rc")
 endif()
 
 string(TOUPPER ${PROJECT_NAME} PROJECT_UPPER_NAME)
