@@ -162,7 +162,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
     endif()
 
     if(${QT_VER} EQUAL 5)
-        target_link_libraries(${LIB_NAME} PRIVATE Qt5::Widgets Qt5::Network openssl ngstd_core${QT_VER})
+        target_link_libraries(${LIB_NAME} PRIVATE Qt5::Widgets Qt5::Network ${OPENSSL_LIBRARIES} ngstd_core${QT_VER})
     elseif(${QT_VER} EQUAL 4)
         message(FATAL_ERROR "Not implemented yet")
     else()
