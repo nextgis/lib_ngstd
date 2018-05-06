@@ -22,9 +22,8 @@
 
 #include "framework/framework.h"
 
+#include <QDialog>
 #include <QToolButton>
-
-#include "framework/access/signdialog.h"
 
 class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
 {
@@ -42,7 +41,7 @@ public slots:
     void onUserInfoUpdated();
 
 private:
-    NGSignDialog *m_signDialog;
+    QDialog *m_signDialog;
 };
 
 #endif // NGFRAMEWORK_SIGNINBUTTON_H

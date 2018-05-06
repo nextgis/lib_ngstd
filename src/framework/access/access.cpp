@@ -31,8 +31,6 @@
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
-#include "cpl_conv.h"
-
 #include "request.h"
 #include "signserver.h"
 #include "version.h"
@@ -54,7 +52,7 @@ NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
     m_avatar(QIcon(":/icons/person-blue.svg"))
-{   
+{
     m_updateUserInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateUserInfoWatcher, SIGNAL(finished()), this,
             SLOT(onUserInfoUpdated()));
@@ -297,7 +295,7 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     options["code"] = code;
     options["redirectUri"] = redirectUri;
 
-    if(NGRequest::addAuth(apiEndpoint, options)) {        
+    if(NGRequest::addAuth(apiEndpoint, options)) {
         updateUserInfo();
         updateSupportInfo();
 
