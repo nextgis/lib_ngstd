@@ -59,7 +59,9 @@ else()
     set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 endif()
 
-cmake_policy(SET CMP0071 NEW)
+if(POLICY CMP0071)
+    cmake_policy(SET CMP0071 NEW)
+endif()
 
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
