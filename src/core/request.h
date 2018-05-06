@@ -23,6 +23,7 @@
 #include "core/core.h"
 
 #include <QMap>
+#include <QMutex>
 #include <QVariant>
 
 class NGCORE_EXPORT NGRequest

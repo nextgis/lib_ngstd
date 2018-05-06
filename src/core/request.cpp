@@ -22,6 +22,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QMutexLocker>
 
 #include "cpl_http.h"
 #include "cpl_json.h"
