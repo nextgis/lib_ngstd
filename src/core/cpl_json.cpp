@@ -296,7 +296,7 @@ bool CPLJSONDocument::LoadChunks(const std::string &osPath, size_t nChunkSize,
  */
 bool CPLJSONDocument::LoadUrl(const std::string &osUrl, char **papszOptions,
                               GDALProgressFunc /*pfnProgress*/,
-                              void */*pProgressArg*/)
+                              void * /*pProgressArg*/)
 {
     CPLHTTPResult* result = CPLHTTPFetch(osUrl.c_str(), papszOptions);
     bool bResult = LoadMemory(result->pabyData, result->nDataLen);
