@@ -24,8 +24,8 @@ function(check_version major minor patch)
 
     # parse the version number from gdal_version.h and include in
     # major, minor and rev parameters
-
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/src/core/version.h VERSION_H_CONTENTS)
+    set(VERSION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/version.h)
+    file(READ ${VERSION_FILE} VERSION_H_CONTENTS)
 
     string(REGEX MATCH "NGLIB_MAJOR_VERSION[ \t]+([0-9]+)"
       MAJOR_VERSION ${VERSION_H_CONTENTS})
@@ -43,6 +43,12 @@ function(check_version major minor patch)
     set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
     set(${patch} ${PATCH_NUMBER} PARENT_SCOPE)
+
+    # Store version string in file for installer needs
+    file(TIMESTAMP ${VERSION_FILE} VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
+    set(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${REV_VERSION})
+    get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
+    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${VERSION}\n${VERSION_DATETIME}\n${PROJECT_CPACK_FILENAME}")
 
 endfunction(check_version)
 
@@ -130,31 +136,31 @@ endif()
 endmacro()
 
 function(get_cpack_filename ver name)
-get_compiler_version(COMPILER)
-if(BUILD_STATIC_LIBS)
-    set(STATIC_PREFIX "static-")
-endif()
+    get_compiler_version(COMPILER)
+    if(BUILD_STATIC_LIBS)
+        set(STATIC_PREFIX "static-")
+    endif()
 
-set(${name} ${PROJECT_NAME}-${STATIC_PREFIX}${ver}-${COMPILER} PARENT_SCOPE)
+    set(${name} ${PROJECT_NAME}-${STATIC_PREFIX}${ver}-${COMPILER} PARENT_SCOPE)
 endfunction()
 
 function(get_compiler_version ver)
-## Limit compiler version to 2 or 1 digits
-string(REPLACE "." ";" VERSION_LIST ${CMAKE_C_COMPILER_VERSION})
-list(LENGTH VERSION_LIST VERSION_LIST_LEN)
-if(VERSION_LIST_LEN GREATER 2 OR VERSION_LIST_LEN EQUAL 2)
-    list(GET VERSION_LIST 0 COMPILER_VERSION_MAJOR)
-    list(GET VERSION_LIST 1 COMPILER_VERSION_MINOR)
-    set(COMPILER ${CMAKE_C_COMPILER_ID}-${COMPILER_VERSION_MAJOR}.${COMPILER_VERSION_MINOR})
-else()
-    set(COMPILER ${CMAKE_C_COMPILER_ID}-${CMAKE_C_COMPILER_VERSION})
-endif()
-
-if(WIN32)
-    if(CMAKE_CL_64)
-        set(COMPILER "${COMPILER}-64bit")
+    ## Limit compiler version to 2 or 1 digits
+    string(REPLACE "." ";" VERSION_LIST ${CMAKE_C_COMPILER_VERSION})
+    list(LENGTH VERSION_LIST VERSION_LIST_LEN)
+    if(VERSION_LIST_LEN GREATER 2 OR VERSION_LIST_LEN EQUAL 2)
+        list(GET VERSION_LIST 0 COMPILER_VERSION_MAJOR)
+        list(GET VERSION_LIST 1 COMPILER_VERSION_MINOR)
+        set(COMPILER ${CMAKE_C_COMPILER_ID}-${COMPILER_VERSION_MAJOR}.${COMPILER_VERSION_MINOR})
+    else()
+        set(COMPILER ${CMAKE_C_COMPILER_ID}-${CMAKE_C_COMPILER_VERSION})
     endif()
-endif()
 
-set(${ver} ${COMPILER} PARENT_SCOPE)
+    if(WIN32)
+        if(CMAKE_CL_64)
+            set(COMPILER "${COMPILER}-64bit")
+        endif()
+    endif()
+
+    set(${ver} ${COMPILER} PARENT_SCOPE)
 endfunction()
