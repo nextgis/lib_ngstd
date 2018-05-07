@@ -165,8 +165,8 @@ void NGMainWindow::loadInterface()
     QJsonDocument iConfigDoc = QJsonDocument::fromJson(jsonFile.readAll());
     if(iConfigDoc.isObject()) {
         QJsonObject root = iConfigDoc.object();
-        loadMenus(root["menus"].toArray());
-        loadToolbars(root["toolbars"].toArray());
+        loadMenus(root[QLatin1String("menus")].toArray());
+        loadToolbars(root[QLatin1String("toolbars")].toArray());
     }
 }
 
@@ -174,17 +174,17 @@ void NGMainWindow::loadMenus(const QJsonArray& array)
 {
     for(const QJsonValue &item : array) {
         QJsonObject itemObject = item.toObject();
-        QString menuName = tr(qPrintable(itemObject["name"].toString()));
+        QString menuName = tr(qPrintable(itemObject[QLatin1String("name")].toString()));
         QMenu *menu = menuBar()->addMenu(menuName);
-        QJsonArray actions = itemObject["actions"].toArray();
+        QJsonArray actions = itemObject[QLatin1String("actions")].toArray();
         for(const QJsonValue& action : actions ) {
             QJsonObject actionObject = action.toObject();
-            QString actionType = actionObject["type"].toString();
+            QString actionType = actionObject[QLatin1String("type")].toString();
             if(actionType == "separator") {
                 menu->addSeparator();
             }
             else if(actionType == "action") {
-                QAction *command = commandByKey(actionObject["key"].toString());
+                QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
                 if(nullptr != command) {
                     menu->addAction(command);
                 }
@@ -197,8 +197,8 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
 {
     for(const QJsonValue &item : array) {
         QJsonObject itemObject = item.toObject();
-        QString menuName = tr(qPrintable(itemObject["name"].toString()));
-        QJsonArray allowedAreas = itemObject["allowedAreas"].toArray();
+        QString menuName = tr(qPrintable(itemObject[QLatin1String("name")].toString()));
+        QJsonArray allowedAreas = itemObject[QLatin1String("allowedAreas")].toArray();
         Qt::ToolBarAreas allowedAreasMask = Qt::TopToolBarArea;
         if(allowedAreas.contains("left")) {
             allowedAreasMask |= Qt::LeftToolBarArea;
@@ -211,15 +211,15 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
         }
         QToolBar *toolBar = addToolBar(menuName);
         toolBar->setAllowedAreas(allowedAreasMask);
-        QJsonArray actions = itemObject["actions"].toArray();
+        QJsonArray actions = itemObject[QLatin1String("actions")].toArray();
         for(const QJsonValue &action : actions ) {
             QJsonObject actionObject = action.toObject();
-            QString actionType = actionObject["type"].toString();
+            QString actionType = actionObject[QLatin1String("type")].toString();
             if(actionType == "separator") {
                 toolBar->addSeparator();
             }
             else if(actionType == "action") {
-                QAction *command = commandByKey(actionObject["key"].toString());
+                QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
                 if(nullptr != command) {
                     toolBar->addAction(command);
                 }
