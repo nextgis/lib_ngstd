@@ -20,7 +20,8 @@ The library has the following functionality:
 
 # Supported software
 
-The following software use NextGIS authorization Qt library:
+The following software use NextGIS authorization capabilities of NextGIS standard
+Qt library:
 
 * NextGIS QGIS [planned]
 * NextGIS QGIS plugings:
@@ -28,7 +29,7 @@ The following software use NextGIS authorization Qt library:
   * NextGIS Data [planned]
   * QuickMapServices [planned]
   * DTClassifier [planned]
-* NextGIS Formbuilder [planned]
+* NextGIS Formbuilder
 * NextGIS Manager [planned]
 
 # Bindings
