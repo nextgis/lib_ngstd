@@ -51,7 +51,8 @@ Antipattern:
 
 # License
 
-All scripts are licensed under GNU GPL v2. See COPYING file.
+All scripts are licensed under GNU GPL v2, or (at your option) any later version.
+See COPYING file.
 
 ![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg?maxAge=2592000)
 
