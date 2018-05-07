@@ -61,3 +61,10 @@ development and support for this software.
 [Contact us](http://nextgis.ru/en/contact/) to discuss options!
 
 [![http://nextgis.com](http://nextgis.ru/img/nextgis.png)](http://nextgis.com)
+
+# Borsch
+
+[NextGIS Borsch](https://github.com/nextgis-borsch/borsch) helps to resolve
+dependencies of building C/C++ libraries and applications. NextGIS Borsch is based on [CMake](https://cmake.org/).
+
+[![Borsch compatible](https://img.shields.io/badge/Borsch-compatible-orange.svg?style=flat)](https://github.com/nextgis-borsch/borsch)
