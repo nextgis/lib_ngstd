@@ -200,13 +200,13 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
         QString menuName = tr(qPrintable(itemObject[QLatin1String("name")].toString()));
         QJsonArray allowedAreas = itemObject[QLatin1String("allowedAreas")].toArray();
         Qt::ToolBarAreas allowedAreasMask = Qt::TopToolBarArea;
-        if(allowedAreas.contains("left")) {
+        if(allowedAreas.contains(QLatin1String("left"))) {
             allowedAreasMask |= Qt::LeftToolBarArea;
         }
-        else if(allowedAreas.contains("right")) {
+        else if(allowedAreas.contains(QLatin1String("right"))) {
             allowedAreasMask |= Qt::RightToolBarArea;
         }
-        else if(allowedAreas.contains("bottom")) {
+        else if(allowedAreas.contains(QLatin1String("bottom"))) {
             allowedAreasMask |= Qt::BottomToolBarArea;
         }
         QToolBar *toolBar = addToolBar(menuName);
