@@ -60,3 +60,4 @@ protected:
 };
 
 #endif // NGFRAMEWORK_MAINWINDOW_H
+// #if (QT_VERSION <= QT_VERSION_CHECK(5, 7, 0))
