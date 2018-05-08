@@ -8,6 +8,7 @@ NGSignDialog::NGSignDialog(QWidget *parent) :
     ui(new Ui::NGSignDialog)
 {
     ui->setupUi(this);
+    update();
 }
 
 NGSignDialog::~NGSignDialog()
