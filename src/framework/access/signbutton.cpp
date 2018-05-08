@@ -52,7 +52,7 @@ void NGSignInButton::onClick()
     QSize btnSize = size();
     QPoint pos2(pos1.x() - dlgSize.width() - btnSize.width() / 2,
                 pos1.y() + btnSize.height());
-    m_signDialog->update();
+    m_signDialog->updateContent();
     m_signDialog->move(pos2);
     m_signDialog->show();
     m_signDialog->raise();

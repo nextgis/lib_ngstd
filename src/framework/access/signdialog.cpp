@@ -8,7 +8,7 @@ NGSignDialog::NGSignDialog(QWidget *parent) :
     ui(new Ui::NGSignDialog)
 {
     ui->setupUi(this);
-    update();
+    updateContent();
 }
 
 NGSignDialog::~NGSignDialog()
@@ -16,7 +16,7 @@ NGSignDialog::~NGSignDialog()
     delete ui;
 }
 
-void NGSignDialog::update()
+void NGSignDialog::updateContent()
 {
     if(NGAccess::instance().isUserAuthorized()) {
         // Show user info in widget
@@ -54,6 +54,6 @@ void NGSignDialog::onSignClicked()
     }
     else {
         NGAccess::instance().authorize();
-        hide();
     }
+    hide();
 }

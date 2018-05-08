@@ -14,7 +14,7 @@ class NGSignDialog : public QDialog
 public:
     explicit NGSignDialog(QWidget *parent = nullptr);
     ~NGSignDialog();
-    void update();
+    void updateContent();
 
 private slots:
     void onSignClicked();
