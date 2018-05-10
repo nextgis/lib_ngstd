@@ -65,7 +65,7 @@ if(POLICY CMP0071)
 endif()
 
 # Tell CMake to run moc when necessary:
-# FIXME: Not working on Qt <= 5.5
+# FIXME: Not working on Qt <= 5.5 and Ubuntu [trusty, xenial]
 # set(CMAKE_AUTOMOC ON)
 
 # As moc files are generated in the binary dir, tell CMake
