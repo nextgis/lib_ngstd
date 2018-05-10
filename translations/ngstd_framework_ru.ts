@@ -142,7 +142,8 @@
         <location filename="../src/framework/access/signserver.cpp" line="58"/>
         <source>Please sign in
 via the opened browser...</source>
-        <translation>Пожалуйста выполните вход\nв открывшемся браузере...</translation>
+        <translation>Пожалуйста выполните вход
+в открывшемся браузере...</translation>
     </message>
     <message>
         <location filename="../src/framework/access/signserver.cpp" line="63"/>

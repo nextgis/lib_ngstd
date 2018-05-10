@@ -165,7 +165,7 @@ void NGAccess::authorize()
         mainWindow->setEnabled(false);
 
     // Show modal dialog with cancel button
-    NGSignServer listenServer(m_clientId, m_scope);
+    NGSignServer listenServer(m_clientId, m_scope, mainWindow);
     listenServer.exec();
 
     if(mainWindow)
