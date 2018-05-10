@@ -131,6 +131,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
             VERSION ${VERSION}
             SOVERSION ${NGLIB_MAJOR_VERSION}
+            CXX_VISIBILITY_PRESET hidden
         )
     elseif(OSX_FRAMEWORK)
         set(INSTALL_CMAKECONF_DIR ${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Resources/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
