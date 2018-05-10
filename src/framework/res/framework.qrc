@@ -21,6 +21,7 @@
         <file alias="drawing.svg">icons/office-drawing.svg</file>
         <file alias="text.svg">icons/text-generic.svg</file>
         <file alias="person-blue.svg">icons/person-blue.svg</file>
+        <file alias="person-red.svg">icons/person-red.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="interface.json">interface.json</file>
