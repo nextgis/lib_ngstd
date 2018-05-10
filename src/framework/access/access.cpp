@@ -39,7 +39,7 @@
 constexpr const char *apiEndpoint = "https://my.nextgis.com/api/v1";
 constexpr const char *tokenEndpoint = "https://my.nextgis.com/oauth2/token/";
 
-constexpr const char *avatarFile = "avatar.png";
+constexpr const char *avatarFile = "avatar.jpg";
 constexpr const char *keyFile = "public.key";
 constexpr const char *settingsFile = "settings.ini";
 
