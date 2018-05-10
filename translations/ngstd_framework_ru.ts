@@ -102,7 +102,7 @@
         <location filename="../src/framework/access/signdialog.ui" line="87"/>
         <location filename="../src/framework/access/signdialog.cpp" line="41"/>
         <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
+        <translation>&lt;a href=&quot;http://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="103"/>

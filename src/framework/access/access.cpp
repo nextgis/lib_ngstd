@@ -324,7 +324,7 @@ extern void updateUserInfoFunction(const QString &configDir)
                                     email.toLower().toLatin1(),
                                     QCryptographicHash::Md5).toHex());
     QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
-    NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg")
+    NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
                        .arg(emailHash), avatarPath);
 }
 
