@@ -63,6 +63,7 @@ private:
     QString m_timeout;
     QString m_maxRetry;
     QString m_retryDelay;
+    QString m_certPem;
     QMutex m_mutex;
 };
 

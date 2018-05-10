@@ -20,11 +20,13 @@
 
 #include "access.h"
 
+#include <QApplication>
 #include <QByteArray>
 #include <QtConcurrent/QtConcurrent>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QMainWindow>
 #include <QSettings>
 #include <QTextStream>
 
@@ -153,9 +155,21 @@ void NGAccess::setScope(const QString &scope)
 
 void NGAccess::authorize()
 {
+    QMainWindow *mainWindow = nullptr;
+    // Get main window
+    foreach(QWidget *widget, QApplication::topLevelWidgets())
+        if((mainWindow = qobject_cast<QMainWindow*>(widget)) != nullptr)
+            break;
+
+    if(mainWindow)
+        mainWindow->setEnabled(false);
+
     // Show modal dialog with cancel button
     NGSignServer listenServer(m_clientId, m_scope);
     listenServer.exec();
+
+    if(mainWindow)
+        mainWindow->setEnabled(true);
 
     getTokens(listenServer.code(), listenServer.redirectUri());
 }

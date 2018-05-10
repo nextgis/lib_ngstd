@@ -20,6 +20,11 @@
 
 #include "request.h"
 
+#ifdef Q_OS_WIN
+#include <QCoreApplication>
+#include <QDir>
+#endif
+
 #include <QDebug>
 #include <QFile>
 #include <QMutexLocker>
@@ -34,6 +39,12 @@ NGRequest::NGRequest() : m_connTimeout("15"),
     m_maxRetry("3"),
     m_retryDelay("5")
 {
+#ifdef Q_OS_WIN
+    // Add SSL cert path
+    const QString &certPemPath = QCoreApplication::applicationDirPath() + QDir::separator() + QLatin1String("..\\share\\ssl\\certs");
+    QDir certPemDir(certPemPath);
+    m_certPem = certPemDir.absoluteFilePath("cert.pem");
+#endif
 }
 
 char **NGRequest::baseOptions() const
@@ -43,6 +54,11 @@ char **NGRequest::baseOptions() const
     options = CSLAddNameValue(options, "TIMEOUT", Q_CONSTCHAR(m_timeout));
     options = CSLAddNameValue(options, "MAX_RETRY", Q_CONSTCHAR(m_maxRetry));
     options = CSLAddNameValue(options, "RETRY_DELAY", Q_CONSTCHAR(m_retryDelay));
+
+#ifdef Q_OS_WIN
+    options = CSLAddNameValue(options, "CAINFO", Q_CONSTCHAR(m_certPem));
+#endif
+
     return options;
 }
 
