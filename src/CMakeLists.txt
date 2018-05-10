@@ -30,7 +30,7 @@ endif()
 
 if(BUILD_QT5)
     # Widgets finds its own dependencies.
-    find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Network LinguistTools)
+    find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Network Svg LinguistTools)
 
     if(WITH_ZLIB_EXTERNAL)
         get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
