@@ -25,7 +25,7 @@
 /**
  * @brief The NGStyledBar class
  */
-class NGStyledBar : public QWidget
+class Q_DECL_HIDDEN NGStyledBar : public QWidget
 {
     Q_OBJECT
 public:
@@ -42,7 +42,7 @@ public slots:
 /**
  * @brief The NGStyledSeparator class
  */
-class NGStyledSeparator : public QWidget
+class Q_DECL_HIDDEN NGStyledSeparator : public QWidget
 {
     Q_OBJECT
 public:

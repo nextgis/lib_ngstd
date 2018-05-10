@@ -111,7 +111,7 @@ void NGAccess::setClientId(const QString &clientId)
         if(QFileInfo(avatarFilePath).exists()) {
             m_avatar = QIcon(avatarFilePath);
             if(m_avatar.isNull()) {
-                m_avatar(QIcon(":/icons/person-red.svg"));
+                m_avatar = QIcon(":/icons/person-red.svg");
             }
         }
 
@@ -364,7 +364,7 @@ void NGAccess::onUserInfoUpdated()
         if(QFileInfo(avatarFilePath).exists()) {
             m_avatar = QIcon(avatarFilePath);
             if(m_avatar.isNull()) {
-                m_avatar(QIcon(":/icons/person-red.svg"));
+                m_avatar = QIcon(":/icons/person-red.svg");
             }
         }
 

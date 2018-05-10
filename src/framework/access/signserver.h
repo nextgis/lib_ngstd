@@ -23,7 +23,7 @@
 #include <QProgressDialog>
 #include <QTcpServer>
 
-class NGSignServer : public QProgressDialog
+class Q_DECL_HIDDEN NGSignServer : public QProgressDialog
 {
     Q_OBJECT
 public:

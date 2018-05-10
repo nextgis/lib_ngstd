@@ -7,7 +7,7 @@ namespace Ui {
 class NGSignDialog;
 }
 
-class NGSignDialog : public QDialog
+class Q_DECL_HIDDEN NGSignDialog : public QDialog
 {
     Q_OBJECT
 

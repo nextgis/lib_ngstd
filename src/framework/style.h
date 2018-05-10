@@ -42,7 +42,7 @@ static int clamp(float x)
  * @library{framework}
  */
 
-class NGTheme : public QObject
+class Q_DECL_HIDDEN NGTheme : public QObject
 {
     Q_OBJECT
 

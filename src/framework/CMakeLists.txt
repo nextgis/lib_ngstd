@@ -84,14 +84,12 @@ set(PRIVATE_HEADERS ${PRIVATE_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
 set(PROJECT_SOURCES ${PROJECT_SOURCES} ${ACCESS_CSOURCES})
 
 if(BUILD_QT5)
-    qt5_wrap_ui(UIS_HDRS_QT5
-        ${ACCESS_UIS}
-    )
+    qt5_wrap_ui(UIS_HDRS_QT5 ${ACCESS_UIS})
+    qt5_wrap_cpp(MOC_SRCS5 ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 endif()
 if(BUILD_QT4)
-    qt4_wrap_ui(UIS_HDRS_QT4
-        ${ACCESS_UIS}
-    )
+    qt4_wrap_ui(UIS_HDRS_QT4 ${ACCESS_UIS})
+    qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 endif()
 
 set(TRANSLATIONS
@@ -123,7 +121,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
     set(PACKAGE_NAME ${PROJECT_NAME}${QT_VER})
     string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
     if(BUILD_SHARED_LIBS)
-        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES})
+        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         if(MSVC)
             set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
         endif()
@@ -137,7 +135,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
         set(INSTALL_CMAKECONF_DIR ${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Resources/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
         set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Headers" CACHE INTERNAL "Installation directory for headers" FORCE)
 
-        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES})
+        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
         set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework")
         set_property(SOURCE ${ACCESS_HHEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/access")
@@ -154,7 +152,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             # PUBLIC_HEADER "${PUBLIC_HEADERS}"
         )
     else()
-        add_library(${LIB_NAME} STATIC ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES})
+        add_library(${LIB_NAME} STATIC ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         add_definitions(-DNGSTD_STATIC)
         if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
             set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
