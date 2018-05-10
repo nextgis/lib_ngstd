@@ -32,6 +32,7 @@ class NGFRAMEWORK_EXPORT NGUpdater : public QObject
     Q_OBJECT
 public:
     explicit NGUpdater( QWidget *parent = nullptr );
+    virtual ~NGUpdater() = default;
 
     void checkUpdates();
     void startUpdate(const QString &projectPath);

@@ -46,7 +46,7 @@ public:
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
-    
+
 signals:
     void userInfoUpdated();
     void supportInfoUpdated();
@@ -57,7 +57,7 @@ private slots:
 
 private:
     NGAccess();
-    ~NGAccess() = default;
+    virtual ~NGAccess() = default;
     NGAccess(NGAccess const&) = delete;
     NGAccess& operator= (NGAccess const&) = delete;
 

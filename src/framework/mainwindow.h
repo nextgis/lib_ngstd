@@ -35,6 +35,7 @@ class NGFRAMEWORK_EXPORT NGMainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit NGMainWindow(QWidget *parent = nullptr );
+    virtual ~NGMainWindow() = default;
     virtual void init();
 
 //signals:

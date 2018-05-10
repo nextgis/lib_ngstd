@@ -29,7 +29,7 @@ class NGSignServer : public QProgressDialog
 public:
     explicit NGSignServer(const QString &clientId, const QString &scope,
                           QWidget *parent = nullptr);
-    ~NGSignServer();
+    virtual ~NGSignServer();
 
     QString code() const;
     QString redirectUri() const;

@@ -42,15 +42,13 @@
 /*! @cond Doxygen_Suppress */
 typedef void *JSONObjectH;
 
-CPL_C_START
-
 class CPLJSONArray;
 /*! @endcond */
 
 /**
  * @brief The CPLJSONArray class holds JSON object from CPLJSONDocument
  */
-class CPL_DLL CPLJSONObject
+class CPLJSONObject
 {
     friend class CPLJSONArray;
     friend class CPLJSONDocument;
@@ -156,7 +154,7 @@ private:
 /**
  * @brief The JSONArray class JSON array from JSONDocument
  */
-class CPL_DLL CPLJSONArray : public CPLJSONObject
+class CPLJSONArray : public CPLJSONObject
 {
     friend class CPLJSONObject;
     friend class CPLJSONDocument;
@@ -185,7 +183,7 @@ public:
 /**
  * @brief The CPLJSONDocument class Wrapper class around json-c library
  */
-class CPL_DLL CPLJSONDocument
+class CPLJSONDocument
 {
 public:
 /*! @cond Doxygen_Suppress */
@@ -212,7 +210,5 @@ public:
 private:
     JSONObjectH m_poRootJsonObject;
 };
-
-CPL_C_END
 
 #endif // CPL_JSON_H_INCLUDED

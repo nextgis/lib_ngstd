@@ -33,6 +33,7 @@ class NGFRAMEWORK_EXPORT NGNavigationPaneHolder : public QWidget
     Q_OBJECT
 public:
     explicit NGNavigationPaneHolder(NGNavigationWidget *parent = nullptr);
+    virtual ~NGNavigationPaneHolder() = default;
     void selectPane(const QString &name);
     void selectComboboxItem(const QString &name);
 

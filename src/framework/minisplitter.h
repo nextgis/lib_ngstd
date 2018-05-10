@@ -29,6 +29,7 @@ class NGFRAMEWORK_EXPORT NGMiniSplitter : public QSplitter
 public:
     NGMiniSplitter(QWidget *parent = nullptr);
     NGMiniSplitter(Qt::Orientation orientation);
+    virtual ~NGMiniSplitter() = default;
 
 protected:
     void init();
