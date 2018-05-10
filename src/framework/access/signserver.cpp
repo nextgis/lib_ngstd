@@ -56,7 +56,7 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     m_scope(scope)
 {
     setLabelText(tr("Please sign in\nvia the opened browser..."));
-    setWindowModality(Qt::WindowModal);
+    setWindowModality(Qt::ApplicationModal);
     setMaximum(0);
 
     // TAdd localized content.
