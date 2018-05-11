@@ -230,7 +230,7 @@ bool NGAccess::checkSupported()
     bool verify = verifyRSASignature(reinterpret_cast<unsigned char*>(baMessage.data()),
                               static_cast<unsigned int>(baMessage.size()),
                               reinterpret_cast<unsigned char*>(baSignature.data()),
-                              static_cast<unsigned>(baSignature.size()));
+                              static_cast<unsigned int>(baSignature.size()));
     if(!verify) {
         return false;
     }
@@ -243,8 +243,18 @@ bool NGAccess::checkSupported()
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
                                   unsigned int messageLength,
                                   unsigned char *signature,
-                                  unsigned sigLength) const
+                                  unsigned int sigLength) const
 {
+    if(nullptr == originalMessage) {
+        qWarning() << "Message is empty";
+        return false;
+    }
+
+    if(nullptr == signature) {
+        qWarning() << "Signature is empty";
+        return false;
+    }
+
     // https://gist.github.com/sakamoto-poteko/396f289682089e1d767e
     // https://stackoverflow.com/questions/9465727/convert-qfile-to-file
     QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
@@ -257,29 +267,37 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
 
     EVP_PKEY *evp_pubkey = PEM_read_PUBKEY(file, nullptr, nullptr, nullptr);
     if (!evp_pubkey) {
-        qDebug() << "Failed PEM_read_PUBKEY";
-        fclose(file);
-        return false;
-    }
-    const EVP_MD* dgst = EVP_get_digestbyname("sha256");
-    EVP_MD_CTX* ctx = EVP_MD_CTX_create();
-    if (!ctx) {
-        qDebug() << "Failed EVP_MD_CTX_create";
-        EVP_PKEY_free(evp_pubkey);
+        qWarning() << "Failed PEM_read_PUBKEY";
         fclose(file);
         return false;
     }
 
-    EVP_VerifyInit(ctx, dgst);
-    EVP_VerifyUpdate(ctx, originalMessage, messageLength);
+    fclose(file);
+
+    EVP_MD_CTX *ctx = EVP_MD_CTX_create();
+    if (!ctx) {
+        qWarning() << "Failed EVP_MD_CTX_create";
+        EVP_PKEY_free(evp_pubkey);
+        return false;
+    }
+
+    if(!EVP_VerifyInit(ctx, EVP_sha256())) {
+        EVP_MD_CTX_destroy(ctx);
+        EVP_PKEY_free(evp_pubkey);
+        qWarning() << "Failed EVP_VerifyInit";
+    }
+
+    if(!EVP_VerifyUpdate(ctx, originalMessage, messageLength)) {
+        EVP_MD_CTX_destroy(ctx);
+        EVP_PKEY_free(evp_pubkey);
+        qWarning() << "Failed EVP_VerifyUpdate";
+    }
     int result = EVP_VerifyFinal(ctx, signature, sigLength, evp_pubkey);
 
     EVP_MD_CTX_destroy(ctx);
     EVP_PKEY_free(evp_pubkey);
 
     qDebug() << "Signature is " << (result == 1 ? "valid" : "invalid");
-
-    fclose(file);
 
     return result == 1;
 }
