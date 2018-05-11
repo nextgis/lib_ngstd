@@ -84,7 +84,7 @@ bool NGRequest::addAuth(const QString &url, const QMap<QString, QString> &option
 
         time_t now = time(nullptr);
         bool result = fetchToken.LoadUrl(Q_CONSTCHAR(info.m_tokenServer), options);
-        qDebug() << "Server: " << info.m_tokenServer << "options:" << postPayload;
+        // qDebug() << "Server: " << info.m_tokenServer << "options:" << postPayload;
         CSLDestroy(options);
         if(!result) {
             qDebug() << "Failed to get tokens";
