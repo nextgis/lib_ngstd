@@ -107,7 +107,7 @@ void NGSignServer::onGetReply()
     reply.append("HTTP/1.0 200 OK \r\n");
     reply.append("Content-Type: text/html; charset=\"utf-8\"\r\n");
     reply.append(QString("Content-Length: %1\r\n\r\n")
-                 .arg(m_replyContent.size()).toLatin1());
+                 .arg(m_replyContent.toUtf8().size()).toLatin1());
     reply.append(m_replyContent);
     socket->write(reply);
 
@@ -119,7 +119,6 @@ void NGSignServer::onGetReply()
         m_code = dataStr.mid(11, pos - 11);
         result = m_code.isEmpty() ? 0 : 1;
     }
-
 
     socket->disconnectFromHost();
 
