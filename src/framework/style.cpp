@@ -41,6 +41,17 @@
 #include <QFileInfo>
 #include <QMetaEnum>
 
+/**
+ * @brief Clamps float color values within (0, 255)
+ * @param x float value color
+ * @return color value within (0, 255)
+ */
+static int clamp(float x)
+{
+    const int val = x > 255 ? 255 : static_cast<int>(x);
+    return val < 0 ? 0 : val;
+}
+
 //------------------------------------------------------------------------------
 // Style
 //------------------------------------------------------------------------------
@@ -1319,7 +1330,7 @@ QPair<QColor, QString> NGTheme::readNamedColor(const QString &color) const
         return qMakePair(QColor(), QString());
 
     bool ok = true;
-    const QRgb rgba = color.toLongLong(&ok, 16);
+    const QRgb rgba = static_cast<QRgb>(color.toLongLong(&ok, 16));
     if (!ok) {
         qWarning("Color \"%s\" is neither a named color nor a valid color",
                  qPrintable(color));
@@ -1376,7 +1387,7 @@ QVariantHash NGTheme::values() const
 QColor NGTheme::readColor(const QString &color)
 {
     bool ok = true;
-    const QRgb rgba = color.toLongLong(&ok, 16);
+    const QRgb rgba = static_cast<QRgb>(color.toLongLong(&ok, 16));
     return QColor::fromRgba(rgba);
 }
 

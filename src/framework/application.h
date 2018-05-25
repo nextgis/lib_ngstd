@@ -32,12 +32,17 @@ class NGFRAMEWORK_EXPORT NGGUIApplication : public NGCoreApplication
 {
 public:
     NGGUIApplication(const QString& applicationName, const QString& version);
-    virtual ~NGGUIApplication();
+    virtual ~NGGUIApplication() override;
     virtual void init(int &argc, char **argv) override;
+    
+public:
+    static QString style();
+    
 protected:
     virtual void createMainWindow();
     virtual QPixmap createSplash(const QColor& bkColor = QColor(0,0,0,0));
     virtual void setStyle(const QString &themeName);
+    
 private:
     void setSplashBackground(QPainter &painter, const QColor& bkColor = QColor(0,0,0,0));
 

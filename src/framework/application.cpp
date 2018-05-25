@@ -28,6 +28,8 @@
 #include <QThread>
 #include <QTimer>
 
+static QString gTheme = "light";
+
 NGGUIApplication::NGGUIApplication(const QString &applicationName,
                                    const QString &version) :
     NGCoreApplication(applicationName, version),
@@ -54,7 +56,7 @@ void NGGUIApplication::init(int &argc, char **argv)
     // Set theme and style.
     QSettings settings;
     settings.beginGroup("Common");
-    QString themeName = settings.value("theme", QLatin1String("light")).toString();//"dark"
+    QString themeName = settings.value("theme", QLatin1String("light")).toString();//"dark" //
     settings.endGroup();
     setStyle(themeName);
 
@@ -67,6 +69,11 @@ void NGGUIApplication::init(int &argc, char **argv)
     processCommandLine(parser);
 
     m_wnd->show();
+}
+
+QString NGGUIApplication::style()
+{
+    return gTheme;
 }
 
 void NGGUIApplication::createApplication(int &argc, char **argv)
@@ -145,14 +152,9 @@ void NGGUIApplication::setSplashBackground(QPainter& painter, const QColor &bkCo
 
 void NGGUIApplication::setStyle(const QString& themeName)
 {
+    gTheme = themeName;
     QString sBaseName("fusion");
     QString themeURI = QStringLiteral(":/themes/%1.theme").arg(themeName);
-    if (themeURI.isEmpty()) {
-        qCritical("%s", qPrintable(QCoreApplication::translate("Application",
-                                       "No valid theme \"%1\"").arg(themeName)));
-        return;
-    }
-
     QSettings themeSettings(themeURI, QSettings::IniFormat);
     NGTheme *theme = new NGTheme(themeName);
     theme->readSettings(themeSettings);

@@ -20,12 +20,14 @@
 #ifndef NGFRAMEWORK_STYLEDBAR_H
 #define NGFRAMEWORK_STYLEDBAR_H
 
+#include "framework/framework.h"
+
 #include <QWidget>
 
 /**
  * @brief The NGStyledBar class
  */
-class Q_DECL_HIDDEN NGStyledBar : public QWidget
+class NGFRAMEWORK_EXPORT NGStyledBar : public QWidget
 {
     Q_OBJECT
 public:
@@ -46,7 +48,7 @@ class Q_DECL_HIDDEN NGStyledSeparator : public QWidget
 {
     Q_OBJECT
 public:
-    NGStyledSeparator(QWidget *parent = 0);
+    NGStyledSeparator(QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event);

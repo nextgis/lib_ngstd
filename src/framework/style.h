@@ -27,19 +27,7 @@
 #include <QSettings>
 
 /**
- * @brief Clamps float color values within (0, 255)
- * @param x float value color
- * @return color value within (0, 255)
- */
-static int clamp(float x)
-{
-    const int val = x > 255 ? 255 : static_cast<int>(x);
-    return val < 0 ? 0 : val;
-}
-
-/**
  * @brief Main theme for NextGIS Qt applications
- * @library{framework}
  */
 
 class Q_DECL_HIDDEN NGTheme : public QObject
@@ -53,7 +41,7 @@ class Q_DECL_HIDDEN NGTheme : public QObject
     Q_ENUMS(WidgetStyle)
 
 public:
-    NGTheme(const QString &name, QObject *parent = 0);
+    NGTheme(const QString &name, QObject *parent = nullptr);
     ~NGTheme();
 
     enum Color {
@@ -201,14 +189,13 @@ private:
 
 /**
  * @brief Main style for NextGIS Qt applications
- * @library{framework}
  */
 
 class NGStyle : public QProxyStyle
 {
 public:
     NGStyle(const QString &baseStyleName, NGTheme *theme = nullptr);
-    ~NGStyle();
+    ~NGStyle() override;
     int pixelMetric(PixelMetric metric, const QStyleOption *option,
                     const QWidget *widget) const override;
     QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *opt,
