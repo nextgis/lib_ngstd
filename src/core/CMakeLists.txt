@@ -26,19 +26,19 @@ project(ngstd_core)
 find_anyproject(GDAL REQUIRED)
 
 set(PUBLIC_HEADERS
-    core.h
-    application.h
-    version.h
-    request.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/core.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/application.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/request.h
 )
 
 set(PRIVATE_HEADERS
 )
 
 set(PROJECT_SOURCES
-    core.cpp
-    application.cpp
-    request.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/core.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/application.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/request.cpp
 )
 
 if(GDAL_VERSION VERSION_LESS "2.3")
@@ -50,10 +50,10 @@ if(GDAL_VERSION VERSION_LESS "2.3")
     endif()
 
     set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-        cpl_json.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpl_json.h
     )
     set(PROJECT_SOURCES ${PROJECT_SOURCES}
-        cpl_json.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpl_json.cpp
     )
 endif()
 
@@ -61,24 +61,6 @@ set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_ru.ts
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
 )
-
-unset(QM_FILES)
-foreach(TRANSLATION ${TRANSLATIONS})
-    if(EXISTS ${TRANSLATION})
-        if(BUILD_QT4 AND NOT BUILD_QT5)
-            qt4_add_translation(QM_FILES ${TRANSLATION})
-        else()
-            qt5_add_translation(QM_FILES ${TRANSLATION})
-        endif()
-    endif()
-endforeach()
-
-if(BUILD_QT5)
-    qt5_wrap_cpp(MOC_SRCS5 ${PUBLIC_HEADERS})
-endif()
-if(BUILD_QT4)
-    qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS})
-endif()
 
 if(MSVC)
     add_definitions(-DLIB_NAME=${PROJECT_NAME})
@@ -146,7 +128,7 @@ macro(ADD_NGSTDCORE_LIB NAME QT_VER)
     endif()
 
     target_include_directories(${LIB_NAME} INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
     )
 
     # Install
@@ -182,10 +164,12 @@ macro(ADD_NGSTDCORE_LIB NAME QT_VER)
 endmacro()
 
 if(BUILD_QT5)
-    add_ngstdcore_lib(${PROJECT_NAME} 5)
+    add_subdirectory(5)
+    # add_ngstdcore_lib(${PROJECT_NAME} 5)
 endif()
 if(BUILD_QT4)
-    add_ngstdcore_lib(${PROJECT_NAME} 4)
+    add_subdirectory(4)
+    # add_ngstdcore_lib(${PROJECT_NAME} 4)
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)

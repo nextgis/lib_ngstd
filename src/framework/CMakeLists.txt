@@ -23,90 +23,66 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 project(ngstd_framework)
 
-if(BUILD_QT5)
-    qt5_add_resources(RESOURCES_QT5 res/framework.qrc)
-endif()
-
-if(BUILD_QT4)
-    qt4_add_resources(RESOURCES_QT4 res/framework.qrc)
-endif()
-
 find_anyproject(OpenSSL REQUIRED)
 
 set(PUBLIC_HEADERS
-    framework.h
-    application.h
-    mainwindow.h
-    minisplitter.h
-    navigationwidget.h
-    navigationpane.h
-    styledbar.h
-    updater.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/framework.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/application.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/minisplitter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/navigationwidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/navigationpane.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/styledbar.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/updater.h
 )
 
 set(PRIVATE_HEADERS
-    style.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/style.h
 )
 
 set(PROJECT_SOURCES
-    application.cpp
-    mainwindow.cpp
-    style.cpp
-    minisplitter.cpp
-    navigationwidget.cpp
-    navigationpane.cpp
-    styledbar.cpp
-    updater.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/application.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/style.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/minisplitter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/navigationwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/navigationpane.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/styledbar.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/updater.cpp
 )
 
 set(ACCESS_HHEADERS
-    access/access.h
-    access/signbutton.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/access.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signbutton.h
 )
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-    access/signdialog.h
-    access/signserver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signserver.h
 )
 
 set(ACCESS_CSOURCES
-    access/access.cpp
-    access/signbutton.cpp
-    access/signdialog.cpp
-    access/signserver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/access.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signbutton.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signserver.cpp
 )
 
 set(ACCESS_UIS
-    access/signdialog.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.ui
+)
+
+set(QRC_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/res/framework.qrc
 )
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
 set(PROJECT_SOURCES ${PROJECT_SOURCES} ${ACCESS_CSOURCES})
 
-if(BUILD_QT5)
-    qt5_wrap_ui(UIS_HDRS_QT5 ${ACCESS_UIS})
-    qt5_wrap_cpp(MOC_SRCS5 ${PRIVATE_HEADERS})
-endif()
-if(BUILD_QT4)
-    qt4_wrap_ui(UIS_HDRS_QT4 ${ACCESS_UIS})
-    qt4_wrap_cpp(MOC_SRCS4 ${PRIVATE_HEADERS})
-endif()
-
 set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_ru.ts
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
 )
-
-unset(QM_FILES)
-foreach(TRANSLATION ${TRANSLATIONS})
-    if(EXISTS ${TRANSLATION})
-        if(BUILD_QT4 AND NOT BUILD_QT5)
-            qt4_add_translation(QM_FILES ${TRANSLATION})
-        else()
-            qt5_add_translation(QM_FILES ${TRANSLATION})
-        endif()
-    endif()
-endforeach()
 
 if(MSVC)
     add_definitions(-DLIB_NAME=${PROJECT_NAME})
@@ -167,9 +143,8 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
         message(FATAL_ERROR "Unexpected qt version")
     endif()
 
-
     target_include_directories(${LIB_NAME} INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
     )
 
     # Install
@@ -204,10 +179,10 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
 endmacro()
 
 if(BUILD_QT5)
-    add_ngstdfrw_lib(${PROJECT_NAME} 5)
+    add_subdirectory(5)
 endif()
 if(BUILD_QT4)
-    add_ngstdfrw_lib(${PROJECT_NAME} 4)
+    add_subdirectory(4)
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
