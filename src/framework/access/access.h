@@ -31,7 +31,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
     Q_OBJECT
 public:
-    static NGAccess& instance();
+    static NGAccess &instance();
     void authorize();
     void exit();
     void save();
@@ -59,7 +59,7 @@ private:
     NGAccess();
     virtual ~NGAccess() = default;
     NGAccess(NGAccess const&) = delete;
-    NGAccess& operator= (NGAccess const&) = delete;
+    NGAccess &operator= (NGAccess const&) = delete;
 
     bool checkSupported();
     bool verifyRSASignature(unsigned char *originalMessage, unsigned int messageLength,

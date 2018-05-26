@@ -20,6 +20,8 @@
 
 #include "framework/style.h"
 
+#if QT_VERSION >= 0x050000
+
 #include "mainwindow.h"
 
 #include <QStyleFactory>
@@ -1602,3 +1604,5 @@ QSize NGStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt
         newSize += QSize(14, 0);
     return newSize;
 }
+
+#endif // QT_VERSION >= 0x050000

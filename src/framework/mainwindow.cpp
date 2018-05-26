@@ -17,10 +17,11 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
+#include "mainwindow.h"
 
 #include "core/application.h"
 
-#include "mainwindow.h"
+#if QT_VERSION >= 0x050000
 
 #include <QStatusBar>
 #include <QSettings>
@@ -227,3 +228,5 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
         }
     }
 }
+
+#endif // QT_VERSION >= 0x050000

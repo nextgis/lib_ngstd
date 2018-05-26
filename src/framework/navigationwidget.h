@@ -20,8 +20,9 @@
 #ifndef NGFRAMEWORK_NAVIGATIONWIDGET_H
 #define NGFRAMEWORK_NAVIGATIONWIDGET_H
 
-#include "framework/framework.h"
 #include "framework/minisplitter.h"
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 
 #include <QIcon>
 
@@ -60,5 +61,6 @@ protected:
     QList<INGNavigationPane *> m_panes;
 };
 
+#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_NAVIGATIONWIDGET_H

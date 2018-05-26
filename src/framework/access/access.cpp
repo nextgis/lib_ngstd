@@ -21,7 +21,13 @@
 #include "access.h"
 
 #include <QByteArray>
-#include <QtConcurrent/QtConcurrent>
+
+#if QT_VERSION >= 0x050000
+    #include <QtConcurrent/QtConcurrent>
+#else
+    #include <qtconcurrentrun.h>
+#endif // QT_VERSION >= 0x050000
+
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -43,7 +49,7 @@ constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
 constexpr const char *settingsFile = "settings.ini";
 
-NGAccess& NGAccess::instance()
+NGAccess &NGAccess::instance()
 {
     static NGAccess s;
     return s;
@@ -191,7 +197,7 @@ void NGAccess::save()
 
 bool NGAccess::isFunctionAvailable(const QString &/*app*/, const QString &/*func*/) const
 {
-    // TODO: Add more complicated logic which func of app is supported for authorized user
+    // TODO: Add more complicated logic which func or app is supported for authorized user
     return isUserSupported();
 }
 

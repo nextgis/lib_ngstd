@@ -20,6 +20,8 @@
 
 #include "minisplitter.h"
 
+#if QT_VERSION >= 0x050000
+
 #include <QResizeEvent>
 
 NGMiniSplitter::NGMiniSplitter(QWidget *parent) : QSplitter (parent)
@@ -38,3 +40,4 @@ void NGMiniSplitter::init()
     setChildrenCollapsible(false);
     setProperty("minisplitter", true);
 }
+ #endif // QT_VERSION >= 0x050000

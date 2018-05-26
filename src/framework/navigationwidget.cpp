@@ -21,6 +21,8 @@
 #include "navigationwidget.h"
 #include "navigationpane.h"
 
+#if QT_VERSION >= 0x050000
+
 #include <QSettings>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,3 +118,4 @@ QList<INGNavigationPane *> NGNavigationWidget::panes() const
     return m_panes;
 }
 
+#endif // QT_VERSION >= 0x050000

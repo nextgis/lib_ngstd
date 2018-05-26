@@ -264,3 +264,8 @@ const QMap<QString, QString> NGRequest::properties(const QString &url) const
     out["expiresIn"] = QString::number(info.m_expiresIn);
     return out;
 }
+
+QString NGRequest::getAuthHeader(const QString &url)
+{
+    return instance().authHeader(url);
+}

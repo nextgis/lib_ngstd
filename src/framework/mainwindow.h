@@ -22,6 +22,8 @@
 
 #include "framework/framework.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+
 #include <QAction>
 #include <QJsonArray>
 #include <QHash>
@@ -60,5 +62,8 @@ protected:
     QHash<QString, QAction*> m_commands;
 };
 
+#endif // QT_VERSION >= 0x050000
+
 #endif // NGFRAMEWORK_MAINWINDOW_H
+
 // #if (QT_VERSION <= QT_VERSION_CHECK(5, 7, 0))

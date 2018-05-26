@@ -23,6 +23,8 @@
 #include "core/application.h"
 #include "framework/mainwindow.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+
 #include <QSplashScreen>
 
 /**
@@ -53,5 +55,7 @@ protected:
 protected:
     NGMainWindow* m_wnd;
 };
+
+#endif // QT_VERSION >= 0x050000
 
 #endif // NGGUIAPPLICATION_H

@@ -22,6 +22,8 @@
 
 #include "core/core.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QString>
@@ -54,5 +56,7 @@ protected:
     QString m_applicationName, m_version, m_organization, m_organizationDomain;
     QVector<QTranslator*> m_translations;
 };
+
+#endif // QT_VERSION >= 0x050000
 
 #endif // NGSTD_COREAPPLICATION_H

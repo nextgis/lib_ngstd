@@ -90,6 +90,26 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 option(BUILD_QT5 "Build qt5 library" ON)
 option(BUILD_QT4 "Build qt4 library" OFF)
+option(WITH_BINDINGS "Build python bindings" OFF)
+
+if(WITH_BINDINGS)
+    find_package(PythonInterp REQUIRED)
+    find_package(PythonLibs REQUIRED)
+
+    if(OSX_FRAMEWORK)
+        set(NGSTD_PYTHON_DIR "Library/Python/${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PROJECT_NAME}")
+    elseif(WIN32)
+        set(NGSTD_PYTHON_DIR "${INSTALL_LIB_DIR}/Python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}/site-packages/${PROJECT_NAME}")
+    else()
+        set(NGSTD_PYTHON_DIR "lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/${PROJECT_NAME}")
+    endif()
+endif()
+
+
+
+if(BUILD_QT4)
+
+endif()
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -104,6 +124,9 @@ set(NGLIBS
 )
 
 add_subdirectory(src)
+if(WITH_BINDINGS)
+    add_subdirectory(python)
+endif()
 add_subdirectory(translations)
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

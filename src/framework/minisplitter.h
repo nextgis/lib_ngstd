@@ -22,6 +22,8 @@
 
 #include "framework/framework.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+
 #include <QSplitter>
 
 class NGFRAMEWORK_EXPORT NGMiniSplitter : public QSplitter
@@ -34,5 +36,7 @@ public:
 protected:
     void init();
 };
+
+#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_MINISPLITTER_H
