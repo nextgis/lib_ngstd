@@ -21,8 +21,6 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-include(FindAnyProject)
-
 if(WITH_ZLIB_EXTERNAL)
     # ZLIB needed for uic, rcc, lrelease and lupdate
     find_anyproject(ZLIB REQUIRED)
@@ -48,7 +46,6 @@ if(BUILD_QT5)
 endif()
 
 if(BUILD_QT4)
-    find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
     if(WITH_ZLIB_EXTERNAL)
         get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
         get_target_property(RCC_PATH Qt4::rcc IMPORTED_LOCATION)

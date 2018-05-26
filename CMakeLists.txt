@@ -105,10 +105,10 @@ if(WITH_BINDINGS)
     endif()
 endif()
 
-
+include(FindAnyProject)
 
 if(BUILD_QT4)
-
+    find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
 endif()
 
 include(CheckCXXCompilerFlag)
