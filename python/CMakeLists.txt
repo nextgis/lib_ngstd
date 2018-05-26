@@ -76,9 +76,9 @@ if(BUILD_QT4)
         set(SIP_EXTRA_FILES_DEPEND ${sip_files_${PY_MODULE}})
         set(SIP_EXTRA_OPTIONS ${PYQT_SIP_FLAGS} -o -a ${CMAKE_CURRENT_BINARY_DIR}/ngstd.${PY_MODULE}.api)
 
-        # FIXME: Not support only PyQt4 and BUILD_QT4
+        # FIXME: Now support only PyQt4 and BUILD_QT4
         set(MODULES_SIP ${MODULES_SIP} ngstd_${PY_MODULE}4)
-        add_sip_python_module(ngstd._${PY_MODULE} ${PY_MODULE}/${PY_MODULE}.sip ${MODULES_SIP} ${TARGET_LINK_LIB})
+        add_sip_python_module(ngstd._${PY_MODULE} ${PY_MODULE}/${PY_MODULE}.sip ${MODULES_SIP} Qt4::QtGui Qt4::QtCore)
 
         add_custom_target(py${PY_MODULE} ALL)
         add_dependencies(py${PY_MODULE} python_module_ngstd__${PY_MODULE})

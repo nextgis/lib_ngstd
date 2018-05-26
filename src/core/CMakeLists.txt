@@ -165,11 +165,9 @@ endmacro()
 
 if(BUILD_QT5)
     add_subdirectory(5)
-    # add_ngstdcore_lib(${PROJECT_NAME} 5)
 endif()
 if(BUILD_QT4)
     add_subdirectory(4)
-    # add_ngstdcore_lib(${PROJECT_NAME} 4)
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
