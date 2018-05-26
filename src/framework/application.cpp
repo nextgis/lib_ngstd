@@ -20,6 +20,8 @@
 #include "framework/application.h"
 #include "framework/style.h"
 
+#if QT_VERSION >= 0x050000
+
 #include <QApplication>
 #include <QDir>
 #include <QPainter>
@@ -166,3 +168,5 @@ void NGGUIApplication::setStyle(const QString& themeName)
 
     pApp->setStyle(pStyle);
 }
+
+#endif // QT_VERSION >= 0x050000

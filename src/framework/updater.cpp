@@ -58,6 +58,9 @@ void NGUpdater::checkUpdates()
         return;
     }
 
+    // Show available packages on Ubuntu without root access
+    // apt list --upgradable
+
     const QString path = updaterPath();
     QStringList args;
     args << "--checkupdates";
@@ -111,6 +114,7 @@ void NGUpdater::maintainerReadyReadStandardError()
 
 void NGUpdater::startUpdate(const QString &projectPath)
 {
+  // TODO: pkexec or update-manager
 	QString program = updaterPath();
 	QStringList arguments;
 	arguments << "--updater";

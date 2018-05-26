@@ -20,6 +20,8 @@
 
 #include "core/application.h"
 
+#if QT_VERSION >= 0x050000
+
 #include "mainwindow.h"
 
 #include <QStatusBar>
@@ -227,3 +229,5 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
         }
     }
 }
+
+#endif // QT_VERSION >= 0x050000

@@ -20,6 +20,8 @@
 #ifndef NGFRAMEWORK_STYLEDBAR_H
 #define NGFRAMEWORK_STYLEDBAR_H
 
+#if QT_VERSION >= 0x050000
+
 #include <QWidget>
 
 /**
@@ -51,5 +53,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *event);
 };
+
+#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_STYLEDBAR_H

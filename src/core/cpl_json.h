@@ -42,6 +42,8 @@
 /*! @cond Doxygen_Suppress */
 typedef void *JSONObjectH;
 
+typedef GIntBig GInt64; // This is for GDAL 1.x
+
 class CPLJSONArray;
 /*! @endcond */
 

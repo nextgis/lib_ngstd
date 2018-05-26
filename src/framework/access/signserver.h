@@ -51,7 +51,11 @@ private:
 
     // QDialog interface
 public slots:
+#if QT_VERSION >= 0x050000
     virtual int exec() override;
+#else
+    int exec();
+#endif // QT_VERSION >= 0x050000
 };
 
 #endif // NGFRAMEWORK_SIGNSERVER_H
