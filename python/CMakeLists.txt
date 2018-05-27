@@ -21,6 +21,8 @@
 
 if(BUILD_QT4)
 
+    find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
+    
     find_anyproject(SIP REQUIRED)
     find_anyproject(PyQt4 REQUIRED)
 

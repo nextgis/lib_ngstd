@@ -21,6 +21,8 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
+find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
+
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
         qt4_add_translation(QM_FILES ${TRANSLATION})

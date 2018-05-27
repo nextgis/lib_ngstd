@@ -55,11 +55,11 @@ private slots:
     void onUserInfoUpdated();
     void onSupportInfoUpdated();
 
-private:
+protected:
     NGAccess();
     virtual ~NGAccess() = default;
-    NGAccess(NGAccess const&) = delete;
-    NGAccess &operator= (NGAccess const&) = delete;
+    NGAccess(const NGAccess &) = delete;
+    NGAccess &operator= (const NGAccess &) = delete;
 
     bool checkSupported();
     bool verifyRSASignature(unsigned char *originalMessage, unsigned int messageLength,

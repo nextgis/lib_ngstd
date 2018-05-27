@@ -21,6 +21,8 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
+find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Network Svg) # LinguistTools
+
 set(PUBLIC_HEADERS ${PUBLIC_HEADERS}
     ${PROJECT_SOURCE_DIR}/application.h
     ${PROJECT_SOURCE_DIR}/mainwindow.h

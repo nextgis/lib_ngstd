@@ -30,6 +30,7 @@ signals:
 
 private:
     NGAccess();
-//    NGAccess(NGAccess const &);
+    NGAccess(const NGAccess &);
+    NGAccess &operator=(const NGAccess &);
     virtual ~NGAccess();
 };

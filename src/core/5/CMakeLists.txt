@@ -21,6 +21,23 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
+find_anyproject(Qt5 REQUIRED COMPONENTS Core Network Svg) # LinguistTools
+if(WITH_ZLIB_EXTERNAL)
+    get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
+    get_target_property(RCC_PATH Qt5::rcc IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
+    if(WIN32)
+        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+        set(ENV{PATH} "$ENV{PATH};${PATH_DIR}")
+        file(COPY ${ZLIB_IMPORTED_LOCATION} DESTINATION ${QT_BIN_DIR})
+    elseif(OSX_FRAMEWORK)
+        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+        file(COPY ${PATH_DIR} DESTINATION ${QT_BIN_DIR}/Frameworks)
+    endif()
+endif()
+
 set(PUBLIC_HEADERS ${PUBLIC_HEADERS}
     ${PROJECT_SOURCE_DIR}/application.h
 )

@@ -51,11 +51,11 @@ public:
     const QMap<QString, QString> properties(const QString &url) const;
 
 
-private:
+protected:
     NGRequest();
     ~NGRequest() = default;
-    NGRequest(NGRequest const&) = delete;
-    NGRequest& operator= (NGRequest const&) = delete;
+    NGRequest(const NGRequest &) = delete;
+    NGRequest& operator= (const NGRequest &) = delete;
     char **baseOptions() const;
 
 private:

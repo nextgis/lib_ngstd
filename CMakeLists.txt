@@ -107,9 +107,9 @@ endif()
 
 include(FindAnyProject)
 
-if(BUILD_QT4)
-    find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
-endif()
+# if(BUILD_QT4)
+#     find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
+# endif()
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -118,10 +118,6 @@ if(COMPILER_SUPPORTS_CXX11)
 endif()
 
 set(NGSTD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(NGLIBS
-    core
-    framework
-)
 
 add_subdirectory(src)
 if(WITH_BINDINGS)

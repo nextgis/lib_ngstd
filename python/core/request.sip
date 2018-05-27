@@ -15,4 +15,6 @@ public:
 private:
     NGRequest();
     ~NGRequest();
+    NGRequest(const NGRequest &);
+    NGRequest &operator=(const NGRequest &);
 };

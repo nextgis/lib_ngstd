@@ -105,10 +105,9 @@ macro(ADD_NGSTDCORE_LIB NAME QT_VER)
     else()
         add_library(${LIB_NAME} STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         add_definitions(-DNGSTD_STATIC)
-        if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-            set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-            set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
-        endif()
+        set_target_properties(${LIB_NAME} PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
+        )
     endif()
 
     if(${QT_VER} EQUAL 5)
@@ -161,9 +160,10 @@ macro(ADD_NGSTDCORE_LIB NAME QT_VER)
 
 endmacro()
 
-if(BUILD_QT5)
-    add_subdirectory(5)
-endif()
 if(BUILD_QT4)
     add_subdirectory(4)
+endif()
+
+if(BUILD_QT5)
+    add_subdirectory(5)
 endif()
