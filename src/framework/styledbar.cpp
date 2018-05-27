@@ -19,8 +19,6 @@
 ******************************************************************************/
 #include "styledbar.h"
 
-#if QT_VERSION >= 0x050000
-
 #include <QPainter>
 #include <QStyleOptionToolBar>
 
@@ -64,5 +62,3 @@ void NGStyledBar::paintEvent(QPaintEvent *event)
     option.state = QStyle::State_Horizontal;
     style()->drawControl(QStyle::CE_ToolBar, &option, &painter, this);
 }
-
-#endif // QT_VERSION >= 0x050000

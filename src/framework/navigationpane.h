@@ -23,8 +23,6 @@
 #include "framework/navigationwidget.h"
 #include "framework/styledbar.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-
 #include <QComboBox>
 #include <QMenu>
 #include <QWidget>
@@ -56,7 +54,5 @@ protected:
     QWidget *m_currentWidget;
     QString m_currentWidgetName;
 };
-
-#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_NAVIGATIONPANE_H

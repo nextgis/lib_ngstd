@@ -19,8 +19,6 @@
 ******************************************************************************/
 #include "core/application.h"
 
-#if QT_VERSION >= 0x050000
-
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -174,5 +172,3 @@ NGCoreApplication *NGCoreApplication::instance()
 {
     return gCoreApplication;
 }
-
-#endif // QT_VERSION >= 0x050000

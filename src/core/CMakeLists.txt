@@ -26,19 +26,17 @@ project(ngstd_core)
 find_anyproject(GDAL REQUIRED)
 
 set(PUBLIC_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/core.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/application.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/version.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/request.h
+    ${PROJECT_SOURCE_DIR}/core.h
+    ${PROJECT_SOURCE_DIR}/version.h
+    ${PROJECT_SOURCE_DIR}/request.h
 )
 
 set(PRIVATE_HEADERS
 )
 
 set(PROJECT_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/core.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/application.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/request.cpp
+    ${PROJECT_SOURCE_DIR}/core.cpp
+    ${PROJECT_SOURCE_DIR}/request.cpp
 )
 
 if(GDAL_VERSION VERSION_LESS "2.3")
@@ -50,10 +48,10 @@ if(GDAL_VERSION VERSION_LESS "2.3")
     endif()
 
     set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpl_json.h
+        ${PROJECT_SOURCE_DIR}/cpl_json.h
     )
     set(PROJECT_SOURCES ${PROJECT_SOURCES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpl_json.cpp
+        ${PROJECT_SOURCE_DIR}/cpl_json.cpp
     )
 endif()
 
@@ -168,12 +166,4 @@ if(BUILD_QT5)
 endif()
 if(BUILD_QT4)
     add_subdirectory(4)
-endif()
-
-if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR}/core)
-endif()
-
-if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${QM_FILES} DESTINATION ${INSTALL_TRANSLATIONS_DIR})
 endif()

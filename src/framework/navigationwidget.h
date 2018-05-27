@@ -22,8 +22,6 @@
 
 #include "framework/minisplitter.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-
 #include <QIcon>
 
 /**
@@ -60,7 +58,5 @@ public:
 protected:
     QList<INGNavigationPane *> m_panes;
 };
-
-#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_NAVIGATIONWIDGET_H

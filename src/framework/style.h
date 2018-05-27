@@ -23,8 +23,6 @@
 
 #include "framework/framework.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-
 #include <QProxyStyle>
 #include <QSettings>
 
@@ -270,7 +268,5 @@ protected:
     QImage m_lineeditImage_disabled;
 
 };
-
-#endif // QT_VERSION >= 0x050000
 
 #endif // QNGSTYLE_H

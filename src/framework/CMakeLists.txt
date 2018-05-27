@@ -26,58 +26,41 @@ project(ngstd_framework)
 find_anyproject(OpenSSL REQUIRED)
 
 set(PUBLIC_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/framework.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/application.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/minisplitter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/navigationwidget.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/navigationpane.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/styledbar.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/updater.h
+    ${PROJECT_SOURCE_DIR}/framework.h
+    ${PROJECT_SOURCE_DIR}/updater.h
 )
 
 set(PRIVATE_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/style.h
 )
 
 set(PROJECT_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/application.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/style.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/minisplitter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/navigationwidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/navigationpane.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/styledbar.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/updater.cpp
+    ${PROJECT_SOURCE_DIR}/updater.cpp
 )
 
 set(ACCESS_HHEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/access.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signbutton.h
+    ${PROJECT_SOURCE_DIR}/access/access.h
+    ${PROJECT_SOURCE_DIR}/access/signbutton.h
 )
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signserver.h
+    ${PROJECT_SOURCE_DIR}/access/signdialog.h
+    ${PROJECT_SOURCE_DIR}/access/signserver.h
 )
 
 set(ACCESS_CSOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/access.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signbutton.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signserver.cpp
+    ${PROJECT_SOURCE_DIR}/access/access.cpp
+    ${PROJECT_SOURCE_DIR}/access/signbutton.cpp
+    ${PROJECT_SOURCE_DIR}/access/signdialog.cpp
+    ${PROJECT_SOURCE_DIR}/access/signserver.cpp
 )
 
 set(ACCESS_UIS
-    ${CMAKE_CURRENT_SOURCE_DIR}/access/signdialog.ui
+    ${PROJECT_SOURCE_DIR}/access/signdialog.ui
 )
 
 set(QRC_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/res/framework.qrc
+    ${PROJECT_SOURCE_DIR}/res/framework.qrc
 )
-
-set(PRIVATE_HEADERS ${PRIVATE_HEADERS} ${PUBLIC_HEADERS} ${ACCESS_HHEADERS})
-set(PROJECT_SOURCES ${PROJECT_SOURCES} ${ACCESS_CSOURCES})
 
 set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_ru.ts
@@ -96,7 +79,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
     set(PACKAGE_NAME ${PROJECT_NAME}${QT_VER})
     string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
     if(BUILD_SHARED_LIBS)
-        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
+        add_library(${LIB_NAME} SHARED ${ALL_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         if(MSVC)
             set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
         endif()
@@ -110,7 +93,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
         set(INSTALL_CMAKECONF_DIR ${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Resources/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
         set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${LIB_NAME}.framework/Headers" CACHE INTERNAL "Installation directory for headers" FORCE)
 
-        add_library(${LIB_NAME} SHARED ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
+        add_library(${LIB_NAME} SHARED ${ALL_HEADERS} ${PROJECT_SOURCES} ${QM_FILES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
         set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework")
         set_property(SOURCE ${ACCESS_HHEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/access")
@@ -127,7 +110,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
             # PUBLIC_HEADER "${PUBLIC_HEADERS}"
         )
     else()
-        add_library(${LIB_NAME} STATIC ${PRIVATE_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
+        add_library(${LIB_NAME} STATIC ${ALL_HEADERS} ${PROJECT_SOURCES} ${RESOURCES_QT${QT_VER}} ${UIS_HDRS_QT${QT_VER}} ${QM_FILES} ${MOC_SRCS${QT_VER}})
         add_definitions(-DNGSTD_STATIC)
         if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
             set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
@@ -183,13 +166,4 @@ if(BUILD_QT5)
 endif()
 if(BUILD_QT4)
     add_subdirectory(4)
-endif()
-
-if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR}/framework)
-    install(FILES ${ACCESS_HHEADERS} DESTINATION ${INSTALL_INC_DIR}/framework/access)
-endif()
-
-if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
-    install(FILES ${QM_FILES} DESTINATION ${INSTALL_TRANSLATIONS_DIR})
 endif()

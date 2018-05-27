@@ -20,8 +20,6 @@
 
 #include "framework/style.h"
 
-#if QT_VERSION >= 0x050000
-
 #include "mainwindow.h"
 
 #include <QStyleFactory>
@@ -58,8 +56,8 @@ static int clamp(float x)
 // Style
 //------------------------------------------------------------------------------
 
-NGStyle::NGStyle(const QString &baseStyleName, NGTheme *theme) : 
-    QProxyStyle(QStyleFactory::create(baseStyleName)), 
+NGStyle::NGStyle(const QString &baseStyleName, NGTheme *theme) :
+    QProxyStyle(QStyleFactory::create(baseStyleName)),
     m_theme(theme)
 {
     m_baseColor = QColor(160, 160, 160);
@@ -80,7 +78,7 @@ QPalette NGStyle::panelPalette(const QPalette &oldPalette, bool lightColored) co
     if(nullptr == m_theme)
         return pal;
 
-    QColor color = m_theme->color(lightColored ? NGTheme::PanelTextColorDark : 
+    QColor color = m_theme->color(lightColored ? NGTheme::PanelTextColorDark :
                                                  NGTheme::PanelTextColorLight);
     pal.setBrush(QPalette::All, QPalette::WindowText, color);
     pal.setBrush(QPalette::All, QPalette::ButtonText, color);
@@ -871,7 +869,7 @@ void NGStyle::drawComplexControl(ComplexControl control,
                 drawPrimitive(PE_PanelButtonTool, &tool, painter, widget);
             }
 
-            QStyleOptionToolButton label = *toolbutton;            
+            QStyleOptionToolButton label = *toolbutton;
             if (widget && widget->property("highlightWidget").toBool())
                 label.palette.setColor(QPalette::ButtonText, Qt::red);
             int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
@@ -1604,5 +1602,3 @@ QSize NGStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt
         newSize += QSize(14, 0);
     return newSize;
 }
-
-#endif // QT_VERSION >= 0x050000

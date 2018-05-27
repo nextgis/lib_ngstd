@@ -23,8 +23,6 @@
 #include "core/application.h"
 #include "framework/mainwindow.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-
 #include <QSplashScreen>
 
 /**
@@ -36,15 +34,15 @@ public:
     NGGUIApplication(const QString& applicationName, const QString& version);
     virtual ~NGGUIApplication() override;
     virtual void init(int &argc, char **argv) override;
-    
+
 public:
     static QString style();
-    
+
 protected:
     virtual void createMainWindow();
     virtual QPixmap createSplash(const QColor& bkColor = QColor(0,0,0,0));
     virtual void setStyle(const QString &themeName);
-    
+
 private:
     void setSplashBackground(QPainter &painter, const QColor& bkColor = QColor(0,0,0,0));
 
@@ -55,7 +53,5 @@ protected:
 protected:
     NGMainWindow* m_wnd;
 };
-
-#endif // QT_VERSION >= 0x050000
 
 #endif // NGGUIAPPLICATION_H

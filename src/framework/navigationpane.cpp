@@ -20,8 +20,6 @@
 
 #include "navigationpane.h"
 
-#if QT_VERSION >= 0x050000
-
 #include <QHBoxLayout>
 #include <QToolButton>
 
@@ -146,5 +144,3 @@ QString NGNavigationPaneHolder::currentWidgetName() const
 {
     return m_currentWidgetName;
 }
-
-#endif // QT_VERSION >= 0x050000

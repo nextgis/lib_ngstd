@@ -23,8 +23,6 @@
 
 #include "framework/framework.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-
 #include <QWidget>
 
 /**
@@ -56,7 +54,5 @@ public:
 protected:
     void paintEvent(QPaintEvent *event);
 };
-
-#endif // QT_VERSION >= 0x050000
 
 #endif // NGFRAMEWORK_STYLEDBAR_H
