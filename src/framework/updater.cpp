@@ -26,7 +26,7 @@
 
 #if defined Q_OS_WIN
 constexpr const char *updater = "nextgisupdater.exe";
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MAC)
 constexpr const char *updater = "nextgisupdater.app/Contents/MacOS/nextgisupdater";
 #else
 constexpr const char *updater = "";
