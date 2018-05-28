@@ -59,7 +59,7 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     setWindowModality(Qt::ApplicationModal);
     setMaximum(0);
 
-    // TAdd localized content.
+    // Add localized content.
     QString mesageBody = tr("You have successfully signed in <br> at <span>%1</span> application")
             .arg(qApp->applicationName());
     m_replyContent = QString(contentStr)
@@ -75,8 +75,6 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
 
 NGSignServer::~NGSignServer()
 {
-    // FIXME: we need to process events to finish write to socket
-    QCoreApplication::processEvents();
     m_listenServer->close();
 }
 
@@ -99,17 +97,25 @@ void NGSignServer::onIncomingConnection()
 
 void NGSignServer::onGetReply()
 {
+    if (!m_listenServer->isListening()) {
+        return;
+    }
+
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) {
         return;
     }
+    socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
+
     QByteArray reply;
     reply.append("HTTP/1.0 200 OK \r\n");
     reply.append("Content-Type: text/html; charset=\"utf-8\"\r\n");
+    QByteArray msg = m_replyContent.toUtf8();
     reply.append(QString("Content-Length: %1\r\n\r\n")
-                 .arg(m_replyContent.toUtf8().size()).toLatin1());
-    reply.append(m_replyContent);
+                 .arg(msg.size()).toLatin1());
+    reply.append(msg);
     socket->write(reply);
+    socket->waitForBytesWritten();
 
     QByteArray data = socket->readAll();
     int result = 0;
