@@ -125,7 +125,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
                 out[name] = child.ToBool();
                 break;
             case CPLJSONObject::String:
-                out[name] = QString::fromStdString(child.ToString());
+                out[name] = QString::fromUtf8(child.ToString().c_str());
                 break;
             case CPLJSONObject::Integer:
                 out[name] = child.ToInteger();
@@ -137,7 +137,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
                 out[name] = child.ToDouble();
                 break;
             default:
-                out[name] = QString::fromStdString(child.ToString());
+                out[name] = QString::fromUtf8(child.ToString().c_str());
             }
         }
     }
