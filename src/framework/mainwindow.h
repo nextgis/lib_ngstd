@@ -37,6 +37,7 @@ public:
     explicit NGMainWindow(QWidget *parent = nullptr );
     virtual ~NGMainWindow() = default;
     virtual void init();
+    QAction* commandByKey(const QString &key) const;
 
 //signals:
 
@@ -47,7 +48,6 @@ protected slots:
 
 protected:
     void closeEvent(QCloseEvent *event);
-    QAction* commandByKey(const QString &key) const;
     virtual bool maybeSave();
     virtual void writeSettings();
     virtual void readSettings();

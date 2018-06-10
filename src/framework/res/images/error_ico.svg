@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 16 16" height="16px" width="16px" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="linearGradient2926" gradientUnits="userSpaceOnUse" x1="36.917976" y1="66.288063" x2="19.071495" y2="5.5410109">
+      <stop style="stop-color:#a40000;stop-opacity:1;" offset="0" id="stop2538"/>
+      <stop style="stop-color:#ff1717;stop-opacity:1;" offset="1" id="stop2540"/>
+    </linearGradient>
+    <linearGradient id="linearGradient2928" gradientUnits="userSpaceOnUse" x1="43.93581" y1="53.835983" x2="20.064686" y2="-8.5626707">
+      <stop style="stop-color:#ffe69b;stop-opacity:1;" offset="0" id="stop2481"/>
+      <stop style="stop-color:#ffffff;stop-opacity:1;" offset="1" id="stop2483"/>
+    </linearGradient>
+    <linearGradient id="linearGradient2874" gradientUnits="userSpaceOnUse" x1="21.993773" y1="33.955299" x2="20.917078" y2="15.814602" gradientTransform="matrix(0.312798, 0, 0, 0.312798, 0.492857, 0.833253)">
+      <stop style="stop-color:#fffeff;stop-opacity:0.33333334;" offset="0" id="stop3959"/>
+      <stop style="stop-color:#fffeff;stop-opacity:0.21568628;" offset="1" id="stop3961"/>
+    </linearGradient>
+  </defs>
+  <g id="g4006" transform="matrix(0.311864, 0, 0, 0.311864, 0.515265, 0.827116)">
+    <path transform="matrix(0.920488,0,0,0.920488,2.368532,0.97408)" d="m 46.857143,23.928572 c 0,12.899794 -10.457349,23.357143 -23.357143,23.357143 -12.899794,0 -23.3571434,-10.457349 -23.3571434,-23.357143 0,-12.899794 10.4573494,-23.3571437 23.3571434,-23.3571437 12.899794,0 23.357143,10.4573497 23.357143,23.3571437 z" id="path1314" style="fill:url(#linearGradient2926);fill-opacity:1;fill-rule:nonzero;stroke:#b20000;stroke-width:1.08638;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"/>
+    <path transform="matrix(0.856093,0,0,0.856093,1.818275,0.197769)" d="m 49.901535,26.635273 c 0,13.249931 -10.741192,23.991123 -23.991123,23.991123 -13.249932,0 -23.9911234,-10.741192 -23.9911234,-23.991123 0,-13.249931 10.7411914,-23.9911232 23.9911234,-23.9911232 13.249931,0 23.991123,10.7411922 23.991123,23.9911232 z" id="path3560" style="opacity:0.34659089;fill:#cc0000;fill-opacity:0;stroke:url(#linearGradient2928);stroke-width:1.16809607;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"/>
+  </g>
+  <path id="path3955" d="M 14.059 7.625 C 14.059 11.013 10.82 5.665 8.218 7.746 C 5.676 9.779 1.775 11.559 1.775 8.172 C 1.775 4.705 4.495 1.488 7.883 1.488 C 11.271 1.488 14.059 4.238 14.059 7.625 Z" style="fill:url(#linearGradient2874);fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+  <g id="g2902" transform="matrix(1, 0, 0, -1, 0.000017, 47.963207)">
+    <rect transform="matrix(0,-1,1,0,0,0)" y="6.7525425" x="-44.366104" height="2.494916" width="5.634048" id="rect2070" style="fill:#efefef;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+    <rect transform="matrix(0,-1,1,0,0,0)" y="6.7280025" x="-37.45813" height="2.494916" width="1.8610417" id="rect2070-1" style="fill:#efefef;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+  </g>
+</svg>

@@ -22,6 +22,16 @@
         <file alias="text.svg">icons/text-generic.svg</file>
         <file alias="person-blue.svg">icons/person-blue.svg</file>
         <file alias="person-red.svg">icons/person-red.svg</file>
+        <file alias="apply-icon.svg">icons/apply_ico.svg</file>
+        <file alias="cancel-icon.svg">icons/cancel_ico.svg</file>
+        <file alias="error-icon.svg">icons/error_ico.svg</file>
+        <file alias="info-icon.svg">icons/info_ico.svg</file>
+        <file alias="next-icon.svg">icons/next_ico.svg</file>
+        <file alias="pause-icon.svg">icons/pause_ico.svg</file>
+        <file alias="prev-icon.svg">icons/prev_ico.svg</file>
+        <file alias="query-icon.svg">icons/query_ico.svg</file>
+        <file alias="success-icon.svg">icons/success_ico.svg</file>
+        <file alias="warning-icon.svg">icons/warning_ico.svg</file>        
     </qresource>
     <qresource prefix="/">
         <file alias="interface.json">interface.json</file>
