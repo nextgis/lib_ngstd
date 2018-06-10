@@ -23,7 +23,7 @@ The library has the following functionality:
 The following software use NextGIS authorization capabilities of NextGIS standard
 Qt library:
 
-* NextGIS QGIS [planned]
+* NextGIS QGIS
 * NextGIS QGIS plugings:
   * NextGIS Connect [planned]
   * NextGIS Data [planned]
