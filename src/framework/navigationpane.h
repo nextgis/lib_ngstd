@@ -37,6 +37,7 @@ public:
     void selectComboboxItem(const QString &name);
 
     QString currentWidgetName() const;
+    QWidget *currentWidget() const;
 
 signals:
 

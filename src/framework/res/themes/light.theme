@@ -76,6 +76,7 @@ ProgressBarTitleColor=ffffffff
 SplitterColor=ffC8C8C8
 TextColorDisabled=textDisabled
 TextColorError=ffff0000
+TextColorWarning=ffff8000
 TextColorHighlight=ffa0a0a4
 TextColorLink=ff0057ae
 TextColorLinkVisited=ff644a9b
@@ -87,6 +88,7 @@ TreeViewArrowColorNormal=hoverBackground
 TreeViewArrowColorSelected=text
 ToolTipBase=tooltipBackground
 ToolTipText=brightText
+EditorCurrentLineScrollBarColor=TodoItemTextColor
 
 [Flags]
 ComboBoxDrawTextShadow=false

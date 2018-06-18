@@ -176,17 +176,28 @@ void NGMainWindow::loadMenus(const QJsonArray& array)
         QString menuName = tr(qPrintable(itemObject[QLatin1String("name")].toString()));
         QMenu *menu = menuBar()->addMenu(menuName);
         QJsonArray actions = itemObject[QLatin1String("actions")].toArray();
-        for(const QJsonValue& action : actions ) {
-            QJsonObject actionObject = action.toObject();
-            QString actionType = actionObject[QLatin1String("type")].toString();
-            if(actionType == "separator") {
-                menu->addSeparator();
-            }
-            else if(actionType == "action") {
-                QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
-                if(nullptr != command) {
-                    menu->addAction(command);
-                }
+        loadMenuActions(menu, actions);
+    }
+}
+
+void NGMainWindow::loadMenuActions(QMenu *menu, const QJsonArray &array)
+{
+    for(const QJsonValue& action : array ) {
+        QJsonObject actionObject = action.toObject();
+        QString actionType = actionObject[QLatin1String("type")].toString();
+        if(actionType == "separator") {
+            menu->addSeparator();
+        }
+        else if(actionType == "menu") {
+            QMenu *subMenu = new QMenu(tr(qPrintable(actionObject[QLatin1String("name")].toString())));
+            QJsonArray subActions = actionObject[QLatin1String("actions")].toArray();
+            loadMenuActions(subMenu, subActions);
+            menu->addMenu(subMenu);
+        }
+        else if(actionType == "action") {
+            QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
+            if(nullptr != command) {
+                menu->addAction(command);
             }
         }
     }

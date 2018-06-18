@@ -32,6 +32,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
     Q_OBJECT
 public:
     static NGAccess &instance();
+    static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
     void authorize();
     void exit();
     void save();

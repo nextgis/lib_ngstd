@@ -101,6 +101,20 @@ void NGNavigationWidget::readSettings()
     settings.endGroup();
 }
 
+QList<QWidget *> NGNavigationWidget::paneHolders(const QString &paneName) const
+{
+    QList<QWidget *> out;
+    for(int i = 0; i < count(); ++i) {
+        NGNavigationPaneHolder *holder =
+                static_cast<NGNavigationPaneHolder *>(widget(i));
+
+        if(holder->currentWidgetName().compare(paneName) == 0) {
+            out << holder->currentWidget();
+        }
+    }
+    return out;
+}
+
 INGNavigationPane *NGNavigationWidget::paneByName(const QString &name) const
 {
     foreach(INGNavigationPane *pane, m_panes) {

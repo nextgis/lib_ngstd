@@ -51,6 +51,7 @@ public:
     virtual void removePaneHolder(NGNavigationPaneHolder *pane);
     virtual void writeSettings();
     virtual void readSettings();
+    virtual QList<QWidget *> paneHolders(const QString &paneName) const;
 
     INGNavigationPane *paneByName(const QString &name) const;
     QList<INGNavigationPane *> panes() const;

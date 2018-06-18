@@ -54,6 +54,7 @@ protected:
     virtual void createCommands();
     virtual void loadInterface();
     virtual void loadMenus(const QJsonArray &array);
+    virtual void loadMenuActions(QMenu *menu, const QJsonArray &array);
     virtual void loadToolbars(const QJsonArray &array);
 
 protected:

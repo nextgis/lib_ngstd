@@ -140,6 +140,11 @@ void NGNavigationPaneHolder::comboBoxIndexChanged(const QString &text)
     selectPane(text);
 }
 
+QWidget *NGNavigationPaneHolder::currentWidget() const
+{
+    return m_currentWidget;
+}
+
 QString NGNavigationPaneHolder::currentWidgetName() const
 {
     return m_currentWidgetName;

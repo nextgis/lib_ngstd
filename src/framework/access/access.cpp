@@ -32,6 +32,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QMainWindow>
+#include <QPainter>
 #include <QSettings>
 #include <QTextStream>
 
@@ -53,6 +54,32 @@ NGAccess &NGAccess::instance()
 {
     static NGAccess s;
     return s;
+}
+
+QIcon NGAccess::lockIcon(const QIcon &origin, const QSize &originSize,
+                         const QIcon &lock)
+{
+    QIcon dummyIcon;
+    QPixmap comboPixmap(originSize);
+    QPixmap firstImage(origin.pixmap(originSize));
+    QIcon lockIcon(lock);
+    if(lockIcon.isNull()) {
+        lockIcon = QIcon(":/icons/lock-icon.svg");
+    }
+    QSize lockSize(originSize.width() / 1.5, originSize.height() / 1.5);
+    QPixmap secondImage(lockIcon.pixmap(lockSize));
+
+    comboPixmap.fill(Qt::transparent);
+    QPainter painter(&comboPixmap);
+    painter.setBackgroundMode(Qt::TransparentMode);
+    painter.setBackground(QBrush(Qt::transparent));
+    painter.eraseRect(comboPixmap.rect());
+    painter.drawPixmap(0, 0, firstImage);
+    painter.drawPixmap(originSize.width() - lockSize.width(),
+                       originSize.height() - lockSize.height(), secondImage);
+
+    dummyIcon.addPixmap(comboPixmap);
+    return dummyIcon;
 }
 
 NGAccess::NGAccess() :

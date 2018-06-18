@@ -1083,7 +1083,7 @@ void NGStyle::setTheme(NGTheme *theme)
     m_baseColor = theme->color(NGTheme::ToolBarBackgroundColor);
 }
 
-const NGTheme *NGStyle::getTheme() const
+const NGTheme *NGStyle::theme() const
 {
     return m_theme;
 }

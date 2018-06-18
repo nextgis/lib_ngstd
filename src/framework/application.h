@@ -22,6 +22,7 @@
 
 #include "core/application.h"
 #include "framework/mainwindow.h"
+#include "framework/style.h"
 
 #include <QSplashScreen>
 
@@ -37,6 +38,7 @@ public:
 
 public:
     static QString style();
+    static const NGTheme *theme();
 
 protected:
     virtual void createMainWindow();

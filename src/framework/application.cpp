@@ -18,7 +18,6 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include "framework/application.h"
-#include "framework/style.h"
 
 #include <QApplication>
 #include <QDir>
@@ -74,6 +73,14 @@ void NGGUIApplication::init(int &argc, char **argv)
 QString NGGUIApplication::style()
 {
     return gTheme;
+}
+
+const NGTheme *NGGUIApplication::theme()
+{
+    NGGUIApplication *app = static_cast<NGGUIApplication *>(NGCoreApplication::instance());
+    QApplication *guiApp = static_cast<QApplication*>(app->m_app);
+    NGStyle *style = static_cast<NGStyle *>(guiApp->style());
+    return style->theme();
 }
 
 void NGGUIApplication::createApplication(int &argc, char **argv)

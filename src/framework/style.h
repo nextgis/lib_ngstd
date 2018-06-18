@@ -30,7 +30,7 @@
  * @brief Main theme for NextGIS Qt applications
  */
 
-class NGTheme : public QObject
+class NGFRAMEWORK_EXPORT NGTheme : public QObject
 {
     Q_OBJECT
 
@@ -108,6 +108,7 @@ public:
         SplitterColor,
         TextColorDisabled,
         TextColorError,
+        TextColorWarning,
         TextColorHighlight,
         TextColorLink,
         TextColorLinkVisited,
@@ -118,7 +119,8 @@ public:
         TreeViewArrowColorNormal,
         TreeViewArrowColorSelected,
         ToolTipBase,
-        ToolTipText
+        ToolTipText,
+        EditorCurrentLineScrollBarColor
     };
 
     enum Gradient {
@@ -217,7 +219,7 @@ public:
                                    const QSize &contentsSize,
                                    const QWidget *w) const override;
     void setTheme(NGTheme* theme);
-    const NGTheme *getTheme(void) const;
+    const NGTheme *theme(void) const;
 public:
     int navigationWidgetHeight()  const { return 22;/*4;*/ }
 protected:
