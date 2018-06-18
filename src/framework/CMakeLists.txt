@@ -127,6 +127,7 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
 
     target_include_directories(${LIB_NAME} INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>/src
     )
 
     # Install
