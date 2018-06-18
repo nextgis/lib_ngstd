@@ -63,14 +63,19 @@ endif()
 #     endif()
 # endif()
 
+configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfigFullLocal.cmake.in
+    ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY
+)
+
 # Create the <Package>Config.cmake file
 configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfigFull.cmake.in
-    ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
+    ${PROJECT_BINARY_DIR}/src/${PACKAGE_UPPER_NAME}Config.cmake @ONLY
+)
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     # Install the <Package>Config.cmake
     install(FILES
-      ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
+      ${PROJECT_BINARY_DIR}/src/${PACKAGE_UPPER_NAME}Config.cmake
       DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
 endif()
 

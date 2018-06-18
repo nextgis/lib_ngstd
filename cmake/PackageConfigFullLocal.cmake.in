@@ -1,0 +1,54 @@
+# - Config file for the @PACKAGE_UPPER_NAME@ package
+# It defines the following variables
+#  @PACKAGE_UPPER_NAME@_INCLUDE_DIRS - include directories for @PACKAGE_NAME@
+#  @PACKAGE_UPPER_NAME@_LIBRARIES    - libraries to link against
+#  @PACKAGE_UPPER_NAME@_VERSION      - @PACKAGE_NAME@ version
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+set(NGLIBS
+    core
+    framework
+)
+
+set(QT_VERSIONS
+    4
+    5
+)
+
+foreach(NGLIB ${NGLIBS})
+    foreach(QT_VER ${QT_VERSIONS})
+        if(WIN32)
+            set(PACKAGE_CONFIG_PATH ${CMAKE_CURRENT_LIST_DIR})
+        elseif(APPLE)
+            get_filename_component(PACKAGE_CONFIG_PATH "${CMAKE_CURRENT_LIST_DIR}" PATH)
+            set(PACKAGE_CONFIG_PATH ${PACKAGE_CONFIG_PATH}/Library/Frameworks/@PACKAGE_NAME@_${NGLIB}${QT_VER}.framework/Resources/CMake)
+        else()
+            set(PACKAGE_CONFIG_PATH ${CMAKE_CURRENT_LIST_DIR})
+        endif()
+
+        string(TOUPPER ${NGLIB} UPPER_NGLIB)
+        if(NOT TARGET @PACKAGE_NAME@_${NGLIB}${QT_VER})
+            if(EXISTS "${PACKAGE_CONFIG_PATH}/@PACKAGE_UPPER_NAME@_${UPPER_NGLIB}${QT_VER}Config.cmake")
+                include("${PACKAGE_CONFIG_PATH}/@PACKAGE_UPPER_NAME@_${UPPER_NGLIB}${QT_VER}Config.cmake")
+            endif()
+        endif()
+    endforeach()
+endforeach()
+
+if(@PACKAGE_UPPER_NAME@_FIND_COMPONENTS)
+    foreach(module ${@PACKAGE_UPPER_NAME@_FIND_COMPONENTS})
+        string(TOUPPER ${module} MODULE_UPPERNAME)
+        set(@PACKAGE_UPPER_NAME@_LIBRARIES ${@PACKAGE_UPPER_NAME@_LIBRARIES} ${@PACKAGE_UPPER_NAME@_${MODULE_UPPERNAME}_LIBRARIES})
+        set(@PACKAGE_UPPER_NAME@_INCLUDE_DIRS ${@PACKAGE_UPPER_NAME@_INCLUDE_DIRS} ${@PACKAGE_UPPER_NAME@_${MODULE_UPPERNAME}_INCLUDE_DIRS})
+    endforeach()
+else()
+    foreach(NGLIB ${NGLIBS})
+        foreach(QT_VER ${QT_VERSIONS})
+            set(@PACKAGE_UPPER_NAME@_LIBRARIES ${@PACKAGE_UPPER_NAME@_LIBRARIES} ${@PACKAGE_UPPER_NAME@_${UPPER_NGLIB}${QT_VER}_LIBRARIES})
+            set(@PACKAGE_UPPER_NAME@_INCLUDE_DIRS ${@PACKAGE_UPPER_NAME@_INCLUDE_DIRS} ${@PACKAGE_UPPER_NAME@_${UPPER_NGLIB}${QT_VER}_INCLUDE_DIRS})
+        endforeach()
+    endforeach()
+endif()
+
+set(@PACKAGE_UPPER_NAME@_VERSION "@VERSION@")
+set(@PACKAGE_UPPER_NAME@_FOUND TRUE)
