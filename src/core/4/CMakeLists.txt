@@ -46,8 +46,7 @@ foreach(TRANSLATION ${TRANSLATIONS})
     endif()
 endforeach()
 
-qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS})
-
+# qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS})
 add_ngstdcore_lib(${PROJECT_NAME} 4)
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
