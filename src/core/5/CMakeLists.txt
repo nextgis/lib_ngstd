@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Network Svg LinguistTools)
-get_target_property(RCC_PATH Qt5::lrelease IMPORTED_LOCATION)
+get_target_property(RCC_PATH Qt5::lupdate IMPORTED_LOCATION)
 execute_process(COMMAND ${RCC_PATH} -version RESULT_VARIABLE IS_RCC_WORKING)
 if(NOT IS_RCC_WORKING EQUAL 0)
     if(WITH_ZLIB_EXTERNAL)
@@ -55,7 +55,7 @@ foreach(TRANSLATION ${TRANSLATIONS})
     endif()
 endforeach()
 
-# qt5_wrap_cpp(MOC_SRCS5 ${PUBLIC_HEADERS})
+qt5_wrap_cpp(MOC_SRCS5 ${PUBLIC_HEADERS})
 add_ngstdcore_lib(${PROJECT_NAME} 5)
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)

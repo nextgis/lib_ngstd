@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
-get_target_property(RCC_PATH Qt4::lrelease IMPORTED_LOCATION)
+get_target_property(RCC_PATH Qt4::lupdate IMPORTED_LOCATION)
 execute_process(COMMAND ${RCC_PATH} -version RESULT_VARIABLE IS_RCC_WORKING)
 if(NOT IS_RCC_WORKING EQUAL 0)
     if(WITH_ZLIB_EXTERNAL)
@@ -47,7 +47,7 @@ foreach(TRANSLATION ${TRANSLATIONS})
     endif()
 endforeach()
 
-# qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS})
+qt4_wrap_cpp(MOC_SRCS4 ${PUBLIC_HEADERS})
 add_ngstdcore_lib(${PROJECT_NAME} 4)
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
