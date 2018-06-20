@@ -22,8 +22,8 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Network Svg LinguistTools)
-get_target_property(RCC_PATH Qt5::rcc IMPORTED_LOCATION)
-execute_process(COMMAND ${RCC_PATH} -v RESULT_VARIABLE IS_RCC_WORKING)
+get_target_property(RCC_PATH Qt5::lrelease IMPORTED_LOCATION)
+execute_process(COMMAND ${RCC_PATH} -version RESULT_VARIABLE IS_RCC_WORKING)
 if(NOT IS_RCC_WORKING EQUAL 0)
     if(WITH_ZLIB_EXTERNAL)
         get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
