@@ -22,10 +22,10 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
-get_target_property(RCC_PATH Qt4::lupdate IMPORTED_LOCATION)
 if(NOT BUILD_STATIC_LIBS)
     if(WITH_ZLIB_EXTERNAL)
         get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
+        get_target_property(RCC_PATH Qt4::lupdate IMPORTED_LOCATION)
         get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
         if(WIN32)
             get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)

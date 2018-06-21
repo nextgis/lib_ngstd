@@ -55,6 +55,11 @@ void NGMainWindow::quit()
     QCoreApplication::quit();
 }
 
+void NGMainWindow::preferences()
+{
+
+}
+
 void NGMainWindow::closeEvent(QCloseEvent *event)
 {
     if (maybeSave()) {
@@ -145,6 +150,13 @@ void NGMainWindow::createCommands()
     connect(aboutAct, &QAction::triggered, this, &NGMainWindow::about);
 
     m_commands["help.about"] = aboutAct;
+
+    QAction *prefAct = new QAction(QIcon(":/icons/settings.svg"), tr("&Preferences"), this);
+    prefAct->setShortcuts(QKeySequence::Preferences);
+    prefAct->setStatusTip(tr("Application preferences"));
+    prefAct->setMenuRole(QAction::PreferencesRole);
+    connect(prefAct, &QAction::triggered, this, &NGMainWindow::preferences);
+    m_commands["options.preferences"] = prefAct;
 }
 
 void NGMainWindow::loadInterface()

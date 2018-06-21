@@ -45,6 +45,7 @@ protected slots:
     virtual void open();
     virtual void about();
     virtual void quit();
+    virtual void preferences();
 
 protected:
     void closeEvent(QCloseEvent *event);

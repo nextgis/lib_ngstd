@@ -36,6 +36,7 @@
         <file alias="cut.svg">icons/cut.svg</file>
         <file alias="copy.svg">icons/copy.svg</file>
         <file alias="paste.svg">icons/paste.svg</file>
+        <file alias="settings.svg">icons/settings.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="interface.json.template">interface.json</file>
