@@ -94,7 +94,7 @@ void NGNavigationWidget::readSettings()
     else {
         for(const QString &pane : panes) {
             NGNavigationPaneHolder *holder = addPaneHolder();
-            holder->selectPane(pane);
+            holder->selectComboboxItem(pane);
         }
     }
     restoreState(settings.value("splitter.sizes").toByteArray());

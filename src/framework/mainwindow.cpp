@@ -240,6 +240,16 @@ void NGMainWindow::loadToolbars(const QJsonArray& array)
             if(actionType == "separator") {
                 toolBar->addSeparator();
             }
+            else if(actionType == "menu") {
+                QMenu *subMenu = new QMenu(tr(qPrintable(actionObject[QLatin1String("name")].toString())));
+                QJsonArray subActions = actionObject[QLatin1String("actions")].toArray();
+                loadMenuActions(subMenu, subActions);
+                QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
+                if(nullptr != command) {
+                    command->setMenu(subMenu);
+                    toolBar->addAction(command);
+                }
+            }
             else if(actionType == "action") {
                 QAction *command = commandByKey(actionObject[QLatin1String("key")].toString());
                 if(nullptr != command) {
