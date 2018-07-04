@@ -33,6 +33,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
 public:
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
+    static void showUnsupportedMessage(QWidget *parent = nullptr);
     void authorize();
     void exit();
     void save();

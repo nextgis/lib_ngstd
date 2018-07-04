@@ -8,6 +8,10 @@
         <source>No valid theme &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>APP_LANGUAGE</source>
+        <translation>en</translation>
+    </message>
 </context>
 <context>
     <name>NGAccess</name>
@@ -157,6 +161,14 @@ via the opened browser...</source>
     <message>
         <location filename="../src/framework/access/signserver.cpp" line="68"/>
         <source>Now you can close this page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please upgrade and sign in to use this feature.<br>View pricing at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please upgrade to use this feature.<br>View pricing at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

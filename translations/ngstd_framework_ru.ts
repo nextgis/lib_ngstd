@@ -8,6 +8,10 @@
         <source>No valid theme &quot;%1&quot;</source>
         <translation>Тема &quot;%1&quot; не существует</translation>
     </message>
+    <message>
+        <source>APP_LANGUAGE</source>
+        <translation>ru</translation>
+    </message>
 </context>
 <context>
     <name>NGAccess</name>
@@ -159,6 +163,14 @@ via the opened browser...</source>
         <location filename="../src/framework/access/signserver.cpp" line="68"/>
         <source>Now you can close this page</source>
         <translation>Теперь вы можете закрыть эту страницу</translation>
+    </message>
+    <message>
+        <source>Please upgrade and sign in to use this feature.<br>View pricing at %1</source>
+        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности. Подробнее по ссылке %1</translation>
+    </message>
+    <message>
+        <source>Please upgrade to use this feature.<br>View pricing at %1</source>
+        <translation>Обновите свой план для использования данной возможности. Подробнее по ссылке %1</translation>
     </message>
 </context>
 </TS>
