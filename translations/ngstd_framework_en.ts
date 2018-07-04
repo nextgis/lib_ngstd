@@ -164,11 +164,11 @@ via the opened browser...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please upgrade and sign in to use this feature.<br>View pricing at %1</source>
+        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please upgrade to use this feature.<br>View pricing at %1</source>
+        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

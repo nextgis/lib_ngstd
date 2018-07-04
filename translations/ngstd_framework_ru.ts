@@ -165,12 +165,12 @@ via the opened browser...</source>
         <translation>Теперь вы можете закрыть эту страницу</translation>
     </message>
     <message>
-        <source>Please upgrade and sign in to use this feature.<br>View pricing at %1</source>
-        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности. Подробнее по ссылке %1</translation>
+        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
+        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
     </message>
     <message>
-        <source>Please upgrade to use this feature.<br>View pricing at %1</source>
-        <translation>Обновите свой план для использования данной возможности. Подробнее по ссылке %1</translation>
+        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
+        <translation>Обновите свой план для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
     </message>
 </context>
 </TS>
