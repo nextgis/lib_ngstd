@@ -20,6 +20,14 @@
         <source>Failed open file %1</source>
         <translation>Не удалось загрузить файл %1</translation>
     </message>
+    <message>
+        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
+        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
+    </message>
+    <message>
+        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
+        <translation>Обновите свой план для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
+    </message>
 </context>
 <context>
     <name>NGGUIApplication</name>
@@ -163,14 +171,6 @@ via the opened browser...</source>
         <location filename="../src/framework/access/signserver.cpp" line="68"/>
         <source>Now you can close this page</source>
         <translation>Теперь вы можете закрыть эту страницу</translation>
-    </message>
-    <message>
-        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
-        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
-    </message>
-    <message>
-        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
-        <translation>Обновите свой план для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
     </message>
 </context>
 </TS>
