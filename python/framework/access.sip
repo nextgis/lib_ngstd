@@ -9,7 +9,7 @@ class NGAccess : public QObject
 
 public:
     static NGAccess &instance();
-    static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock;
+    static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock);
     static void showUnsupportedMessage(QWidget *parent);
     void authorize();
     void exit();
