@@ -28,6 +28,7 @@
     #include <qtconcurrentrun.h>
 #endif // QT_VERSION >= 0x050000
 
+#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
