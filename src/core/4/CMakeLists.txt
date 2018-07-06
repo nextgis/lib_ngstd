@@ -42,7 +42,6 @@ if(WITH_ZLIB_EXTERNAL)
     endif()
 endif()
 
-
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
         qt4_add_translation(QM_FILES ${TRANSLATION})

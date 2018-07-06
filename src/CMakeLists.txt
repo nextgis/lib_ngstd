@@ -42,11 +42,6 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
       DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
 endif()
 
-set(NGLIBS
-    core
-    framework
-)
-
 foreach(NGLIB ${NGLIBS})
     add_subdirectory(${NGLIB})
 endforeach()

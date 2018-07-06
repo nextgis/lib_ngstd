@@ -119,6 +119,12 @@ endif()
 
 set(NGSTD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Used in src and translations
+set(NGLIBS
+    core
+    framework
+)
+
 add_subdirectory(src)
 if(WITH_BINDINGS)
     add_subdirectory(python)

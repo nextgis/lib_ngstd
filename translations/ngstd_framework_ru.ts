@@ -2,37 +2,38 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
-    <name>Application</name>
-    <message>
-        <location filename="../src/framework/application.cpp" line="151"/>
-        <source>No valid theme &quot;%1&quot;</source>
-        <translation>Тема &quot;%1&quot; не существует</translation>
-    </message>
-    <message>
-        <source>APP_LANGUAGE</source>
-        <translation>ru</translation>
-    </message>
-</context>
-<context>
     <name>NGAccess</name>
     <message>
-        <location filename="../src/framework/access/access.cpp" line="252"/>
+        <location filename="../src/framework/access/access.cpp" line="90"/>
+        <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
+        <translation>&lt;a href=&quot;http://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="93"/>
+        <location filename="../src/framework/access/access.cpp" line="98"/>
+        <source>Unsupported</source>
+        <translation>Без поддержки</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="94"/>
+        <source>Please upgrade and sign in to use this feature.&lt;br&gt;%1</source>
+        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности.&lt;br&gt;%1</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="99"/>
+        <source>Please upgrade to use this feature.&lt;br&gt;%1</source>
+        <translation>Обновите свой план для использования данной возможности.&lt;br&gt;%1</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="316"/>
         <source>Failed open file %1</source>
         <translation>Не удалось загрузить файл %1</translation>
-    </message>
-    <message>
-        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
-        <translation>Обновите свой план и войдите в аккаунт для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
-    </message>
-    <message>
-        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
-        <translation>Обновите свой план для использования данной возможности.&lt;br&gt;Подробнее по ссылке %1</translation>
     </message>
 </context>
 <context>
     <name>NGGUIApplication</name>
     <message>
-        <location filename="../src/framework/application.cpp" line="117"/>
+        <location filename="../src/framework/application.cpp" line="131"/>
         <source>Version</source>
         <translation>Версия</translation>
     </message>
@@ -40,39 +41,49 @@
 <context>
     <name>NGMainWindow</name>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="42"/>
+        <location filename="../src/framework/mainwindow.cpp" line="41"/>
         <source>Ready</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="126"/>
+        <location filename="../src/framework/mainwindow.cpp" line="130"/>
         <source>&amp;Open</source>
         <translation>&amp;Открыть</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="128"/>
+        <location filename="../src/framework/mainwindow.cpp" line="132"/>
         <source>Open project file</source>
         <translation>Открыть файл проекта</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="133"/>
+        <location filename="../src/framework/mainwindow.cpp" line="137"/>
         <source>&amp;Quit</source>
         <translation>&amp;Выйти</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="135"/>
+        <location filename="../src/framework/mainwindow.cpp" line="139"/>
         <source>Quit program</source>
         <translation>Выйти из программы</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="142"/>
+        <location filename="../src/framework/mainwindow.cpp" line="146"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="144"/>
+        <location filename="../src/framework/mainwindow.cpp" line="148"/>
         <source>About program</source>
         <translation>О программе</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="154"/>
+        <source>&amp;Preferences</source>
+        <translation>&amp;Настройки</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="156"/>
+        <source>Application preferences</source>
+        <translation>Настройки программы</translation>
     </message>
 </context>
 <context>
@@ -80,7 +91,7 @@
     <message>
         <location filename="../src/framework/navigationpane.cpp" line="53"/>
         <source>Split</source>
-        <translation>Разбить</translation>
+        <translation>Разделить</translation>
     </message>
     <message>
         <location filename="../src/framework/navigationpane.cpp" line="63"/>
@@ -103,7 +114,7 @@
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="52"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/ng_logo_bw_dark.svg&quot; height=&quot;20&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="68"/>
@@ -112,7 +123,7 @@
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="87"/>
-        <location filename="../src/framework/access/signdialog.cpp" line="41"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="42"/>
         <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
         <translation>&lt;a href=&quot;http://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
     </message>
@@ -120,30 +131,30 @@
         <location filename="../src/framework/access/signdialog.ui" line="103"/>
         <location filename="../src/framework/access/signdialog.ui" line="116"/>
         <source>TextLabel</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="23"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="24"/>
         <source>Exit</source>
         <translation>Выйти</translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="24"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="25"/>
         <source>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Account&lt;/a&gt;</source>
         <translation>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Аккаунт&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="30"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="31"/>
         <source>Supported</source>
         <translation>На поддержке</translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="30"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="31"/>
         <source>Unsupported</source>
         <translation>Без поддержки</translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="40"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="41"/>
         <source>Sign in</source>
         <translation>Войти</translation>
     </message>

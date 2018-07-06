@@ -21,7 +21,7 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
-set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
+set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM true)
 
 set(TRANSLATION_MESSAGES_FULL)
 foreach(NGLIB ${NGLIBS})
@@ -36,8 +36,10 @@ foreach(NGLIB ${NGLIBS})
     set(FILES_TO_TRANSLATE ${TRANSLATION_H} ${TRANSLATION_CPP} ${TRANSLATION_UI})
 
     if(BUILD_QT4 AND NOT BUILD_QT5)
+        find_anyproject(Qt4 REQUIRED COMPONENTS QtCore)
 	    qt4_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS})
     else()
+        find_anyproject(Qt5 REQUIRED COMPONENTS Core LinguistTools)
         qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TRANSLATIONS})
     endif()
     set(TRANSLATION_MESSAGES_FULL ${TRANSLATION_MESSAGES_FULL} ${TRANSLATION_MESSAGES})

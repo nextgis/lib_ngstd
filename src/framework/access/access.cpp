@@ -87,25 +87,17 @@ QIcon NGAccess::lockIcon(const QIcon &origin, const QSize &originSize,
 void NGAccess::showUnsupportedMessage(QWidget *parent)
 {
     //Get link to pricing for current locale
-    QString lang = QCoreApplication::translate("Application", "APP_LANGUAGE");
-    QString pricingLink;
-    if(lang == "ru") {
-        pricingLink = "<a href=\"http://nextgis.ru/pricing/\">http://nextgis.ru/pricing/</a>";
-    }
-    else {
-        pricingLink = "<a href=\"http://nextgis.com/pricing/\">http://nextgis.com/pricing/</a>";
-    }
+    QString pricingLink(tr("<a href=\"http://nextgis.com/pricing/\">Learn more ...</a>"));
+
     if (!instance().isUserAuthorized()) {
-        QMessageBox::warning(parent, QCoreApplication::translate("Application", "Unsupported"),
-                             QCoreApplication::translate("Application",
-                                                         "Please upgrade and sign in to use this feature.<br>"
-                                                         "View pricing at %1").arg(pricingLink));
+        QMessageBox::warning(parent, tr("Unsupported"),
+                             tr("Please upgrade and sign in to use this feature.<br>"
+                                "%1").arg(pricingLink));
     }
     else {
-        QMessageBox::warning(parent, QCoreApplication::translate("Application", "Unsupported"),
-                             QCoreApplication::translate("Application",
-                                                         "Please upgrade to use this feature.<br>"
-                                                         "View pricing at %1").arg(pricingLink));
+        QMessageBox::warning(parent, tr("Unsupported"),
+                             tr("Please upgrade to use this feature.<br>"
+                                "%1").arg(pricingLink));
     }
 }
 

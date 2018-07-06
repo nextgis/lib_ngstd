@@ -2,21 +2,30 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
-    <name>Application</name>
+    <name>NGAccess</name>
     <message>
-        <location filename="../src/framework/application.cpp" line="151"/>
-        <source>No valid theme &quot;%1&quot;</source>
+        <location filename="../src/framework/access/access.cpp" line="90"/>
+        <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>APP_LANGUAGE</source>
-        <translation>en</translation>
+        <location filename="../src/framework/access/access.cpp" line="93"/>
+        <location filename="../src/framework/access/access.cpp" line="98"/>
+        <source>Unsupported</source>
+        <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>NGAccess</name>
     <message>
-        <location filename="../src/framework/access/access.cpp" line="252"/>
+        <location filename="../src/framework/access/access.cpp" line="94"/>
+        <source>Please upgrade and sign in to use this feature.&lt;br&gt;%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="99"/>
+        <source>Please upgrade to use this feature.&lt;br&gt;%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/framework/access/access.cpp" line="316"/>
         <source>Failed open file %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -24,7 +33,7 @@
 <context>
     <name>NGGUIApplication</name>
     <message>
-        <location filename="../src/framework/application.cpp" line="117"/>
+        <location filename="../src/framework/application.cpp" line="131"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
@@ -32,38 +41,48 @@
 <context>
     <name>NGMainWindow</name>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="42"/>
+        <location filename="../src/framework/mainwindow.cpp" line="41"/>
         <source>Ready</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="126"/>
+        <location filename="../src/framework/mainwindow.cpp" line="130"/>
         <source>&amp;Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="128"/>
+        <location filename="../src/framework/mainwindow.cpp" line="132"/>
         <source>Open project file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="133"/>
+        <location filename="../src/framework/mainwindow.cpp" line="137"/>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="135"/>
+        <location filename="../src/framework/mainwindow.cpp" line="139"/>
         <source>Quit program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="142"/>
+        <location filename="../src/framework/mainwindow.cpp" line="146"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="144"/>
+        <location filename="../src/framework/mainwindow.cpp" line="148"/>
         <source>About program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="154"/>
+        <source>&amp;Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="156"/>
+        <source>Application preferences</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -104,7 +123,7 @@
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="87"/>
-        <location filename="../src/framework/access/signdialog.cpp" line="41"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="42"/>
         <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -115,27 +134,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="23"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="24"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="24"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="25"/>
         <source>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Account&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="30"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="31"/>
         <source>Supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="30"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="31"/>
         <source>Unsupported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/framework/access/signdialog.cpp" line="40"/>
+        <location filename="../src/framework/access/signdialog.cpp" line="41"/>
         <source>Sign in</source>
         <translation type="unfinished"></translation>
     </message>
@@ -161,14 +180,6 @@ via the opened browser...</source>
     <message>
         <location filename="../src/framework/access/signserver.cpp" line="68"/>
         <source>Now you can close this page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please upgrade and sign in to use this feature.&lt;br&gt;View pricing at %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please upgrade to use this feature.&lt;br&gt;View pricing at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
