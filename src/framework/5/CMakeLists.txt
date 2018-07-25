@@ -30,10 +30,10 @@ set(PUBLIC_HEADERS ${PUBLIC_HEADERS}
     ${PROJECT_SOURCE_DIR}/navigationwidget.h
     ${PROJECT_SOURCE_DIR}/navigationpane.h
     ${PROJECT_SOURCE_DIR}/styledbar.h
+    ${PROJECT_SOURCE_DIR}/style.h
 )
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-    ${PROJECT_SOURCE_DIR}/style.h
 )
 
 set(PROJECT_SOURCES ${PROJECT_SOURCES}
