@@ -86,7 +86,7 @@ void NGMainWindow::writeSettings()
     bool isStatusBarVisible = statusBar()->isVisible();
     QSettings settings;
 
-    settings.beginGroup("MainWindow");
+    settings.beginGroup(QLatin1String("MainWindow"));
     if(isMaximized()){
         settings.setValue("frame.maximized", true);
     }
@@ -103,7 +103,7 @@ void NGMainWindow::writeSettings()
 void NGMainWindow::readSettings()
 {
     QSettings settings;
-    settings.beginGroup("MainWindow");
+    settings.beginGroup(QLatin1String("MainWindow"));
     if(settings.value("frame.maximized", false).toBool()) {
         showMaximized();
     }

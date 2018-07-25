@@ -54,7 +54,7 @@ void NGGUIApplication::init(int &argc, char **argv)
 
     // Set theme and style.
     QSettings settings;
-    settings.beginGroup("Common");
+    settings.beginGroup(QLatin1String("Common"));
     QString themeName = settings.value("theme", QLatin1String("light")).toString();//"dark" //
     settings.endGroup();
     setStyle(themeName);

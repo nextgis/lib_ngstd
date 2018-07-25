@@ -94,7 +94,7 @@ void NGCoreApplication::loadTranslation()
     QStringList uiLanguages = QLocale::system().uiLanguages();
 
     QSettings settings;
-    settings.beginGroup("Common");
+    settings.beginGroup(QLatin1String("Common"));
     QString overrideLanguage = settings.value("lang").toString();
     settings.endGroup();
 

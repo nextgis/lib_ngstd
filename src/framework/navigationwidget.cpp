@@ -66,7 +66,7 @@ void NGNavigationWidget::removePaneHolder(NGNavigationPaneHolder *pane)
 void NGNavigationWidget::writeSettings()
 {
     QSettings settings;
-    settings.beginGroup("NavigationWidget");
+    settings.beginGroup(QLatin1String("NavigationWidget"));
     QStringList panes;
     for(int i = 0; i < count(); ++i) {
         NGNavigationPaneHolder *holder =
@@ -82,7 +82,7 @@ void NGNavigationWidget::writeSettings()
 void NGNavigationWidget::readSettings()
 {
     QSettings settings;
-    settings.beginGroup("NavigationWidget");
+    settings.beginGroup(QLatin1String("NavigationWidget"));
     QStringList panes = settings.value("panes").toStringList();
     if(panes.empty()) {
         if(!m_panes.empty()) {
