@@ -64,7 +64,7 @@ void NGCoreApplication::init(int &argc, char **argv)
 #ifdef Q_OS_WIN
     QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
                            + QDir::separator() + "..");
-    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/lib/qt%1/plugins").arg(qtVer));
 #elif defined(Q_OS_MAC)
     QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
@@ -72,11 +72,11 @@ void NGCoreApplication::init(int &argc, char **argv)
                            + QDir::separator() + ".."
                            + QDir::separator() + ".."
                            + QDir::separator() + "..");
-    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/Library/Plugins/Qt%1").arg(qtVer));
 #else
     QDir defaultPrefixDir("/usr");
-    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/%1/qt%2/plugins").arg(INSTALL_LIB_DIR).arg(qtVer));
 #endif
     m_prefixPath = defaultPrefixDir.absolutePath();
