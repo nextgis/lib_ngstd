@@ -47,6 +47,10 @@ NGCoreApplication::~NGCoreApplication()
 
 void NGCoreApplication::init(int &argc, char **argv)
 {
+    QString qtVer("5");
+#if QT_VERSION < 0x050000
+    qtVer = "4";
+#endif
 
 #ifdef Q_OS_WIN
     QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
@@ -73,11 +77,6 @@ void NGCoreApplication::init(int &argc, char **argv)
     m_app->setApplicationName(m_applicationName);
     m_app->setApplicationVersion(m_version);
     m_app->setOrganizationDomain(m_organizationDomain);
-
-    QString qtVer("5");
-#if QT_VERSION < 0x050000
-    qtVer = "4";
-#endif
 
     loadTranslation();
 
