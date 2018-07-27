@@ -62,11 +62,13 @@ void NGCoreApplication::init(int &argc, char **argv)
 #endif
 
 #ifdef Q_OS_WIN
-    QDir defaultPrefixDir(applicationDirPath() + QDir::separator() + "..");
+    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
+                           + QDir::separator() + "..");
     m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/lib/qt%1/plugins").arg(qtVer));
 #elif defined(Q_OS_MAC)
-    QDir defaultPrefixDir(applicationDirPath() + QDir::separator() + ".."
+    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
+                           + QDir::separator() + ".."
                            + QDir::separator() + ".."
                            + QDir::separator() + ".."
                            + QDir::separator() + "..");
