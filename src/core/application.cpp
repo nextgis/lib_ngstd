@@ -75,7 +75,7 @@ void NGCoreApplication::init(int &argc, char **argv)
 #else
     QDir defaultPrefixDir("/usr");
     m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
-        QString("/%1/Qt%2").arg(INSTALL_LIB_DIR).arg(qtVer));
+        QString("/%1/qt%2/plugins").arg(INSTALL_LIB_DIR).arg(qtVer));
 #endif
     m_prefixPath = defaultPrefixDir.absolutePath();
 
