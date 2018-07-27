@@ -56,6 +56,8 @@ void NGCoreApplication::init(int &argc, char **argv)
     m_app->setApplicationVersion(m_version);
     m_app->setOrganizationDomain(m_organizationDomain);
 
+    m_app->addLibraryPath(QLibraryInfo::location(QLibraryInfo::PluginsPath));
+
     loadTranslation();
 
     gCoreApplication = this;
