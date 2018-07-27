@@ -47,6 +47,24 @@ NGCoreApplication::~NGCoreApplication()
 
 void NGCoreApplication::init(int &argc, char **argv)
 {
+
+#ifdef Q_OS_WIN
+    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
+                           + QDir::separator() + "..");
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/lib/qt%1/plugins").arg(qtVer));
+#elif defined(Q_OS_MAC)
+    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
+                           + QLatin1String("/../../../.."));
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/Library/Plugins/Qt%1").arg(qtVer));
+#else
+    QDir defaultPrefixDir("/usr");
+    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/%1/qt%2/plugins").arg(INSTALL_LIB_DIR).arg(qtVer));
+#endif
+    m_prefixPath = defaultPrefixDir.absolutePath();
+
     createApplication(argc, argv);
 
     //TODO: create breakpad handler here.
@@ -60,26 +78,6 @@ void NGCoreApplication::init(int &argc, char **argv)
 #if QT_VERSION < 0x050000
     qtVer = "4";
 #endif
-
-#ifdef Q_OS_WIN
-    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
-                           + QDir::separator() + "..");
-    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
-        QString("/lib/qt%1/plugins").arg(qtVer));
-#elif defined(Q_OS_MAC)
-    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
-                           + QDir::separator() + ".."
-                           + QDir::separator() + ".."
-                           + QDir::separator() + ".."
-                           + QDir::separator() + "..");
-    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
-        QString("/Library/Plugins/Qt%1").arg(qtVer));
-#else
-    QDir defaultPrefixDir("/usr");
-    QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
-        QString("/%1/qt%2/plugins").arg(INSTALL_LIB_DIR).arg(qtVer));
-#endif
-    m_prefixPath = defaultPrefixDir.absolutePath();
 
     loadTranslation();
 
@@ -136,11 +134,10 @@ void NGCoreApplication::loadTranslation()
     const QString &libTrPath = QCoreApplication::applicationDirPath()
             + QLatin1String("/Contents/Resources/translations/");
     localePaths.append(libTrPath);
-    localePaths.append(m_prefixPath + QString("/Library/Translations/Qt%1").arg(qtVer);
+    localePaths.append(m_prefixPath + QString("/Library/Translations/Qt%1").arg(qtVer));
     translationPath(QCoreApplication::applicationDirPath() +
                        "/Contents/Frameworks/", localePaths);
-    translationPath(QCoreApplication::applicationDirPath() +
-                       "/../Library/Frameworks/", localePaths);
+    translationPath(m_prefixPath + QLatin1String("/Library/Frameworks/"), localePaths);
 #else
     localePaths.append(m_prefixPath + QLatin1String("/share/translations"));
     localePaths.append(m_prefixPath + QString("/share/qt%1/translations").arg(qtVer));
