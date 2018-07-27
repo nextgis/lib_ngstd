@@ -53,6 +53,7 @@ protected:
     QCoreApplication *m_app;
     QString m_applicationName, m_version, m_organization, m_organizationDomain;
     QVector<QTranslator*> m_translations;
+    QString m_prefixPath;
 };
 
 #endif // NGSTD_COREAPPLICATION_H

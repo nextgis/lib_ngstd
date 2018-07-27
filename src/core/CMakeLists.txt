@@ -23,6 +23,8 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 project(ngstd_core)
 
+add_definitions(-DINSTALL_LIB_DIR="${INSTALL_LIB_DIR}")
+
 find_anyproject(GDAL REQUIRED
 CMAKE_ARGS
     -DSKIP_DEFAULTS=ON

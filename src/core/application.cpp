@@ -56,7 +56,28 @@ void NGCoreApplication::init(int &argc, char **argv)
     m_app->setApplicationVersion(m_version);
     m_app->setOrganizationDomain(m_organizationDomain);
 
-    m_app->addLibraryPath(QLibraryInfo::location(QLibraryInfo::PluginsPath));
+    QString qtVer("5");
+#if QT_VERSION < 0x050000
+    qtVer = "4";
+#endif
+
+#ifdef Q_OS_WIN
+    QDir defaultPrefixDir(applicationDirPath() + QDir::separator() + "..");
+    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/lib/qt%1/plugins").arg(qtVer));
+#elif defined(Q_OS_MAC)
+    QDir defaultPrefixDir(applicationDirPath() + QDir::separator() + ".."
+                           + QDir::separator() + ".."
+                           + QDir::separator() + ".."
+                           + QDir::separator() + "..");
+    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/Library/Plugins/Qt%1").arg(qtVer));
+#else
+    QDir defaultPrefixDir("/usr");
+    m_app->addLibraryPath(defaultPrefixDir.absolutePath() +
+        QString("/%1/Qt%2").arg(INSTALL_LIB_DIR).arg(qtVer));
+#endif
+    m_prefixPath = defaultPrefixDir.absolutePath();
 
     loadTranslation();
 
@@ -104,18 +125,23 @@ void NGCoreApplication::loadTranslation()
         uiLanguages.prepend(overrideLanguage);
 
     QList<QString> localePaths;
+    QString qtVer("5");
+#if QT_VERSION < 0x050000
+    qtVer = "4";
+#endif
+
 #ifdef Q_OS_MACOS
     const QString &libTrPath = QCoreApplication::applicationDirPath()
             + QLatin1String("/Contents/Resources/translations/");
     localePaths.append(libTrPath);
+    localePaths.append(m_prefixPath + QString("/Library/Translations/Qt%1").arg(qtVer);
     translationPath(QCoreApplication::applicationDirPath() +
                        "/Contents/Frameworks/", localePaths);
     translationPath(QCoreApplication::applicationDirPath() +
                        "/../Library/Frameworks/", localePaths);
 #else
-    const QString &libTrPath = QCoreApplication::applicationDirPath()
-            + QLatin1String("/../share/translations");
-    localePaths.append(libTrPath);
+    localePaths.append(m_prefixPath + QLatin1String("/share/translations"));
+    localePaths.append(m_prefixPath + QString("/share/qt%1/translations").arg(qtVer));
 #endif
 
     localePaths.append(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
