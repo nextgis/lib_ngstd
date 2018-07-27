@@ -20,6 +20,7 @@
 #include "core/application.h"
 
 #include <QDir>
+#include <QFileInfo>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QSettings>
@@ -52,14 +53,14 @@ void NGCoreApplication::init(int &argc, char **argv)
     qtVer = "4";
 #endif
 
+    QString exeDir = QFileInfo(argv[0]).absoluteDir().absolutePath();
+
 #ifdef Q_OS_WIN
-    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
-                           + QDir::separator() + "..");
+    QDir defaultPrefixDir(exeDir + QLatin1String("/.."));
     QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/lib/qt%1/plugins").arg(qtVer));
 #elif defined(Q_OS_MAC)
-    QDir defaultPrefixDir(QCoreApplication::applicationDirPath()
-                           + QLatin1String("/../../../.."));
+    QDir defaultPrefixDir(exeDir + QLatin1String("/../../../.."));
     QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
         QString("/Library/Plugins/Qt%1").arg(qtVer));
 #else
