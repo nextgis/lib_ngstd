@@ -144,13 +144,18 @@ void NGCoreApplication::loadTranslation()
 
     localePaths.append(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 
+    QString exeName = QFileInfo(QCoreApplication::applicationFilePath()).baseName();
+
     foreach (QString locale, uiLanguages) {
         locale = QLocale(locale).name();
+        QString localeShort = locale.left(2);
 
         // get qm files list in libTrPath
         QStringList filters;
-        filters << QStringLiteral("ngstd_%1*").arg(locale.left(2));
-        filters << QStringLiteral("qt_%1*").arg(locale.left(2));
+        filters << QStringLiteral("ngstd_%1*").arg(localeShort);
+        filters << QStringLiteral("qt_%1*").arg(localeShort);
+        filters << QStringLiteral("%1_%2*").arg(exeName).arg(localeShort);
+
         foreach(QString localePath, localePaths) {
             QDir localeDir(localePath);
             QStringList libTrList = localeDir.entryList(filters);
