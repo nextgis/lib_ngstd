@@ -40,10 +40,9 @@ NGMainWindow::NGMainWindow(QWidget *parent) : QMainWindow(parent)
 {
     statusBar()->showMessage(tr("Ready"));
 
-    // For lrelease only
-    tr("File");
-    tr("&File");
-    tr("&Help");
+    QT_TR_NOOP("File");
+    QT_TR_NOOP("&File");
+    QT_TR_NOOP("&Help");
 }
 
 void NGMainWindow::open()
