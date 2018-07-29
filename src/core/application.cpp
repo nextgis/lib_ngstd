@@ -153,8 +153,9 @@ void NGCoreApplication::loadTranslation()
 
         // get qm files list in libTrPath
         QStringList filters;
-        filters << QStringLiteral("ngstd_%1*").arg(localeShort);
+        filters << QStringLiteral("ngstd_*_%1*").arg(localeShort);
         filters << QStringLiteral("qt_%1*").arg(localeShort);
+        filters << QStringLiteral("qtbase_%1*").arg(localeShort);
         filters << QStringLiteral("%1_%2*").arg(exeName).arg(localeShort);
 
         foreach(QString localePath, localePaths) {

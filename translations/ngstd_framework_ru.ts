@@ -46,42 +46,57 @@
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="130"/>
+        <location filename="../src/framework/mainwindow.cpp" line="44"/>
+        <source>File</source>
+        <translation>Файл</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="45"/>
+        <source>&amp;File</source>
+        <translation>&amp;Файл</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="46"/>
+        <source>&amp;Help</source>
+        <translation>&amp;Помощь</translation>
+    </message>
+    <message>
+        <location filename="../src/framework/mainwindow.cpp" line="135"/>
         <source>&amp;Open</source>
         <translation>&amp;Открыть</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="132"/>
+        <location filename="../src/framework/mainwindow.cpp" line="137"/>
         <source>Open project file</source>
         <translation>Открыть файл проекта</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="137"/>
+        <location filename="../src/framework/mainwindow.cpp" line="142"/>
         <source>&amp;Quit</source>
         <translation>&amp;Выйти</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="139"/>
+        <location filename="../src/framework/mainwindow.cpp" line="144"/>
         <source>Quit program</source>
         <translation>Выйти из программы</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="146"/>
+        <location filename="../src/framework/mainwindow.cpp" line="151"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="148"/>
+        <location filename="../src/framework/mainwindow.cpp" line="153"/>
         <source>About program</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="154"/>
+        <location filename="../src/framework/mainwindow.cpp" line="159"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Настройки</translation>
     </message>
     <message>
-        <location filename="../src/framework/mainwindow.cpp" line="156"/>
+        <location filename="../src/framework/mainwindow.cpp" line="161"/>
         <source>Application preferences</source>
         <translation>Настройки программы</translation>
     </message>

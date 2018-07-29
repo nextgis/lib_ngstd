@@ -34,11 +34,16 @@
 #include <QToolBar>
 #include <QMessageBox>
 
-//FIXME: 5. add properties dialog (dynamic)
+
 
 NGMainWindow::NGMainWindow(QWidget *parent) : QMainWindow(parent)
 {
     statusBar()->showMessage(tr("Ready"));
+
+    // For lrelease only
+    tr("File");
+    tr("&File");
+    tr("&Help");
 }
 
 void NGMainWindow::open()
