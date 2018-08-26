@@ -165,9 +165,8 @@ void NGAccess::setClientId(const QString &clientId)
 
     if(m_authorized) {
         // Get user avatar from local folder
-        QString avatarFilePath = avatarFilePath();
-        if(QFileInfo(avatarFilePath).exists()) {
-            m_avatar = QIcon(avatarFilePath);
+        if(QFileInfo(avatarFilePath()).exists()) {
+            m_avatar = QIcon(avatarFilePath());
             if(m_avatar.isNull()) {
                 m_avatar = QIcon(":/icons/person-red.svg");
             }
@@ -438,9 +437,8 @@ void NGAccess::onUserInfoUpdated()
     QString ngUsertId = settings.value("user_id").toString();
     m_authorized = !ngUsertId.isEmpty();
     if(m_authorized) {
-        QString avatarFilePath = avatarFilePath();
-        if(QFileInfo(avatarFilePath).exists()) {
-            m_avatar = QIcon(avatarFilePath);
+        if(QFileInfo(avatarFilePath()).exists()) {
+            m_avatar = QIcon(avatarFilePath());
             if(m_avatar.isNull()) {
                 m_avatar = QIcon(":/icons/person-red.svg");
             }
