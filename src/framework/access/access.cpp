@@ -405,8 +405,9 @@ extern void updateUserInfoFunction(const QString &configDir)
     QString emailHash = QString(QCryptographicHash::hash(
                                     email.toLower().toLatin1(),
                                     QCryptographicHash::Md5).toHex());
+    QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
     NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
-                       .arg(emailHash), avatarFilePath());
+                       .arg(emailHash), avatarPath);
 }
 
 extern void updateSupportInfoFunction(const QString &configDir)
