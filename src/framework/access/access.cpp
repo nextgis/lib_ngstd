@@ -139,8 +139,15 @@ void NGAccess::setClientId(const QString &clientId)
 {
     m_clientId = clientId;
 
-    m_configDir = QString( "%1.config%2access%3" )
-            .arg( QDir::homePath() + QDir::separator() )
+    QString config;
+#ifdef Q_OS_MACOS
+    config = QLatin1String("Library/Application Support");
+#else
+    config = QLatin1String(".config");
+#endif
+
+    m_configDir = QString( "%1%2access%3" )
+            .arg( QDir::homePath() + QDir::separator() + config + QDir::separator())
             .arg( QDir::separator() + QLatin1String(VENDOR) + QDir::separator() )
             .arg( QDir::separator() + QString(QCryptographicHash::hash(
                                                   m_clientId.toLatin1(),
