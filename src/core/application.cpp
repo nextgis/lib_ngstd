@@ -197,7 +197,13 @@ void NGCoreApplication::processCommandLine(const QCommandLineParser &/*parser*/)
 
 QString NGCoreApplication::configDirectory() const
 {
-    return QDir::homePath() + QDir::separator() + ".config" + QDir::separator() +
+    QString config;
+#ifdef Q_OS_MACOS
+    config = QLatin1String("Library/Application Support");
+#else
+    config = QLatin1String(".config");
+#endif
+    return QDir::homePath() + QDir::separator() + config + QDir::separator() +
             m_organization + QDir::separator() + m_applicationName;
 }
 
