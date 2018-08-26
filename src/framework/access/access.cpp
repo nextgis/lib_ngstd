@@ -165,8 +165,7 @@ void NGAccess::setClientId(const QString &clientId)
 
     if(m_authorized) {
         // Get user avatar from local folder
-        QString avatarFilePath = m_configDir + QDir::separator() +
-                QLatin1String(avatarFile);
+        QString avatarFilePath = avatarFilePath();
         if(QFileInfo(avatarFilePath).exists()) {
             m_avatar = QIcon(avatarFilePath);
             if(m_avatar.isNull()) {
@@ -226,6 +225,10 @@ void NGAccess::authorize()
 void NGAccess::exit()
 {
     m_authorized = m_supported = false;
+
+    QFile file(avatarFilePath());
+    file.remove();
+
     m_avatar = QIcon(":/icons/person-blue.svg");
 
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
@@ -403,9 +406,8 @@ extern void updateUserInfoFunction(const QString &configDir)
     QString emailHash = QString(QCryptographicHash::hash(
                                     email.toLower().toLatin1(),
                                     QCryptographicHash::Md5).toHex());
-    QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
     NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
-                       .arg(emailHash), avatarPath);
+                       .arg(emailHash), avatarFilePath());
 }
 
 extern void updateSupportInfoFunction(const QString &configDir)
@@ -436,13 +438,15 @@ void NGAccess::onUserInfoUpdated()
     QString ngUsertId = settings.value("user_id").toString();
     m_authorized = !ngUsertId.isEmpty();
     if(m_authorized) {
-        QString avatarFilePath = m_configDir + QDir::separator() +
-                QLatin1String(avatarFile);
+        QString avatarFilePath = avatarFilePath();
         if(QFileInfo(avatarFilePath).exists()) {
             m_avatar = QIcon(avatarFilePath);
             if(m_avatar.isNull()) {
                 m_avatar = QIcon(":/icons/person-red.svg");
             }
+        }
+        else {
+            m_avatar = QIcon(":/icons/person-blue.svg");
         }
 
         m_firstName = settings.value("first_name").toString();
