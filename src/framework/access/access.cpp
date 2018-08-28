@@ -140,7 +140,7 @@ void NGAccess::setClientId(const QString &clientId)
     m_clientId = clientId;
 
     QString config;
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS) || defined(Q_OS_MAC) // In Qt 4.8 Q_OS_MAC
     config = QLatin1String("Library/Application Support");
 #else
     config = QLatin1String(".config");
