@@ -104,8 +104,7 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
-    m_avatar(QIcon(":/icons/person-blue.svg")),
-    m_logFile(Q_NULLPTR)
+    m_avatar(QIcon(":/icons/person-blue.svg"))
 {
     m_updateUserInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateUserInfoWatcher, SIGNAL(finished()), this,
