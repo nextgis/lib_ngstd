@@ -23,6 +23,7 @@
 #include "framework/framework.h"
 
 #include <QDateTime>
+#include <QFile>
 #include <QFutureWatcher>
 #include <QIcon>
 #include <QObject>
@@ -69,6 +70,7 @@ protected:
     void getTokens(const QString &code, const QString &redirectUri);
     void updateUserInfo() const;
     void updateSupportInfo() const;
+    void logMessage(const QString &value);
 
 private:
     bool m_authorized;
@@ -78,6 +80,7 @@ private:
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
     QString m_firstName, m_lastName;
+    QFile m_logFile;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H

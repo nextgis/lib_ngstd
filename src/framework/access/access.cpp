@@ -104,7 +104,8 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
-    m_avatar(QIcon(":/icons/person-blue.svg"))
+    m_avatar(QIcon(":/icons/person-blue.svg")),
+    m_logFile(Q_NULLPTR)
 {
     m_updateUserInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateUserInfoWatcher, SIGNAL(finished()), this,
@@ -156,6 +157,9 @@ void NGAccess::setClientId(const QString &clientId)
     if(!QDir(m_configDir).exists()) {
         QDir().mkdir(m_configDir);
     }
+
+    m_logFile.setFileName(m_configDir + QDir::separator() + "access.log");
+    m_logFile.open(QIODevice::Append | QIODevice::Text);
 
     // Get user id from config
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
@@ -274,6 +278,7 @@ bool NGAccess::checkSupported()
     QSettings settings(settingsFilePath, QSettings::IniFormat);
     bool supported = settings.value("supported").toBool();
     if(!supported) {
+        logMessage("Account is not supported");
         return false;
     }
 
@@ -293,12 +298,17 @@ bool NGAccess::checkSupported()
                               reinterpret_cast<unsigned char*>(baSignature.data()),
                               static_cast<unsigned int>(baSignature.size()));
     if(!verify) {
+        logMessage("Account is supported. Verify failed");
         return false;
     }
 
     QDate start = QDate::fromString(startDate, "yyyy-MM-dd");
     QDate end = QDate::fromString(endDate, "yyyy-MM-dd");
-    return QDate::currentDate() >= start && QDate::currentDate() <= end;
+    bool out = QDate::currentDate() >= start && QDate::currentDate() <= end;
+    if(!out) {
+        logMessage("Account is supported. Verify success. Period expired.");
+    }
+    return out;
 }
 
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
@@ -472,3 +482,11 @@ void NGAccess::updateSupportInfo() const
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir);
     m_updateSupportInfoWatcher->setFuture(future);
 }
+
+void NGAccess::logMessage(const QString &value)
+{
+    QTextStream out(&m_logFile);
+    out.setCodec("UTF-8");
+    out << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss ") + value << endl;
+}
+
