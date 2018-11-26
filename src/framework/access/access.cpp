@@ -312,15 +312,6 @@ bool NGAccess::checkSupported()
     return out;
 }
 
-static void createKeyFile(const QString &path)
-{
-    QByteArray data("-----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzbmnrTLjTLxqCnIqXgIJ jebXVOn4oV++8z5VsBkQwK+svDkGK/UcJ4YjXUuPqyiZwauHGy1wizGCgVIRcPNM I0n9W6797NMFaC1G6Rp04ISv7DAu0GIZ75uDxE/HHDAH48V4PqQeXMp01Uf4ttti XfErPKGio7+SL3GloEqtqGbGDj6Yx4DQwWyIi6VvmMsbXKmdMm4ErczWFDFHIxpV ln/VfX43r/YOFxqt26M7eTpaBIvAU6/yWkIsvidMNL/FekQVTiRCl/exPgioDGrf 06z5a0sd3NDbS++GMCJstcKxkzk5KLQljAJ85Jciiuy2vv14WU621ves8S9cMISO HwIDAQAB -----END PUBLIC KEY-----");
-    QFile file(path);
-    file.open(QIODevice::WriteOnly);
-    file.write(data);
-    file.close();
-}
-
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
                                   unsigned int messageLength,
                                   unsigned char *signature,
@@ -342,20 +333,12 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
 
     FILE *file = fopen(keyFilePath.toLatin1().data(), "r");
     if (!file) {
-        logMessage(tr("Failed open file %1").arg(keyFilePath));
         qWarning() << tr("Failed open file %1").arg(keyFilePath);
-        createKeyFile();
-        file = fopen(keyFilePath.toLatin1().data(), "r");
-        if (!file) {
-            logMessage(tr("Failed open file %1").arg(keyFilePath));
-            qWarning() << tr("Failed open file %1").arg(keyFilePath);
-            return false;
-        }
+        return false;
     }
 
     EVP_PKEY *evp_pubkey = PEM_read_PUBKEY(file, nullptr, nullptr, nullptr);
     if (!evp_pubkey) {
-        logMessage("Failed PEM_read_PUBKEY");
         qWarning() << "Failed PEM_read_PUBKEY";
         fclose(file);
         return false;
@@ -365,7 +348,6 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
 
     EVP_MD_CTX *ctx = EVP_MD_CTX_create();
     if (!ctx) {
-        logMessage("Failed EVP_MD_CTX_create");
         qWarning() << "Failed EVP_MD_CTX_create";
         EVP_PKEY_free(evp_pubkey);
         return false;
@@ -374,14 +356,12 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
     if(!EVP_VerifyInit(ctx, EVP_sha256())) {
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
-        logMessage("Failed EVP_VerifyInit");
         qWarning() << "Failed EVP_VerifyInit";
     }
 
     if(!EVP_VerifyUpdate(ctx, originalMessage, messageLength)) {
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
-        logMessage("Failed EVP_VerifyUpdate");
         qWarning() << "Failed EVP_VerifyUpdate";
     }
     int result = EVP_VerifyFinal(ctx, signature, sigLength, evp_pubkey);
@@ -390,7 +370,6 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
     EVP_PKEY_free(evp_pubkey);
 
     qDebug() << "Signature is " << (result == 1 ? "valid" : "invalid");
-    logMessage( QString("Signature is %1").arg((result == 1 ? "valid" : "invalid")) );
 
     return result == 1;
 }
