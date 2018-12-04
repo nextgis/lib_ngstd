@@ -195,6 +195,7 @@ void NGAccess::setClientId(const QString &clientId)
 
             if(!NGRequest::addAuth(apiEndpoint, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
+                logMessage("Add tokens to NGRequest failed");
             }
         }
 
@@ -291,12 +292,14 @@ bool NGAccess::checkSupported()
     QByteArray baMessage = sMessage.toUtf8();
     QByteArray baSignature = QByteArray::fromBase64(sign.toUtf8());
 
-
+    QString errorMsg;
     bool verify = verifyRSASignature(reinterpret_cast<unsigned char*>(baMessage.data()),
                               static_cast<unsigned int>(baMessage.size()),
                               reinterpret_cast<unsigned char*>(baSignature.data()),
-                              static_cast<unsigned int>(baSignature.size()));
+                              static_cast<unsigned int>(baSignature.size()),
+                              errorMsg);
     if(!verify) {
+        logMessage(errorMsg);
         logMessage("Account is supported. Verify failed");
         return false;
     }
@@ -313,40 +316,49 @@ bool NGAccess::checkSupported()
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
                                   unsigned int messageLength,
                                   unsigned char *signature,
-                                  unsigned int sigLength) const
+                                  unsigned int sigLength,
+                                  QString &errorMsg) const
 {
     if(nullptr == originalMessage) {
         qWarning() << "Message is empty";
+        errorMsg = "Message is empty";
         return false;
     }
 
     if(nullptr == signature) {
         qWarning() << "Signature is empty";
+        errorMsg = "Signature is empty";
         return false;
     }
 
     // https://gist.github.com/sakamoto-poteko/396f289682089e1d767e
     // https://stackoverflow.com/questions/9465727/convert-qfile-to-file
     QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
+    QFile keyFile(keyFilePath);
+    if(!keyFile.open(QIODevice::ReadOnly)) {
+        qWarning() << tr("Failed open file %1").arg(keyFilePath);
+        errorMsg = QString("Failed open file %1").arg(keyFilePath);
+        return false;
+    }
 
-    FILE *file = fopen(keyFilePath.toLatin1().data(), "r");
+    FILE *file = fdopen(keyFile.handle(), "r"); // fopen(keyFilePath.toLatin1().data(), "r");
     if (!file) {
         qWarning() << tr("Failed open file %1").arg(keyFilePath);
+        errorMsg = QString("Failed open file %1").arg(keyFilePath);
         return false;
     }
 
     EVP_PKEY *evp_pubkey = PEM_read_PUBKEY(file, nullptr, nullptr, nullptr);
     if (!evp_pubkey) {
         qWarning() << "Failed PEM_read_PUBKEY";
-        fclose(file);
+        errorMsg = "Failed PEM_read_PUBKEY";
         return false;
     }
-
-    fclose(file);
 
     EVP_MD_CTX *ctx = EVP_MD_CTX_create();
     if (!ctx) {
         qWarning() << "Failed EVP_MD_CTX_create";
+        errorMsg = "Failed PEM_read_PUBKEY";
         EVP_PKEY_free(evp_pubkey);
         return false;
     }
@@ -355,12 +367,14 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
         qWarning() << "Failed EVP_VerifyInit";
+        errorMsg = "Failed EVP_VerifyInit";
     }
 
     if(!EVP_VerifyUpdate(ctx, originalMessage, messageLength)) {
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
         qWarning() << "Failed EVP_VerifyUpdate";
+        errorMsg = "Failed EVP_VerifyUpdate";
     }
     int result = EVP_VerifyFinal(ctx, signature, sigLength, evp_pubkey);
 
@@ -488,4 +502,3 @@ void NGAccess::logMessage(const QString &value)
     out.setCodec("UTF-8");
     out << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss ") + value << endl;
 }
-

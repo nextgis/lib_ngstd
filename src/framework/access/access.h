@@ -66,7 +66,8 @@ protected:
 
     bool checkSupported();
     bool verifyRSASignature(unsigned char *originalMessage, unsigned int messageLength,
-                            unsigned char *signature, unsigned int sigLength) const;
+                            unsigned char *signature, unsigned int sigLength,
+                            QString &errorMsg) const;
     void getTokens(const QString &code, const QString &redirectUri);
     void updateUserInfo() const;
     void updateSupportInfo() const;
