@@ -16,6 +16,8 @@ public:
     virtual ~NGSignDialog();
     void updateContent();
 
+    QPushButton *getSignButton () const;
+
 private slots:
     void onSignClicked();
 

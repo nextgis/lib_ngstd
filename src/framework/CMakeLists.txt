@@ -40,10 +40,10 @@ set(PROJECT_SOURCES
 set(ACCESS_HHEADERS
     ${PROJECT_SOURCE_DIR}/access/access.h
     ${PROJECT_SOURCE_DIR}/access/signbutton.h
+    ${PROJECT_SOURCE_DIR}/access/signdialog.h
 )
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
-    ${PROJECT_SOURCE_DIR}/access/signdialog.h
     ${PROJECT_SOURCE_DIR}/access/signserver.h
 )
 

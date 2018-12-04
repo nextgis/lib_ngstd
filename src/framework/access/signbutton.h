@@ -31,7 +31,8 @@ class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
 public:
     NGSignInButton(const QString &clientId, const QString &scope = "user_info.read",
                    QWidget * parent = nullptr);
-    virtual ~NGSignInButton() = default;               
+    virtual ~NGSignInButton() = default;
+    inline QDialog *getDialog () const { return m_signDialog; }
 
 signals:
     void userInfoUpdated();
