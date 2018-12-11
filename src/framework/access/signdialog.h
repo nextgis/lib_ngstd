@@ -1,6 +1,8 @@
 #ifndef SIGNDIALOG_H
 #define SIGNDIALOG_H
 
+#include "framework/framework.h"
+
 #include <QDialog>
 
 namespace Ui {
