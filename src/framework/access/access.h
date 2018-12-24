@@ -82,6 +82,7 @@ private:
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
     QString m_firstName, m_lastName;
     QFile m_logFile;
+    mutable QString m_updateToken;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H

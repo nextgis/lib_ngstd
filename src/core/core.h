@@ -33,6 +33,6 @@
 #endif // if defined(NGSTD_CORE_LIBRARY)
 
 
-NGCORE_EXPORT const char* getVersion();
+NGCORE_EXPORT const char *getVersion();
 
 #endif // NGSTD_CORE_H

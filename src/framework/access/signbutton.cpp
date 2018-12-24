@@ -46,12 +46,15 @@ NGSignInButton::NGSignInButton(const QString &clientId, const QString &scope,
 }
 
 void NGSignInButton::onClick()
-{
+{   
     NGSignDialog *dlg = qobject_cast<NGSignDialog*>(m_signDialog);
     QSize dlgSize = dlg->size();
     QSize btnSize = size();
-    QPoint pos1 = mapToGlobal(QPoint(btnSize.width(), btnSize.width()));
+    QPoint pos1 = mapToGlobal(QPoint(btnSize.width(), btnSize.height()));
     QPoint pos2(pos1.x() - dlgSize.width(), pos1.y());
+    if(pos2.x() < 0) {
+        pos2.setX(pos1.x() - btnSize.width());
+    }
     dlg->updateContent();
     dlg->move(pos2);
     dlg->show();

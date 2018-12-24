@@ -184,6 +184,7 @@ void NGAccess::setClientId(const QString &clientId)
         if(!accessToken.isEmpty()) {
 
             QMap<QString, QString> options;
+            options["type"] = "bearer";
             options["clientId"] = m_clientId;
             options["tokenServer"] = tokenEndpoint;
             options["expiresIn"] = settings.value("expires_in").toString();
@@ -252,6 +253,8 @@ void NGAccess::save()
     settings.setValue("expires_in", properties["expiresIn"]);
     settings.setValue("update_token", properties["updateToken"]);
     settings.setValue("access_token", properties["accessToken"]);
+
+    settings.sync();
 }
 
 bool NGAccess::isFunctionAvailable(const QString &/*app*/, const QString &/*func*/) const
@@ -395,6 +398,7 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     qDebug() << "code: " << code << "\nuri:" << redirectUri;
 
     QMap<QString, QString> options;
+    options["type"] = "bearer";
     options["clientId"] = m_clientId;
     options["tokenServer"] = tokenEndpoint;
     options["expiresIn"] = "-1";
@@ -475,6 +479,12 @@ void NGAccess::onUserInfoUpdated()
         m_lastName = settings.value("last_name").toString();
     }
     emit userInfoUpdated();
+
+    // If token changed, save
+    auto properties = NGRequest::instance().properties(apiEndpoint);
+    if(m_updateToken != properties["updateToken"]) {
+        save();
+    }
 }
 
 void NGAccess::onSupportInfoUpdated()
@@ -482,16 +492,26 @@ void NGAccess::onSupportInfoUpdated()
     qDebug() << "onSupportInfoUpdated";
     m_supported = checkSupported();
     emit supportInfoUpdated();
+
+    // If token changed, save
+    auto properties = NGRequest::instance().properties(apiEndpoint);
+    if(m_updateToken != properties["updateToken"]) {
+        save();
+    }
 }
 
 void NGAccess::updateUserInfo() const
 {
+    auto properties = NGRequest::instance().properties(apiEndpoint);
+    m_updateToken = properties["updateToken"];
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir);
     m_updateUserInfoWatcher->setFuture(future);
 }
 
 void NGAccess::updateSupportInfo() const
 {
+    auto properties = NGRequest::instance().properties(apiEndpoint);
+    m_updateToken = properties["updateToken"];
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir);
     m_updateSupportInfoWatcher->setFuture(future);
 }

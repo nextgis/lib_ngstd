@@ -26,40 +26,43 @@
 #include <QMutex>
 #include <QVariant>
 
+/**
+ * @brief The IHTTPAuth class is base class for HTTP Authorization headers
+ */
+class IHTTPAuth {
+public:
+    virtual ~IHTTPAuth() = default;
+    virtual const QString header() = 0;
+    virtual const QMap<QString, QString> properties() const = 0;
+};
+
 class NGCORE_EXPORT NGRequest
 {
 
 public:
     static bool addAuth(const QString &url, const QMap<QString, QString> &options);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
-    static void getFile(const QString &url, const QString &path);
+    static bool getFile(const QString &url, const QString &path);
     static QString getAuthHeader(const QString &url);
-    static NGRequest& instance();
+    static QString uploadFile(const QString &url, const QString &path,
+                              const QString &name);
+    static NGRequest &instance();
 
-    typedef struct _authInfo {
-        QString m_clientId;
-        QString m_accessToken;
-        QString m_updateToken;
-        QString m_tokenServer;
-        int m_expiresIn;
-        time_t m_lastCheck;
-    } AuthInfo;
 public:
-    void addAuth(const QString &url, AuthInfo auth);
+    void addAuth(const QString &url, IHTTPAuth *auth);
     void removeAuth(const QString &url);
     const QString authHeader(const QString &url);
     const QMap<QString, QString> properties(const QString &url) const;
-
+    char **baseOptions() const;
 
 protected:
     NGRequest();
-    ~NGRequest() = default;
+    ~NGRequest();
     NGRequest(const NGRequest &) = delete;
-    NGRequest& operator= (const NGRequest &) = delete;
-    char **baseOptions() const;
+    NGRequest &operator= (const NGRequest &) = delete;
 
 private:
-    QMap<QString, AuthInfo> m_auths;
+    QMap<QString, IHTTPAuth*> m_auths;
     QString m_connTimeout;
     QString m_timeout;
     QString m_maxRetry;
