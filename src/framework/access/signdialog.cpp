@@ -47,6 +47,11 @@ void NGSignDialog::updateContent()
     }
 }
 
+QPushButton *NGSignDialog::getSignButton () const
+{
+    return ui->signButton;
+}
+
 void NGSignDialog::onSignClicked()
 {
     if(NGAccess::instance().isUserAuthorized()) {
