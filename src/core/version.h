@@ -28,7 +28,7 @@
 #define LIB_NAME "ngstd" // for settings
 
 #define NGLIB_MAJOR_VERSION     0
-#define NGLIB_MINOR_VERSION     10
+#define NGLIB_MINOR_VERSION     11
 #define NGLIB_PATCH_NUMBER      0
 
 #define NGLIB_VERSION_NUMBER ( NGLIB_MAJOR_VERSION * 1000) + ( NGLIB_MINOR_VERSION \
