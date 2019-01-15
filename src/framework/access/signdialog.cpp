@@ -18,7 +18,23 @@ NGSignDialog::~NGSignDialog()
 
 void NGSignDialog::updateContent()
 {
-    if(NGAccess::instance().isUserAuthorized()) {
+    if(NGAccess::instance().isEnterprise()) {
+        ui->signButton->hide();
+        ui->learnMore->hide();
+        ui->userInfo->show();
+        ui->userInfo->setText(QString("<html><head/><body><p>%1<br>%2</p><p><b>%3</b></p></body></html>")
+                              .arg(NGAccess::instance().firstName())
+                              .arg(NGAccess::instance().lastName())
+                              .arg(NGAccess::instance().isUserSupported() ?
+                                       tr("Supported") : tr("Unsupported")));
+        ui->avatar->show();
+        ui->avatar->setText(QString("<html><head/><body><p><img src=\"%1\" height=\"64\"/></p></body></html>")
+                            .arg(NGAccess::instance().avatarFilePath()));
+
+        ui->ngLogo->hide();
+        ui->descriptionText->hide();
+    }
+    else if(NGAccess::instance().isUserAuthorized()) {
         // Show user info in widget
         // Name, big avatar, plan
         ui->signButton->setText(tr("Exit"));

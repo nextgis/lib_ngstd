@@ -21,7 +21,41 @@
 
 #include "core/version.h"
 
+#include "cpl_json.h"
+
 const char* getVersion()
 {
     return NGLIB_VERSION_STRING;
+}
+
+QMap<QString, QVariant> jsonToMap(const QString &path)
+{
+    QMap<QString, QVariant> out;
+    CPLJSONDocument in;
+    if(in.Load(path.toStdString())) {
+        CPLJSONObject root = in.GetRoot();
+        for(const CPLJSONObject &child : root.GetChildren()) {
+            QString name = QString::fromStdString(child.GetName());
+            switch(child.GetType()) {
+            case CPLJSONObject::Boolean:
+                out[name] = child.ToBool();
+                break;
+            case CPLJSONObject::String:
+                out[name] = QString::fromStdString(child.ToString());
+                break;
+            case CPLJSONObject::Integer:
+                out[name] = child.ToInteger();
+                break;
+            case CPLJSONObject::Long:
+                out[name] = child.ToLong();
+                break;
+            case CPLJSONObject::Double:
+                out[name] = child.ToDouble();
+                break;
+            default:
+                out[name] = QString::fromStdString(child.ToString());
+            }
+        }
+    }
+    return out;
 }

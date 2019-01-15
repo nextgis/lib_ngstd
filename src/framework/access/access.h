@@ -41,6 +41,7 @@ public:
     bool isFunctionAvailable(const QString &app, const QString &func) const;
     bool isUserSupported() const;
     bool isUserAuthorized() const;
+    bool isEnterprise() const;
 
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);
@@ -83,6 +84,7 @@ private:
     QString m_firstName, m_lastName;
     QFile m_logFile;
     mutable QString m_updateToken;
+    QString m_licenseDir;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H

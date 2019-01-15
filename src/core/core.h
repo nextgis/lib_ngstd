@@ -22,6 +22,8 @@
 
 #include <QtCore/QtGlobal>
 
+#include <QVariant>
+
 #if defined(NGSTD_CORE_LIBRARY)
 #  define NGCORE_EXPORT Q_DECL_EXPORT
 #else
@@ -34,5 +36,6 @@
 
 
 NGCORE_EXPORT const char *getVersion();
+NGCORE_EXPORT QMap<QString, QVariant> jsonToMap(const QString &path);
 
 #endif // NGSTD_CORE_H

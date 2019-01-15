@@ -106,6 +106,23 @@ NGAccess::NGAccess() :
     m_supported(false),
     m_avatar(QIcon(":/icons/person-blue.svg"))
 {
+    // Setup license key file
+    QFileInfo appDir(QCoreApplication::applicationDirPath());
+
+#if defined Q_OS_WIN
+    m_licenseDir = appDir.dir().absoluteFilePath("share\\license");
+#elif defined(Q_OS_MACX)
+    // 4 level up
+    QDir updaterDir = appDir.dir();
+    updaterDir.cdUp();
+    updaterDir.cdUp();
+    updaterDir.cdUp();
+    m_licenseDir = updaterDir.absoluteFilePath("usr/share/license");
+#else
+    m_licenseDir = QLatin1String("/usr/share/license");
+#endif
+
+
     m_updateUserInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateUserInfoWatcher, SIGNAL(finished()), this,
             SLOT(onUserInfoUpdated()));
@@ -207,6 +224,10 @@ void NGAccess::setClientId(const QString &clientId)
         updateUserInfo();
         updateSupportInfo();
     }
+    else if(isEnterprise()) {
+        updateUserInfo();
+        updateSupportInfo();
+    }
     else {
         m_avatar = QIcon(":/icons/person-blue.svg");
     }
@@ -271,6 +292,12 @@ bool NGAccess::isUserSupported() const
 bool NGAccess::isUserAuthorized() const
 {
     return m_authorized;
+}
+
+bool NGAccess::isEnterprise() const
+{
+    QFileInfo licenseJson(QDir(m_licenseDir).filePath("license.json"));
+    return licenseJson.exists() && licenseJson.isFile();
 }
 
 bool NGAccess::checkSupported()
@@ -413,13 +440,24 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     }
 }
 
-extern void updateUserInfoFunction(const QString &configDir)
+extern void updateUserInfoFunction(const QString &configDir, const QString &licenseDir)
 {
-    auto result = NGRequest::getJsonAsMap(QString("%1/user_info/").arg(apiEndpoint));
-    QString firstName = result["first_name"].toString();
-    QString lastName = result["last_name"].toString();
-    QString email = result["email"].toString();
-    QString userId = result["nextgis_guid"].toString();
+    QString firstName, lastName, email, userId;
+
+    // Check local files before request my.nextgis.com
+    QFileInfo licenseJson(QDir(licenseDir).filePath("license.json"));
+    QMap<QString, QVariant> result;
+    if(licenseJson.exists() && licenseJson.isFile()) {
+        result = jsonToMap(licenseJson.absoluteFilePath());
+    }
+    else {
+        result = NGRequest::getJsonAsMap(QString("%1/user_info/").arg(apiEndpoint));
+
+    }
+    firstName = result["first_name"].toString();
+    lastName = result["last_name"].toString();
+    email = result["email"].toString();
+    userId = result["nextgis_guid"].toString();
 
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
@@ -429,27 +467,50 @@ extern void updateUserInfoFunction(const QString &configDir)
     settings.setValue("last_name", lastName);
 
     // Get avatar
-    QString emailHash = QString(QCryptographicHash::hash(
-                                    email.toLower().toLatin1(),
-                                    QCryptographicHash::Md5).toHex());
     QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
-    NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
-                       .arg(emailHash), avatarPath);
+    QFileInfo avatar(QDir(licenseDir).filePath(avatarFile));
+    if(avatar.exists() && avatar.isFile()) {
+        if(QFile::exists(avatarPath)) {
+            QFile::remove(avatarPath);
+        }
+        QFile::copy(avatar.absoluteFilePath(), avatarPath);
+    }
+    else {
+        QString emailHash = QString(QCryptographicHash::hash(
+                                        email.toLower().toLatin1(),
+                                        QCryptographicHash::Md5).toHex());
+        NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
+                           .arg(emailHash), avatarPath);
+    }
 }
 
-extern void updateSupportInfoFunction(const QString &configDir)
+extern void updateSupportInfoFunction(const QString &configDir, const QString &licenseDir)
 {
-    auto result = NGRequest::getJsonAsMap(QString("%1/support_info/").arg(apiEndpoint));
-    bool supported = result["supported"].toBool();
+    bool supported = false;
+    QString sign, start_date, end_date;
+    // Check local files before request my.nextgis.com
+    QFileInfo licenseJson(QDir(licenseDir).filePath("license.json"));
+    QMap<QString, QVariant> result;
+    if(licenseJson.exists() && licenseJson.isFile()) {
+        result = jsonToMap(licenseJson.absoluteFilePath());
+    }
+    else {
+        result = NGRequest::getJsonAsMap(QString("%1/support_info/").arg(apiEndpoint));
+    }
+
+    supported = result["supported"].toBool();
+    sign = result["sign"].toString();
+    start_date = result["start_date"].toString();
+    end_date = result["end_date"].toString();
 
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
     settings.setValue("supported", supported);
 
     if(supported) {
-        settings.setValue("sign", result["sign"].toString());
-        settings.setValue("start_date", result["start_date"].toString());
-        settings.setValue("end_date", result["end_date"].toString());
+        settings.setValue("sign", sign);
+        settings.setValue("start_date", start_date);
+        settings.setValue("end_date", end_date);
 
         // Get key file
         QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
@@ -504,7 +565,8 @@ void NGAccess::updateUserInfo() const
 {
     auto properties = NGRequest::instance().properties(apiEndpoint);
     m_updateToken = properties["updateToken"];
-    QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir);
+    QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
+        m_licenseDir);
     m_updateUserInfoWatcher->setFuture(future);
 }
 
@@ -512,7 +574,8 @@ void NGAccess::updateSupportInfo() const
 {
     auto properties = NGRequest::instance().properties(apiEndpoint);
     m_updateToken = properties["updateToken"];
-    QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir);
+    QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir,
+        m_licenseDir);
     m_updateSupportInfoWatcher->setFuture(future);
 }
 
