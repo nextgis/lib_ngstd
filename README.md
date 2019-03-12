@@ -28,7 +28,7 @@ Qt library:
   * NextGIS Connect [planned]
   * NextGIS Data [planned]
   * QuickMapServices [planned]
-  * DTClassifier [planned]
+  * DTClassifier
 * NextGIS Formbuilder
 * NextGIS Manager [planned]
 
