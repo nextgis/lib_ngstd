@@ -30,7 +30,8 @@ Qt library:
   * QuickMapServices [planned]
   * DTClassifier
 * NextGIS Formbuilder
-* NextGIS Manager
+* NextGIS Manager [planned]
+* NextGIS Manuscript
 
 # Bindings
 
