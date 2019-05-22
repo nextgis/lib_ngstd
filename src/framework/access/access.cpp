@@ -304,8 +304,11 @@ bool NGAccess::isEnterprise() const
 
 QString NGAccess::getPluginSign(const QString &app, const QString &plugin) const
 {
-    //TODO: Add check from server
-    return signs[app + "." + plugin];
+    if(isUserSupported()) {
+        //TODO: Add check from server
+        return signs[app + "." + plugin];
+    }
+    return "";
 }
 
 bool NGAccess::checkSupported()
