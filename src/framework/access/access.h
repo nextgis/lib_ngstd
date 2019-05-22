@@ -42,6 +42,7 @@ public:
     bool isUserSupported() const;
     bool isUserAuthorized() const;
     bool isEnterprise() const;
+    QString getPluginSign(const QString &app, const QString &plugin) const;
 
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);

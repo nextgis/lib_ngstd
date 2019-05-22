@@ -67,6 +67,9 @@ set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
 )
 
+configure_file(${PROJECT_SOURCE_DIR}/access/sign.h.in ${PROJECT_BINARY_DIR}/access/sign.h)
+include_directories(${PROJECT_BINARY_DIR}/access)
+
 if(MSVC)
     add_definitions(-DLIB_NAME=${PROJECT_NAME})
     set(PROJECT_SOURCES ${PROJECT_SOURCES} "${CMAKE_SOURCE_DIR}/res/ngstd.rc")

@@ -52,6 +52,8 @@ constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
 constexpr const char *settingsFile = "settings.ini";
 
+#include "sign.h"
+
 NGAccess &NGAccess::instance()
 {
     static NGAccess s;
@@ -298,6 +300,12 @@ bool NGAccess::isEnterprise() const
 {
     QFileInfo licenseJson(QDir(m_licenseDir).filePath("license.json"));
     return licenseJson.exists() && licenseJson.isFile();
+}
+
+QString NGAccess::getPluginSign(const QString &app, const QString &plugin) const
+{
+    //TODO: Add check from server
+    return signs[app + "." + plugin];
 }
 
 bool NGAccess::checkSupported()

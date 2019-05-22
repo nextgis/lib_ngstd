@@ -1,0 +1,3 @@
+static QMap<QString, QString> signs(std::map<QString, QString> {
+    {"QGIS.TerritoryPlanStyler", "${TPS_PLUGIN_SIGN}"}
+});
