@@ -28,8 +28,11 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QFile>
+#include <QNetworkProxy>
+#include <QNetworkProxyFactory>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QUrl>
 
 #include "cpl_http.h"
 #include "cpl_json.h"
@@ -423,4 +426,50 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     CPLHTTPDestroyResult(result);
 
     return data;
+}
+
+/**
+ * @brief NGRequest::setProxy Set proxy for all requests.
+ * @param useProxy Use or not proxy.
+ * @param useSystemProxy Get proxy information from system. Any other properties ignored.
+ * @param proxyUrl Proxy url.
+ * @param porxyPort Proxy port.
+ * @param proxyUser User to authenticate in proxy.
+ * @param proxyPassword Password to authenticate in proxy.
+ * @param proxyAuth Proxy authentication scheme to use. Can be BASIC/NTLM/DIGEST/ANY.
+ */
+void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &proxyUrl,
+                         int porxyPort, const QString &proxyUser,
+                         const QString &proxyPassword, const QString &proxyAuth)
+{
+    if(useProxy) {
+        std::string url;
+        std::string userpwd;
+        if(useSystemProxy) {
+            QNetworkProxyQuery npq(QUrl("http://www.google.com"));
+            QList<QNetworkProxy> listOfProxies =
+                    QNetworkProxyFactory::systemProxyForQuery(npq);
+            // Get first proxy if any.
+            if(!listOfProxies.isEmpty()) {
+                url = listOfProxies[0].hostName().toStdString() + ":" +
+                        std::to_string(listOfProxies[0].port());
+                userpwd = listOfProxies[0].user().toStdString() + ":" +
+                        listOfProxies[0].password().toStdString();
+
+            }
+        }
+        else {
+            url = proxyUrl.toStdString() + ":" + std::to_string(porxyPort);
+            userpwd = proxyUser.toStdString() + ":" +
+                    proxyPassword.toStdString();
+            CPLSetConfigOption("GDAL_PROXY_AUTH", proxyAuth.toStdString().c_str());
+        }
+        CPLSetConfigOption("GDAL_HTTP_PROXY", url.c_str());
+        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", userpwd.c_str());
+    }
+    else {
+        CPLSetConfigOption("GDAL_HTTP_PROXY", nullptr);
+        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", nullptr);
+        CPLSetConfigOption("GDAL_PROXY_AUTH", nullptr);
+    }
 }

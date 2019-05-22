@@ -46,6 +46,11 @@ public:
     static QString getAuthHeader(const QString &url);
     static QString uploadFile(const QString &url, const QString &path,
                               const QString &name);
+    static void setProxy(bool useProxy = true, bool useSystemProxy = true,
+                         const QString &proxyUrl = "",
+                         int porxyPort = 0, const QString &proxyUser = "",
+                         const QString &proxyPassword = "",
+                         const QString &proxyAuth = "ANY");
     static NGRequest &instance();
 
 public:
