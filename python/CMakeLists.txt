@@ -22,7 +22,7 @@
 if(BUILD_QT4)
 
     find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
-    
+
     find_anyproject(SIP REQUIRED)
     find_anyproject(PyQt4 REQUIRED)
 
@@ -89,4 +89,5 @@ if(BUILD_QT4)
     endforeach()
 
     install(FILES __init__.py DESTINATION "${NGSTD_PYTHON_DIR}")
+    install(FILES loader/ximport.py DESTINATION "${NGSTD_PYTHON_DIR}")
 endif()
