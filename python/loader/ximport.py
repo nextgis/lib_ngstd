@@ -170,7 +170,7 @@ class ximporter(object):
         except KeyError:
             # we have the module, but no source
             return None
-        return _get_data(self, toc_entry).decode()
+        return _get_data(self, toc_entry) #.decode()
 
     # Return a bool signifying whether the module is a package or not.
     def is_package(self, fullname):
