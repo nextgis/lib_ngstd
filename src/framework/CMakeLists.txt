@@ -25,6 +25,8 @@ project(ngstd_framework)
 
 find_anyproject(OpenSSL REQUIRED)
 
+include_directories(${PROJECT_SOURCE_DIR}/access)
+
 set(PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/framework.h
     ${PROJECT_SOURCE_DIR}/updater.h
@@ -54,6 +56,17 @@ set(ACCESS_CSOURCES
     ${PROJECT_SOURCE_DIR}/access/signserver.cpp
 )
 
+file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD} TLS_VERIFY OFF)
+if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp)
+    set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
+        ${PROJECT_BINARY_DIR}/access/sign.cpp
+    )
+else()
+    set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
+        ${PROJECT_SOURCE_DIR}/access/sign.cpp
+    )
+endif()
+
 set(ACCESS_UIS
     ${PROJECT_SOURCE_DIR}/access/signdialog.ui
 )
@@ -67,7 +80,6 @@ set(TRANSLATIONS
     ${NGSTD_SOURCE_DIR}/translations/${PROJECT_NAME}_en.ts
 )
 
-configure_file(${PROJECT_SOURCE_DIR}/access/sign.h.in ${PROJECT_BINARY_DIR}/access/sign.h)
 include_directories(${PROJECT_BINARY_DIR}/access)
 
 if(MSVC)

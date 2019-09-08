@@ -52,8 +52,6 @@ constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
 constexpr const char *settingsFile = "settings.ini";
 
-#include "sign.h"
-
 NGAccess &NGAccess::instance()
 {
     static NGAccess s;
@@ -302,11 +300,10 @@ bool NGAccess::isEnterprise() const
     return licenseJson.exists() && licenseJson.isFile();
 }
 
-QString NGAccess::getPluginSign(const QString &app, const QString &plugin) const
+QString NGAccess::getPluginSign(const QString &pluginName, const QString &pluginVersion) const
 {
     if(isUserSupported()) {
-        //TODO: Add check from server
-        return signs[app + "." + plugin];
+        return pluginSign(pluginName, pluginVersion);
     }
     return "";
 }
@@ -352,6 +349,15 @@ bool NGAccess::checkSupported()
         logMessage("Account is supported. Verify success. Period expired.");
     }
     return out;
+}
+
+QString NGAccess::getPublicKey() const 
+{
+    QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
+    QFile keyFile(keyFilePath);
+    QTextStream in(&keyFile);
+    QString fileText = in.readAll();
+    return fileText;
 }
 
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,

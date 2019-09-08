@@ -28,6 +28,7 @@
 #include <QIcon>
 #include <QObject>
 
+
 class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
     Q_OBJECT
@@ -74,6 +75,8 @@ protected:
     void updateUserInfo() const;
     void updateSupportInfo() const;
     void logMessage(const QString &value);
+    QString getPublicKey() const;
+    QString pluginSign(const QString &pluginName, const QString &pluginVersion) const;
 
 private:
     bool m_authorized;

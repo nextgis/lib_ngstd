@@ -3,8 +3,8 @@
 *  Purpose: GIS libraries set.
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2009-2012 Dmitry Baryshnikov, bishop.dev@gmail.com
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2009-2019 Dmitry Baryshnikov, bishop.dev@gmail.com
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #define LIB_NAME "ngstd" // for settings
 
 #define NGLIB_MAJOR_VERSION     0
-#define NGLIB_MINOR_VERSION     11
+#define NGLIB_MINOR_VERSION     12
 #define NGLIB_PATCH_NUMBER      0
 
 #define NGLIB_VERSION_NUMBER ( NGLIB_MAJOR_VERSION * 1000) + ( NGLIB_MINOR_VERSION \

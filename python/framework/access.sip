@@ -17,7 +17,7 @@ public:
     bool isFunctionAvailable(const QString &app, const QString &func) const;
     bool isUserSupported() const;
     bool isUserAuthorized() const;
-    QString getPluginSign(const QString &app, const QString &plugin) const;
+    QString getPluginSign(const QString &pluginName, const QString &pluginVersion) const;
 
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);
