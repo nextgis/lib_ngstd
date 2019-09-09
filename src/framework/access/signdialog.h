@@ -12,7 +12,6 @@ class NGSignDialog;
 class NGFRAMEWORK_EXPORT NGSignDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit NGSignDialog(QWidget *parent = nullptr);
     virtual ~NGSignDialog();
