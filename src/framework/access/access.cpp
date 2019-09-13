@@ -355,8 +355,12 @@ QString NGAccess::getPublicKey() const
 {
     QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
     QFile keyFile(keyFilePath);
+    if(!keyFile.open(QFile::ReadOnly | QFile::Text)) {
+        return "";
+    }
     QTextStream in(&keyFile);
     QString fileText = in.readAll();
+    keyFile.close();
     return fileText;
 }
 
