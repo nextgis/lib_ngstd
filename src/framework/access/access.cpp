@@ -271,9 +271,9 @@ void NGAccess::save()
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
 
-    settings.setValue("expires_in", properties["expiresIn"]);
-    settings.setValue("update_token", properties["updateToken"]);
-    settings.setValue("access_token", properties["accessToken"]);
+    settings.setValue("expires_in", properties.value("expiresIn", 0));
+    settings.setValue("update_token", properties.value("updateToken", ""));
+    settings.setValue("access_token", properties.value("accessToken", ""));
 
     settings.sync();
 }
@@ -533,9 +533,19 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         settings.setValue("start_date", start_date);
         settings.setValue("end_date", end_date);
 
-        // Get key file
-        QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
-        NGRequest::getFile(QString("%1/rsa_public_key/").arg(apiEndpoint), keyFilePath);
+        QString pkPath = configDir + QDir::separator() + QLatin1String(keyFile);
+        QFileInfo pk(QDir(licenseDir).filePath(keyFile));
+        if(pk.exists() && pk.isFile()) {
+            if(QFile::exists(pkPath)) {
+                QFile::remove(pkPath);
+            }
+            QFile::copy(pk.absoluteFilePath(), pkPath);
+        }
+        else {
+            // Get key file
+            QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
+            NGRequest::getFile(QString("%1/rsa_public_key/").arg(apiEndpoint), keyFilePath);
+        }
     }
 }
 
@@ -564,7 +574,7 @@ void NGAccess::onUserInfoUpdated()
 
     // If token changed, save
     auto properties = NGRequest::instance().properties(apiEndpoint);
-    if(m_updateToken != properties["updateToken"]) {
+    if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
 }
@@ -577,7 +587,7 @@ void NGAccess::onSupportInfoUpdated()
 
     // If token changed, save
     auto properties = NGRequest::instance().properties(apiEndpoint);
-    if(m_updateToken != properties["updateToken"]) {
+    if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
 }
@@ -585,7 +595,7 @@ void NGAccess::onSupportInfoUpdated()
 void NGAccess::updateUserInfo() const
 {
     auto properties = NGRequest::instance().properties(apiEndpoint);
-    m_updateToken = properties["updateToken"];
+    m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
         m_licenseDir);
     m_updateUserInfoWatcher->setFuture(future);
@@ -594,7 +604,7 @@ void NGAccess::updateUserInfo() const
 void NGAccess::updateSupportInfo() const
 {
     auto properties = NGRequest::instance().properties(apiEndpoint);
-    m_updateToken = properties["updateToken"];
+    m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir,
         m_licenseDir);
     m_updateSupportInfoWatcher->setFuture(future);
