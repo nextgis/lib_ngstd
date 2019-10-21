@@ -18,6 +18,7 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include "signserver.h"
+#include "access.h"
 
 #include <QCoreApplication>
 #include <QDesktopServices>
