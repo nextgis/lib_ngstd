@@ -473,7 +473,7 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     }
 }
 
-extern void updateUserInfoFunction(const QString &configDir, const QString &licenseDir)
+extern void updateUserInfoFunction(const QString &configDir, const QString &licenseDir, const QString &endPoint)
 {
     QString firstName, lastName, email, userId;
 
@@ -484,7 +484,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1%2/user_info/").arg(m_endPoint).arg(apiEndpoint));
+        result = NGRequest::getJsonAsMap(QString("%1%2/user_info/").arg(endPoint).arg(apiEndpoint));
 
     }
     firstName = result["first_name"].toString();
@@ -517,7 +517,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
     }
 }
 
-extern void updateSupportInfoFunction(const QString &configDir, const QString &licenseDir)
+extern void updateSupportInfoFunction(const QString &configDir, const QString &licenseDir, const QString &endPoint)
 {
     bool supported = false;
     QString sign, start_date, end_date;
@@ -528,7 +528,7 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1%2/support_info/").arg(m_endPoint).arg(apiEndpoint));
+        result = NGRequest::getJsonAsMap(QString("%1%2/support_info/").arg(endPoint).arg(apiEndpoint));
     }
 
     supported = result["supported"].toBool();
@@ -556,7 +556,7 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         else {
             // Get key file
             QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
-            NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(m_endPoint).arg(apiEndpoint), keyFilePath);
+            NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(endPoint).arg(apiEndpoint), keyFilePath);
         }
     }
 }
@@ -609,7 +609,7 @@ void NGAccess::updateUserInfo() const
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
-        m_licenseDir);
+        m_licenseDir, m_endPoint);
     m_updateUserInfoWatcher->setFuture(future);
 }
 
@@ -618,7 +618,7 @@ void NGAccess::updateSupportInfo() const
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir,
-        m_licenseDir);
+        m_licenseDir, m_endPoint);
     m_updateSupportInfoWatcher->setFuture(future);
 }
 
