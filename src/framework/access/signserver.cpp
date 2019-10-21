@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include <QUrlQuery>
 #endif // QT_VERSION >= 0x050000
 
-constexpr const char *authUrlStr = "https://my.nextgis.com/oauth2/authorize/";
+constexpr const char *authUrlStr = "/oauth2/authorize/";
 
 constexpr const char *contentStr = "<html>"
 "<head><meta charset=\"UTF-8\"><title>%1</title></head>"
@@ -135,7 +135,7 @@ void NGSignServer::onGetReply()
 int NGSignServer::exec()
 {
     // Prepare url
-    QUrl url(authUrlStr);
+    QUrl url(NGAccess::instance().endPoint() + QLatin1String(authUrlStr));
     QList<QPair<QString, QString> > parameters;
     parameters.append(qMakePair(QString("response_type"), QString("code")));
     parameters.append(qMakePair(QString("client_id"), m_clientId));

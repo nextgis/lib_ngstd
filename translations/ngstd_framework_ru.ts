@@ -155,8 +155,8 @@
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.cpp" line="25"/>
-        <source>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Account&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Аккаунт&lt;/a&gt;</translation>
+        <source>Account</source>
+        <translation>Аккаунт</translation>
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.cpp" line="31"/>

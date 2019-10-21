@@ -155,7 +155,7 @@
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.cpp" line="25"/>
-        <source>&lt;a href=&quot;http://my.nextgis.com&quot;&gt;Account&lt;/a&gt;</source>
+        <source>Account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

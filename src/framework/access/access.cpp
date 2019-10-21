@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@
 #include "signserver.h"
 #include "version.h"
 
-constexpr const char *apiEndpoint = "https://my.nextgis.com/api/v1";
-constexpr const char *tokenEndpoint = "https://my.nextgis.com/oauth2/token/";
+constexpr const char *apiEndpoint = "/api/v1";
+constexpr const char *tokenEndpoint = "/oauth2/token/";
 
 constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
@@ -104,7 +104,9 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
-    m_avatar(QIcon(":/icons/person-blue.svg"))
+    m_avatar(QIcon(":/icons/person-blue.svg")),
+    m_scope(QLatin1String("user_info.read")),
+    m_endPoint(QLatin1String("https://my.nextgis.com"))
 {
     // Setup license key file
     QFileInfo appDir(QCoreApplication::applicationDirPath());
@@ -203,7 +205,7 @@ void NGAccess::setClientId(const QString &clientId)
             QMap<QString, QString> options;
             options["type"] = "bearer";
             options["clientId"] = m_clientId;
-            options["tokenServer"] = tokenEndpoint;
+            options["tokenServer"] = m_endPoint + tokenEndpoint;
             options["expiresIn"] = settings.value("expires_in").toString();
 
             QString refreshToken = settings.value("update_token").toString();
@@ -211,7 +213,7 @@ void NGAccess::setClientId(const QString &clientId)
             options["accessToken"] = accessToken;
             options["updateToken"] = refreshToken;
 
-            if(!NGRequest::addAuth(apiEndpoint, options)) {
+            if(!NGRequest::addAuth(m_endPoint + apiEndpoint, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
                 logMessage("Add tokens to NGRequest failed");
             }
@@ -236,6 +238,16 @@ void NGAccess::setClientId(const QString &clientId)
 void NGAccess::setScope(const QString &scope)
 {
     m_scope = scope;
+}
+
+void NGAccess::setEndPoint(const QString &endPoint)
+{
+    m_endPoint = endPoint;
+}
+
+QString NGAccess::endPoint() const
+{
+    return m_endPoint;
 }
 
 void NGAccess::authorize()
@@ -267,7 +279,7 @@ void NGAccess::exit()
 
 void NGAccess::save()
 {
-    auto properties = NGRequest::instance().properties(apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
 
@@ -448,12 +460,12 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     QMap<QString, QString> options;
     options["type"] = "bearer";
     options["clientId"] = m_clientId;
-    options["tokenServer"] = tokenEndpoint;
+    options["tokenServer"] = m_endPoint + tokenEndpoint;
     options["expiresIn"] = "-1";
     options["code"] = code;
     options["redirectUri"] = redirectUri;
 
-    if(NGRequest::addAuth(apiEndpoint, options)) {
+    if(NGRequest::addAuth(m_endPoint + apiEndpoint, options)) {
         updateUserInfo();
         updateSupportInfo();
 
@@ -472,7 +484,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1/user_info/").arg(apiEndpoint));
+        result = NGRequest::getJsonAsMap(QString("%1%2/user_info/").arg(m_endPoint).arg(apiEndpoint));
 
     }
     firstName = result["first_name"].toString();
@@ -516,7 +528,7 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1/support_info/").arg(apiEndpoint));
+        result = NGRequest::getJsonAsMap(QString("%1%2/support_info/").arg(m_endPoint).arg(apiEndpoint));
     }
 
     supported = result["supported"].toBool();
@@ -544,7 +556,7 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         else {
             // Get key file
             QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
-            NGRequest::getFile(QString("%1/rsa_public_key/").arg(apiEndpoint), keyFilePath);
+            NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(m_endPoint).arg(apiEndpoint), keyFilePath);
         }
     }
 }
@@ -573,7 +585,7 @@ void NGAccess::onUserInfoUpdated()
     emit userInfoUpdated();
 
     // If token changed, save
-    auto properties = NGRequest::instance().properties(apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
@@ -586,7 +598,7 @@ void NGAccess::onSupportInfoUpdated()
     emit supportInfoUpdated();
 
     // If token changed, save
-    auto properties = NGRequest::instance().properties(apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
@@ -594,7 +606,7 @@ void NGAccess::onSupportInfoUpdated()
 
 void NGAccess::updateUserInfo() const
 {
-    auto properties = NGRequest::instance().properties(apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
         m_licenseDir);
@@ -603,7 +615,7 @@ void NGAccess::updateUserInfo() const
 
 void NGAccess::updateSupportInfo() const
 {
-    auto properties = NGRequest::instance().properties(apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir,
         m_licenseDir);

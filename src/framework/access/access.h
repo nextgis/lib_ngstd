@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -47,11 +47,13 @@ public:
 
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);
+    void setEndPoint(const QString &endPoint);
 
     QIcon avatar() const;
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
+    QString endPoint() const;
 
 signals:
     void userInfoUpdated();
@@ -81,7 +83,7 @@ protected:
 private:
     bool m_authorized;
     bool m_supported;
-    QString m_clientId, m_scope;
+    QString m_clientId, m_scope, m_endPoint;
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
