@@ -56,8 +56,9 @@ set(ACCESS_CSOURCES
     ${PROJECT_SOURCE_DIR}/access/signserver.cpp
 )
 
-file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD} TLS_VERIFY OFF)
-if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp)
+file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD} TLS_VERIFY OFF STATUS download_status)
+list(GET ${download_status} 0 status_code)
+if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp AND ${status_code} EQUAL 0)
     set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
         ${PROJECT_BINARY_DIR}/access/sign.cpp
     )
