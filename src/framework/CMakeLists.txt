@@ -57,9 +57,8 @@ set(ACCESS_CSOURCES
 )
 
 file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD} TLS_VERIFY OFF)
-file(STRINGS ${PROJECT_BINARY_DIR}/access/sign.cpp SIGN_LINES LIMIT_COUNT 3)
-list(LENGTH ${SIGN_LINES} SIGN_LINES_COUNT)
-if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp AND ${SIGN_LINES_COUNT} GREATER 2)
+file(STRINGS ${PROJECT_BINARY_DIR}/access/sign.cpp SIGN_LINES LIMIT_COUNT 2)
+if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp AND ${SIGN_LINES})
     message(STATUS "Success to get sign code ===================================")
     set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
         ${PROJECT_BINARY_DIR}/access/sign.cpp
