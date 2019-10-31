@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2016 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ const NGTheme *NGGUIApplication::theme()
 
 void NGGUIApplication::createApplication(int &argc, char **argv)
 {
-    if(m_app)
+    if(m_app != nullptr)
         return;
     m_app = new QApplication(argc, argv);
 }

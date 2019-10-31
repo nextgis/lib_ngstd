@@ -3,7 +3,7 @@
 *  Purpose: Core library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2016 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -131,11 +131,11 @@ void NGCoreApplication::loadTranslation()
 #endif
 
 #ifdef Q_OS_MACOS
-    const QString &libTrPath = QCoreApplication::applicationDirPath()
+    const QString &libTrPath = m_app->applicationDirPath()
             + QLatin1String("/Contents/Resources/translations/");
     localePaths.append(libTrPath);
     localePaths.append(m_prefixPath + QString("/Library/Translations/Qt%1").arg(qtVer));
-    translationPath(QCoreApplication::applicationDirPath() +
+    translationPath(m_app->applicationDirPath() +
                        "/Contents/Frameworks/", localePaths);
     translationPath(m_prefixPath + QLatin1String("/Library/Frameworks/"), localePaths);
 #else
@@ -145,7 +145,7 @@ void NGCoreApplication::loadTranslation()
 
     localePaths.append(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 
-    QString exeName = QFileInfo(QCoreApplication::applicationFilePath()).baseName();
+    QString exeName = QFileInfo(m_app->applicationFilePath()).baseName();
 
     foreach (QString locale, uiLanguages) {
         locale = QLocale(locale).name();

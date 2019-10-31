@@ -24,10 +24,11 @@
 
 #include <QIcon>
 
-NGSignInButton::NGSignInButton(const QString &clientId, const QString &scope,
-                               QWidget * parent) :
+NGSignInButton::NGSignInButton(const QString &clientId, const QString &scope, 
+                               const QString &endPoint, QWidget * parent) :
     QToolButton (parent)
 {
+    NGAccess::instance().setEndPoint(endPoint);
     NGAccess::instance().setScope(scope);
     NGAccess::instance().setClientId(clientId);
 

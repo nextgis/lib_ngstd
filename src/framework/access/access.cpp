@@ -492,6 +492,10 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
     email = result["email"].toString();
     userId = result["nextgis_guid"].toString();
 
+    if(email.isEmpty()) {
+        email = firstName + QLatin1String(" ") + lastName;
+    }
+
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
 
@@ -566,8 +570,8 @@ void NGAccess::onUserInfoUpdated()
     qDebug() << "onUserInfoUpdated";
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
-    QString ngUsertId = settings.value("user_id").toString();
-    m_authorized = !ngUsertId.isEmpty();
+    QString ngUserId = settings.value("user_id").toString();
+    m_authorized = !ngUserId.isEmpty();
     if(m_authorized) {
         if(QFileInfo(avatarFilePath()).exists()) {
             m_avatar = QIcon(avatarFilePath());
@@ -582,26 +586,28 @@ void NGAccess::onUserInfoUpdated()
         m_firstName = settings.value("first_name").toString();
         m_lastName = settings.value("last_name").toString();
     }
-    emit userInfoUpdated();
 
     // If token changed, save
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
+
+    emit userInfoUpdated();
 }
 
 void NGAccess::onSupportInfoUpdated()
 {
     qDebug() << "onSupportInfoUpdated";
     m_supported = checkSupported();
-    emit supportInfoUpdated();
 
     // If token changed, save
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
+    
+    emit supportInfoUpdated();
 }
 
 void NGAccess::updateUserInfo() const

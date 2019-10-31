@@ -30,6 +30,7 @@ class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
     Q_OBJECT
 public:
     NGSignInButton(const QString &clientId, const QString &scope = "user_info.read",
+                   const QString &endPoint = "https://my.nextgis.com", 
                    QWidget * parent = nullptr);
     virtual ~NGSignInButton() = default;
     inline QDialog *getDialog () const { return m_signDialog; }
