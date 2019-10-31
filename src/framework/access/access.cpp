@@ -528,7 +528,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
 extern void updateSupportInfoFunction(const QString &configDir, const QString &licenseDir, const QString &endPoint)
 {
     bool supported = false;
-    QString sign, start_date, end_date;
+    QString sign, start_date, end_date, userId;
     // Check local files before request my.nextgis.com
     QFileInfo licenseJson(QDir(licenseDir).filePath("license.json"));
     QMap<QString, QVariant> result;
