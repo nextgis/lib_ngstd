@@ -335,6 +335,7 @@ bool NGAccess::checkSupported()
     }
 
     userId = settings.value("user_id").toString();
+    m_authorized = !userId.isEmpty();
     startDate = settings.value("start_date").toString();
     endDate = settings.value("end_date").toString();
     sign = settings.value("sign").toString();
@@ -505,8 +506,6 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
     settings.setValue("first_name", firstName);
     settings.setValue("last_name", lastName);
 
-    settings.sync();
-
     // Get avatar
     QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
     QFileInfo avatar(QDir(licenseDir).filePath(avatarFile));
@@ -569,8 +568,6 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
             NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(endPoint).arg(apiEndpoint), keyFilePath);
         }
     }
-
-    settings.sync();
 }
 
 void NGAccess::onUserInfoUpdated()
@@ -595,27 +592,27 @@ void NGAccess::onUserInfoUpdated()
         m_lastName = settings.value("last_name").toString();
     }
 
+    emit userInfoUpdated();
+
     // If token changed, save
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
-
-    emit userInfoUpdated();
 }
 
 void NGAccess::onSupportInfoUpdated()
 {
     qDebug() << "onSupportInfoUpdated";
     m_supported = checkSupported();
+    
+    emit supportInfoUpdated();
 
     // If token changed, save
     auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
-    
-    emit supportInfoUpdated();
 }
 
 void NGAccess::updateUserInfo() const
