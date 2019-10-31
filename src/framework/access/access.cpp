@@ -543,10 +543,12 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
     sign = result["sign"].toString();
     start_date = result["start_date"].toString();
     end_date = result["end_date"].toString();
+    userId = result["nextgis_guid"].toString();
 
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
     settings.setValue("supported", supported);
+    settings.setValue("user_id", userId);
 
     if(supported) {
         settings.setValue("sign", sign);
