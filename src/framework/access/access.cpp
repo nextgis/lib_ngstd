@@ -273,6 +273,8 @@ void NGAccess::exit()
 
     settings.setValue("user_id", "");
 
+    settings.sync();
+
     emit userInfoUpdated();
     emit supportInfoUpdated();
 }
@@ -503,6 +505,8 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
     settings.setValue("first_name", firstName);
     settings.setValue("last_name", lastName);
 
+    settings.sync();
+
     // Get avatar
     QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
     QFileInfo avatar(QDir(licenseDir).filePath(avatarFile));
@@ -563,6 +567,8 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
             NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(endPoint).arg(apiEndpoint), keyFilePath);
         }
     }
+
+    settings.sync();
 }
 
 void NGAccess::onUserInfoUpdated()
