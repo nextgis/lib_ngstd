@@ -154,6 +154,11 @@
         <translation>Выйти</translation>
     </message>
     <message>
+        <location filename="../src/framework/access/signdialog.cpp" line="24"/>
+        <source>Sign out</source>
+        <translation>Выйти</translation>
+    </message>    
+    <message>
         <location filename="../src/framework/access/signdialog.cpp" line="25"/>
         <source>Account</source>
         <translation>Аккаунт</translation>
