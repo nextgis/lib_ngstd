@@ -56,7 +56,7 @@ void NGSignDialog::updateContent()
     else if(NGAccess::instance().isUserAuthorized()) {
         // Show user info in widget
         // Name, big avatar, plan
-        ui->signButton->setText(tr("Exit"));
+        ui->signButton->setText(tr("Sign out"));
         ui->learnMore->setText(QString("<a href=\"%1\">%2</a>").arg(NGAccess::instance().endPoint()).arg(tr("Account")));
         ui->userInfo->show();
         ui->userInfo->setText(QString("<html><head/><body><p>%1<br>%2</p><p><b>%3</b></p></body></html>")
