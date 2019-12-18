@@ -19,6 +19,20 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#ifndef NGLIB_MAJOR_VERSION
+#define NGLIB_MAJOR_VERSION     0
+#define NGLIB_MINOR_VERSION     12
+#define NGLIB_PATCH_NUMBER      2
+#endif // NGLIB_MAJOR_VERSION
+
+#ifndef NGLIB_COMPUTE_VERSION
+#define NGLIB_COMPUTE_VERSION(maj,min,rev) ((maj)*10000+(min)*100+(rev))
+#endif // NGLIB_COMPUTE_VERSION
+
+#ifdef NGLIB_VERSION_NUMBER
+#define NGLIB_VERSION_NUMBER (NGLIB_COMPUTE_VERSION(NGLIB_MAJOR_VERSION,NGLIB_MINOR_VERSION,NGLIB_PATCH_NUMBER))
+#endif // NGLIB_VERSION_NUMBER
+
 #ifndef NGSTD_VERSION_H
 #define NGSTD_VERSION_H
 
@@ -27,18 +41,11 @@
 #define LIB_COMMENT "Standart NextGIS library for desktop applications."
 #define LIB_NAME "ngstd" // for settings
 
-#define NGLIB_MAJOR_VERSION     0
-#define NGLIB_MINOR_VERSION     12
-#define NGLIB_PATCH_NUMBER      2
-
-#define NGLIB_VERSION_NUMBER ( NGLIB_MAJOR_VERSION * 10000) + ( NGLIB_MINOR_VERSION \
-    * 100) +  NGLIB_PATCH_NUMBER
-
 #define STRINGIZE(x)  #x
 #define MAKE_VERSION_DOT_STRING(x, y, z) STRINGIZE(x) "." STRINGIZE(y) "." \
     STRINGIZE(z)
 
-#define NGLIB_VERSION_STRING MAKE_VERSION_DOT_STRING( NGLIB_MAJOR_VERSION, \
+#define NGLIB_VERSION_STRING MAKE_VERSION_DOT_STRING(NGLIB_MAJOR_VERSION, \
      NGLIB_MINOR_VERSION,  NGLIB_PATCH_NUMBER)
 
 /*  check if the current version is at least major.minor.release */
