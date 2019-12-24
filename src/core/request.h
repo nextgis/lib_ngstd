@@ -3,7 +3,7 @@
 *  Purpose: Core Library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -40,8 +40,10 @@ class NGCORE_EXPORT NGRequest
 {
 
 public:
-    static bool addAuth(const QString &url, const QMap<QString, QString> &options);
+    static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
+    static QString getJsonAsString(const QString &url);
+    static QString getAsString(const QString &url);
     static bool getFile(const QString &url, const QString &path);
     static QString getAuthHeader(const QString &url);
     static QString uploadFile(const QString &url, const QString &path,
@@ -67,7 +69,7 @@ protected:
     NGRequest &operator= (const NGRequest &) = delete;
 
 private:
-    QMap<QString, IHTTPAuth*> m_auths;
+    QMap<QString, QSharedPointer<IHTTPAuth>> m_auths;
     QString m_connTimeout;
     QString m_timeout;
     QString m_maxRetry;

@@ -213,7 +213,10 @@ void NGAccess::setClientId(const QString &clientId)
             options["accessToken"] = accessToken;
             options["updateToken"] = refreshToken;
 
-            if(!NGRequest::addAuth(m_endPoint + apiEndpoint, options)) {
+            QStringList urls;
+            urls << m_endPoint + apiEndpoint << "map.nextgis.com" << "geoservices.nextgis.com" << "nextgis.com" << "nextgis.ru";
+
+            if(!NGRequest::addAuth(urls, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
                 logMessage("Add tokens to NGRequest failed");
             }
@@ -468,7 +471,10 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     options["code"] = code;
     options["redirectUri"] = redirectUri;
 
-    if(NGRequest::addAuth(m_endPoint + apiEndpoint, options)) {
+    QStringList urls;
+    urls << m_endPoint + apiEndpoint << "map.nextgis.com" << "geoservices.nextgis.com" << "nextgis.com" << "nextgis.ru";
+
+    if(NGRequest::addAuth(urls, options)) {
         updateUserInfo();
         updateSupportInfo();
 

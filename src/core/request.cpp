@@ -3,7 +3,7 @@
 *  Purpose: Core Library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ const QMap<QString, QString> HTTPAuthBasic::properties() const
 class HTTPAuthBearer : public IHTTPAuth {
 
 public:
-    explicit HTTPAuthBearer(const QString &url, const QString &clientId,
+    explicit HTTPAuthBearer(const QString &clientId,
                             const QString &tokenServer, const QString &accessToken,
                             const QString &updateToken, int expiresIn,
                             time_t lastCheck, NGRequest *request);
@@ -87,7 +87,6 @@ public:
     virtual const QMap<QString, QString> properties() const override;
 
 private:
-    QString m_url;
     QString m_clientId;
     QString m_accessToken;
     QString m_updateToken;
@@ -97,11 +96,10 @@ private:
     NGRequest *m_request;
 };
 
-HTTPAuthBearer::HTTPAuthBearer(const QString &url, const QString &clientId,
+HTTPAuthBearer::HTTPAuthBearer(const QString &clientId,
                                const QString &tokenServer, const QString &accessToken,
                                const QString &updateToken, int expiresIn,
                                time_t lastCheck, NGRequest *request) : IHTTPAuth(),
-    m_url(url),
     m_clientId(clientId),
     m_accessToken(accessToken),
     m_updateToken(updateToken),
@@ -131,12 +129,10 @@ const QString HTTPAuthBearer::header()
     time_t now = time(nullptr);
     double seconds = difftime(now, m_lastCheck);
     if(seconds < m_expiresIn) {
-        qDebug() << "Token is not expired. Url: " << m_url;
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
 
     // 2. Try to update token
-    // TODO: Get proxy from QNetworkProxy QNetworkAccessManager::proxy() const
     char **options = m_request->baseOptions();
     options = CSLAddNameValue(options, "CUSTOMREQUEST", "POST");
     options = CSLAddNameValue(options, "POSTFIELDS",
@@ -144,19 +140,19 @@ const QString HTTPAuthBearer::header()
                                          Q_CONSTCHAR(m_clientId),
                                          Q_CONSTCHAR(m_updateToken)));
 
-    CPLHTTPResult* result = CPLHTTPFetch(Q_CONSTCHAR(m_tokenServer), options);
+    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(m_tokenServer), options);
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         CPLHTTPDestroyResult( result );
-        qDebug() << "Failed to refresh token. Return last not expired. Url: " << m_url;
+        qDebug() << "Failed to refresh token. Return last not expired. ";
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
 
     CPLJSONDocument resultJson;
     if(!resultJson.LoadMemory(result->pabyData, result->nDataLen)) {
         CPLHTTPDestroyResult( result );
-        qDebug() << "Token is expired. Url: " << m_url;
+        qDebug() << "Token is expired. ";
         return "expired";
     }
     CPLHTTPDestroyResult( result );
@@ -165,8 +161,7 @@ const QString HTTPAuthBearer::header()
     CPLJSONObject root = resultJson.GetRoot();
     if(!EQUAL(root.GetString("error", "").c_str(), "")) {
         qDebug() << "Token is expired. " <<
-                    "\nError:" << QString::fromStdString(root.GetString("error", "")) <<
-                    "\nUrl: " << m_url;
+                    "\nError:" << QString::fromStdString(root.GetString("error", ""));
         return "expired";
     }
 
@@ -178,7 +173,7 @@ const QString HTTPAuthBearer::header()
     m_lastCheck = now;
 
     // 5. Return new Auth Header
-    qDebug() << "Token updated. Url: " << m_url;
+    qDebug() << "Token updated.";
 
     return QString("Authorization: Bearer %1").arg(m_accessToken);
 }
@@ -202,10 +197,6 @@ NGRequest::NGRequest() : m_connTimeout("15"),
 
 NGRequest::~NGRequest()
 {
-    QMap<QString, IHTTPAuth*>::iterator i;
-    for (i = m_auths.begin(); i != m_auths.end(); ++i) {
-        delete i.value();
-    }
 }
 
 char **NGRequest::baseOptions() const
@@ -223,7 +214,7 @@ char **NGRequest::baseOptions() const
     return options;
 }
 
-bool NGRequest::addAuth(const QString &url, const QMap<QString, QString> &options)
+bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &options)
 {
     if(options["type"] == "bearer") {
         int expiresIn = options["expiresIn"].toInt();
@@ -260,14 +251,55 @@ bool NGRequest::addAuth(const QString &url, const QMap<QString, QString> &option
             lastCheck = now;
         }
 
-        HTTPAuthBearer *auth = new HTTPAuthBearer(url, clientId, tokenServer,
+        HTTPAuthBearer *auth = new HTTPAuthBearer(clientId, tokenServer,
                                                   accessToken, updateToken,
                                                   expiresIn, lastCheck,
                                                   &instance());
-        instance().addAuth(url, auth);
+        foreach(const QString &url, urls) {
+            instance().addAuth(url, auth);
+        }
         return true;
     }
     return false;
+}
+
+QString NGRequest::getAsString(const QString &url)
+{
+    char **options = instance().baseOptions();
+    QString headers = "Accept: */*";
+    QString authHeaderStr = instance().authHeader(url);
+    if(!authHeaderStr.isEmpty()) {
+        headers += "\r\n" + authHeaderStr;
+    }
+    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
+    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
+    CSLDestroy(options);
+    if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
+        CPLHTTPDestroyResult( result );
+        return QString();
+    }
+    QByteArray data(reinterpret_cast<const char*>(result->pabyData), result->nDataLen);
+    CPLHTTPDestroyResult(result);
+    return data;
+}
+
+QString NGRequest::getJsonAsString(const QString &url)
+{
+    char **options = instance().baseOptions();
+    QString headers = "Accept: */*";
+    QString authHeaderStr = instance().authHeader(url);
+    if(!authHeaderStr.isEmpty()) {
+        headers += "\r\n" + authHeaderStr;
+    }
+    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
+    QString out;
+    CPLJSONDocument in;
+    if(in.LoadUrl(url.toStdString(), options)) {
+        out = QString::fromStdString(in.SaveAsString());
+    }
+    CSLDestroy(options);
+
+    return out;
 }
 
 QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
@@ -322,7 +354,7 @@ bool NGRequest::getFile(const QString &url, const QString &path)
         headers += "\r\n" + authHeaderStr;
     }
     options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
-    CPLHTTPResult* result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
+    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
@@ -349,7 +381,7 @@ NGRequest &NGRequest::instance()
 
 void NGRequest::addAuth(const QString &url, IHTTPAuth *auth)
 {
-    m_auths[url] = auth;
+    m_auths[url] = QSharedPointer<IHTTPAuth>(auth);
 }
 
 void NGRequest::removeAuth(const QString &url)
@@ -361,7 +393,7 @@ const QString NGRequest::authHeader(const QString &url)
 {
     QMutexLocker locker(&m_mutex);
     QString header;
-    QMap<QString, IHTTPAuth*>::iterator it;
+    QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
     for(it = m_auths.begin(); it != m_auths.end(); ++it) {
         if(url.startsWith(it.key())) {
             return it.value()->header();
@@ -378,11 +410,9 @@ const QString NGRequest::authHeader(const QString &url)
 const QMap<QString, QString> NGRequest::properties(const QString &url) const
 {
     QMap<QString, QString> out;
-    IHTTPAuth *info = m_auths[url];
-    if(info) {
-        return info->properties();
+    if(m_auths.contains(url)) {
+        return m_auths[url]->properties();
     }
-
     return out;
 }
 
@@ -414,7 +444,7 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
     options = CSLAddNameValue(options, "FORM_FILE_PATH", Q_CONSTCHAR(path));
     options = CSLAddNameValue(options, "FORM_FILE_NAME", Q_CONSTCHAR(name));
-    CPLHTTPResult* result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
+    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {

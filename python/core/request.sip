@@ -7,8 +7,10 @@ class NGRequest
 %End
 
 public:
-    static bool addAuth(const QString &url, const QMap<QString, QString> &options);
+    static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
+    static QString getJsonAsString(const QString &url);
+    static QString getAsString(const QString &url);
     static bool getFile(const QString &url, const QString &path);
     static QString getAuthHeader(const QString &url);
     static QString uploadFile(const QString &url, const QString &path, const QString &name);
