@@ -84,7 +84,7 @@
     <cursorShape>PointingHandCursor</cursorShape>
    </property>
    <property name="text">
-    <string>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</string>
+    <string>&lt;a href=&quot;https://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</string>
    </property>
    <property name="openExternalLinks">
     <bool>true</bool>

@@ -87,7 +87,7 @@ QIcon NGAccess::lockIcon(const QIcon &origin, const QSize &originSize,
 void NGAccess::showUnsupportedMessage(QWidget *parent)
 {
     //Get link to pricing for current locale
-    QString pricingLink(tr("<a href=\"http://nextgis.com/pricing/\">Learn more ...</a>"));
+    QString pricingLink(tr("<a href=\"https://nextgis.com/pricing/\">Learn more ...</a>"));
 
     if (!instance().isUserAuthorized()) {
         QMessageBox::warning(parent, tr("Unsupported"),
@@ -214,7 +214,7 @@ void NGAccess::setClientId(const QString &clientId)
             options["updateToken"] = refreshToken;
 
             QStringList urls;
-            urls << m_endPoint + apiEndpoint << "map.nextgis.com" << "geoservices.nextgis.com" << "nextgis.com" << "nextgis.ru";
+            urls << m_endPoint + apiEndpoint << "http://map.nextgis.com" << "https://geoservices.nextgis.com" << "https://nextgis.com" << "https://nextgis.ru";
 
             if(!NGRequest::addAuth(urls, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
@@ -472,7 +472,7 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     options["redirectUri"] = redirectUri;
 
     QStringList urls;
-    urls << m_endPoint + apiEndpoint << "map.nextgis.com" << "geoservices.nextgis.com" << "nextgis.com" << "nextgis.ru";
+    urls << m_endPoint + apiEndpoint << "http://map.nextgis.com" << "https://geoservices.nextgis.com" << "https://nextgis.com" << "https://nextgis.ru";
 
     if(NGRequest::addAuth(urls, options)) {
         updateUserInfo();
@@ -525,7 +525,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
         QString emailHash = QString(QCryptographicHash::hash(
                                         email.toLower().toLatin1(),
                                         QCryptographicHash::Md5).toHex());
-        NGRequest::getFile(QString("https://www.gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
+        NGRequest::getFile(QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
                            .arg(emailHash), avatarPath);
     }
 }

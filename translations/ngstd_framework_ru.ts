@@ -5,8 +5,8 @@
     <name>NGAccess</name>
     <message>
         <location filename="../src/framework/access/access.cpp" line="90"/>
-        <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
+        <source>&lt;a href=&quot;https://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
+        <translation>&lt;a href=&quot;https://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/framework/access/access.cpp" line="93"/>
@@ -139,8 +139,8 @@
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="87"/>
         <location filename="../src/framework/access/signdialog.cpp" line="42"/>
-        <source>&lt;a href=&quot;http://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
+        <source>&lt;a href=&quot;https://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
+        <translation>&lt;a href=&quot;https://nextgis.ru/pricing/&quot;&gt;Подробнее ...&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="103"/>
