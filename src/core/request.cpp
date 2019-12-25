@@ -255,8 +255,9 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
                                                   accessToken, updateToken,
                                                   expiresIn, lastCheck,
                                                   &instance());
+        QSharedPointer<IHTTPAuth> authPtr(auth);
         foreach(const QString &url, urls) {
-            instance().addAuth(url, auth);
+            instance().addAuth(url, authPtr);
         }
         return true;
     }
@@ -379,9 +380,9 @@ NGRequest &NGRequest::instance()
     return n;
 }
 
-void NGRequest::addAuth(const QString &url, IHTTPAuth *auth)
+void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 {
-    m_auths[url] = QSharedPointer<IHTTPAuth>(auth);
+    m_auths[url] = auth;
 }
 
 void NGRequest::removeAuth(const QString &url)

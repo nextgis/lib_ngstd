@@ -24,6 +24,8 @@
 
 #include <QMap>
 #include <QMutex>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QVariant>
 
 /**
@@ -56,7 +58,7 @@ public:
     static NGRequest &instance();
 
 public:
-    void addAuth(const QString &url, IHTTPAuth *auth);
+    void addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth);
     void removeAuth(const QString &url);
     const QString authHeader(const QString &url);
     const QMap<QString, QString> properties(const QString &url) const;
