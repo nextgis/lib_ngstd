@@ -79,7 +79,7 @@ CPLJSONDocument& CPLJSONDocument::operator=(const CPLJSONDocument& other)
  *
  * @since GDAL 2.3
  */
-bool CPLJSONDocument::Save(const std::string &osPath)
+bool CPLJSONDocument::Save(const std::string &osPath) const
 {
     VSILFILE *fp = VSIFOpenL( osPath.c_str(), "wt" );
     if( nullptr == fp )
@@ -104,7 +104,7 @@ bool CPLJSONDocument::Save(const std::string &osPath)
  *
  * @since GDAL 2.3
  */
-std::string CPLJSONDocument::SaveAsString()
+std::string CPLJSONDocument::SaveAsString() const
 {
     return json_object_to_json_string_ext(
                 TO_JSONOBJ(m_poRootJsonObject), JSON_C_TO_STRING_PRETTY );
@@ -116,7 +116,7 @@ std::string CPLJSONDocument::SaveAsString()
  *
  * @since GDAL 2.3
  */
-CPLJSONObject CPLJSONDocument::GetRoot()
+const CPLJSONObject CPLJSONDocument::GetRoot() const
 {
     if( nullptr == m_poRootJsonObject )
     {
