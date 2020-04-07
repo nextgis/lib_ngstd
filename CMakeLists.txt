@@ -93,8 +93,8 @@ option(BUILD_QT4 "Build qt4 library" OFF)
 option(WITH_BINDINGS "Build python bindings" OFF)
 
 if(WITH_BINDINGS)
-    find_package(PythonInterp REQUIRED)
-    find_package(PythonLibs REQUIRED)
+    find_package(PythonInterp 2.7 REQUIRED)
+    find_package(PythonLibs 2.7 REQUIRED)
 
     if(OSX_FRAMEWORK)
         set(NGSTD_PYTHON_DIR "Library/Python/${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PROJECT_NAME}")
