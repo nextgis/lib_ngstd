@@ -56,7 +56,11 @@ set(ACCESS_CSOURCES
     ${PROJECT_SOURCE_DIR}/access/signserver.cpp
 )
 
-file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD} TLS_VERIFY OFF)
+set(USERPWD $ENV{BUILDBOT_USERPWD})
+if(NOT USERPWD)
+    set(USERPWD ${BUILDBOT_USER}:${BUILDBOT_PASSWORD})
+endif()
+file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/sign.cpp USERPWD ${USERPWD} TLS_VERIFY OFF)
 file(STRINGS ${PROJECT_BINARY_DIR}/access/sign.cpp SIGN_LINES LIMIT_COUNT 2)
 if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp AND SIGN_LINES)
     message(STATUS "Success get sign code ===================================")
