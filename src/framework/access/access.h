@@ -48,6 +48,7 @@ public:
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);
     void setEndPoint(const QString &endPoint);
+    void initSentry(bool enabled, const QString &sentryKey);
 
     QIcon avatar() const;
     QString avatarFilePath() const;
