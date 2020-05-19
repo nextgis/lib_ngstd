@@ -46,7 +46,7 @@ constexpr const char *contentStr = "<html>"
 "</body>"
 "</html>";
 
-constexpr int listenPort = 65020;
+constexpr unsigned short listenPort = 65020;
 constexpr const char *redirectUriStr = "http://127.0.0.1:65020";
 
 NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
@@ -116,6 +116,7 @@ void NGSignServer::onGetReply()
                  .arg(msg.size()).toLatin1());
     reply.append(msg);
     socket->write(reply);
+    socket->flush();
     socket->waitForBytesWritten();
 
     QByteArray data = socket->readAll();

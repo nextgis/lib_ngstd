@@ -25,7 +25,7 @@ project(ngstd_core)
 
 add_definitions(-DINSTALL_LIB_DIR="${INSTALL_LIB_DIR}")
 
-find_anyproject(GDAL VERSION 2.3 REQUIRED)
+find_anyproject(GDAL VERSION 2.4 REQUIRED)
 
 set(PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/core.h
