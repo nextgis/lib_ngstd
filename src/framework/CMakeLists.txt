@@ -3,7 +3,7 @@
 # Purpose:  cmake script
 # Author:   Dmitry Baryshnikov, bishop.dev@gmail.com
 #***************************************************************************
-#   Copyright (C) 2015-2018 NextGIS, info@nextgis.ru
+#   Copyright (C) 2015-2020 NextGIS, info@nextgis.ru
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(ngstd_framework)
 
 find_anyproject(OpenSSL REQUIRED)
+find_anyproject(SENTRYNATIVE REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/access)
 
@@ -37,6 +38,7 @@ set(PRIVATE_HEADERS
 
 set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/updater.cpp
+    ${PROJECT_SOURCE_DIR}/sentryreporter.cpp
 )
 
 set(ACCESS_HHEADERS
@@ -47,6 +49,7 @@ set(ACCESS_HHEADERS
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     ${PROJECT_SOURCE_DIR}/access/signserver.h
+    ${PROJECT_SOURCE_DIR}/sentryreporter.h
 )
 
 set(ACCESS_CSOURCES
@@ -139,9 +142,9 @@ macro(ADD_NGSTDFRW_LIB NAME QT_VER)
     endif()
 
     if(${QT_VER} EQUAL 5)
-        target_link_libraries(${LIB_NAME} PRIVATE Qt5::Widgets Qt5::Network ${OPENSSL_LIBRARIES} ngstd_core${QT_VER})
+        target_link_libraries(${LIB_NAME} PRIVATE Qt5::Widgets Qt5::Network ${OPENSSL_LIBRARIES} ${SENTRYNATIVE_LIBRARIES} ngstd_core${QT_VER})
     elseif(${QT_VER} EQUAL 4)
-        target_link_libraries(${LIB_NAME} PRIVATE Qt4::QtCore Qt4::QtGui Qt4::QtNetwork ${OPENSSL_LIBRARIES} ngstd_core${QT_VER})
+        target_link_libraries(${LIB_NAME} PRIVATE Qt4::QtCore Qt4::QtGui Qt4::QtNetwork ${OPENSSL_LIBRARIES} ${SENTRYNATIVE_LIBRARIES} ngstd_core${QT_VER})
     else()
         message(FATAL_ERROR "Unexpected qt version")
     endif()

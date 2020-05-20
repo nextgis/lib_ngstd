@@ -21,6 +21,7 @@
 #include "access.h"
 
 #include <QByteArray>
+#include "framework/sentryreporter.h"
 
 #if QT_VERSION >= 0x050000
     #include <QtConcurrent/QtConcurrent>
@@ -246,6 +247,11 @@ void NGAccess::setScope(const QString &scope)
 void NGAccess::setEndPoint(const QString &endPoint)
 {
     m_endPoint = endPoint;
+}
+
+void NGAccess::initSentry(bool enabled, const QString &sentryKey)
+{
+    SentryReporter::instance().init(enabled, sentryKey);
 }
 
 QString NGAccess::endPoint() const

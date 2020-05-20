@@ -29,6 +29,8 @@
 #include <QUrlQuery>
 #endif // QT_VERSION >= 0x050000
 
+#include "framework/sentryreporter.h"
+
 constexpr const char *authUrlStr = "/oauth2/authorize/";
 
 constexpr const char *contentStr = "<html>"
@@ -70,8 +72,11 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
 
     // Start listen server
     m_listenServer = new QTcpServer(this);
-    m_listenServer->listen(QHostAddress::LocalHost, listenPort);
+    bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
     connect(m_listenServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+
+    SentryReporter::instance().sendMessage(QString("NGSignServer listen: 127.0.0.1:%1 result: %2")
+            .arg(QString::number(listenPort), result ? "ok" : "bad"));
 }
 
 NGSignServer::~NGSignServer()
@@ -94,16 +99,23 @@ void NGSignServer::onIncomingConnection()
     QTcpSocket *socket = m_listenServer->nextPendingConnection();
     connect(socket, SIGNAL(readyRead()), this, SLOT(onGetReply()), Qt::UniqueConnection);
     connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
+
+    SentryReporter::instance().sendMessage(QString("NGSignServer::onIncomingConnection %1:%2")
+            .arg(socket->peerAddress().toString(), QString::number(socket->peerPort())));
 }
 
 void NGSignServer::onGetReply()
 {
+	SentryReporter::instance().sendMessage("NGSignServer::onGetReply enter");
+
     if (!m_listenServer->isListening()) {
+        SentryReporter::instance().sendMessage("NGSignServer::onGetReply !m_listenServer->isListening");
         return;
     }
 
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) {
+        SentryReporter::instance().sendMessage("NGSignServer::onGetReply !socket");
         return;
     }
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -130,6 +142,9 @@ void NGSignServer::onGetReply()
 
     socket->disconnectFromHost();
 
+    SentryReporter::instance().sendMessage(QString("NGSignServer::onGetReply exit, data: %1")
+            .arg(dataStr));
+
     // Close dialog
     done(result);
 }
@@ -153,7 +168,9 @@ int NGSignServer::exec()
 #endif
 
     // Open external browser
-    QDesktopServices::openUrl(url);
+    bool result = QDesktopServices::openUrl(url);
+    SentryReporter::instance().sendMessage(QString("QDesktopServices::openUrl %1, result: %2")
+            .arg(url.toString(), result ? "ok" : "bad"));
 
     return QProgressDialog::exec();
 }
