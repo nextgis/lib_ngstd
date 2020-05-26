@@ -246,7 +246,9 @@ void NGAccess::setScope(const QString &scope)
 
 void NGAccess::setEndPoint(const QString &endPoint)
 {
-    m_endPoint = endPoint;
+    if (!endPoint.isEmpty()) {
+        m_endPoint = endPoint;
+    }
 }
 
 void NGAccess::initSentry(bool enabled, const QString &sentryKey)
