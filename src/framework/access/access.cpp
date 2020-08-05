@@ -360,7 +360,7 @@ bool NGAccess::checkSupported()
                               static_cast<unsigned int>(baSignature.size()),
                               errorMsg);
     if(!verify) {
-        logMessage(errorMsg, SentryReporter::Level::Error);
+        logMessage(errorMsg, LogLevel::Error);
         logMessage("Account is supported. Verify failed", LogLevel::Error);
         return false;
     }
@@ -646,6 +646,7 @@ void NGAccess::updateSupportInfo() const
 
 void NGAccess::logMessage(const QString &value, LogLevel level)
 {
+    // Unknown levels will be info
     SentryReporter::Level slevel = SentryReporter::Level::Info;
     if(level == LogLevel::Warning) {
         slevel = SentryReporter::Level::Warning;
