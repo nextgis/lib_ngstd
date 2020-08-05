@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -177,9 +177,6 @@ void NGAccess::setClientId(const QString &clientId)
         QDir().mkdir(m_configDir);
     }
 
-    m_logFile.setFileName(m_configDir + QDir::separator() + "access.log");
-    m_logFile.open(QIODevice::Append | QIODevice::Text);
-
     // Get user id from config
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
@@ -219,7 +216,7 @@ void NGAccess::setClientId(const QString &clientId)
 
             if(!NGRequest::addAuth(urls, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
-                logMessage("Add tokens to NGRequest failed");
+                logMessage("Add tokens to NGRequest failed", LogLevel::Error);
             }
         }
 
@@ -341,7 +338,7 @@ bool NGAccess::checkSupported()
     QSettings settings(settingsFilePath, QSettings::IniFormat);
     bool supported = settings.value("supported").toBool();
     if(!supported) {
-        logMessage("Account is not supported");
+        logMessage("Account is not supported", LogLevel::Warning);
         return false;
     }
 
@@ -363,8 +360,8 @@ bool NGAccess::checkSupported()
                               static_cast<unsigned int>(baSignature.size()),
                               errorMsg);
     if(!verify) {
-        logMessage(errorMsg);
-        logMessage("Account is supported. Verify failed");
+        logMessage(errorMsg, SentryReporter::Level::Error);
+        logMessage("Account is supported. Verify failed", LogLevel::Error);
         return false;
     }
 
@@ -372,7 +369,7 @@ bool NGAccess::checkSupported()
     QDate end = QDate::fromString(endDate, "yyyy-MM-dd");
     bool out = QDate::currentDate() >= start && QDate::currentDate() <= end;
     if(!out) {
-        logMessage("Account is supported. Verify success. Period expired.");
+        logMessage("Account is supported. Verify success. Period expired.", LogLevel::Warning);
     }
     return out;
 }
@@ -647,9 +644,17 @@ void NGAccess::updateSupportInfo() const
     m_updateSupportInfoWatcher->setFuture(future);
 }
 
-void NGAccess::logMessage(const QString &value)
+void NGAccess::logMessage(const QString &value, LogLevel level)
 {
-    QTextStream out(&m_logFile);
-    out.setCodec("UTF-8");
-    out << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss ") + value << endl;
+    SentryReporter::Level slevel = SentryReporter::Level::Info;
+    if(level == LogLevel::Warning) {
+        slevel = SentryReporter::Level::Warning;
+    }
+    else if(level == LogLevel::Error) {
+        slevel = SentryReporter::Level::Error;
+    }
+    else if(level == LogLevel::Fatal) {
+        slevel = SentryReporter::Level::Fatal;
+    }
+    SentryReporter::instance().sendMessage(value, slevel);
 }

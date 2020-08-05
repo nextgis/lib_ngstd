@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
     Q_OBJECT
 public:
+    enum class LogLevel { Info, Warning, Error, Fatal };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
     static void showUnsupportedMessage(QWidget *parent = nullptr);
@@ -49,6 +50,7 @@ public:
     void setClientId(const QString &clientId);
     void setEndPoint(const QString &endPoint);
     void initSentry(bool enabled, const QString &sentryKey);
+    void logMessage(const QString &value, LogLevel level = LogLevel::Info);
 
     QIcon avatar() const;
     QString avatarFilePath() const;
@@ -77,7 +79,6 @@ protected:
     void getTokens(const QString &code, const QString &redirectUri);
     void updateUserInfo() const;
     void updateSupportInfo() const;
-    void logMessage(const QString &value);
     QString getPublicKey() const;
     QString pluginSign(const QString &pluginName, const QString &pluginVersion) const;
 
@@ -89,7 +90,6 @@ private:
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
     QString m_firstName, m_lastName;
-    QFile m_logFile;
     mutable QString m_updateToken;
     QString m_licenseDir;
 };
