@@ -8,7 +8,6 @@ class NGAccess : public QObject
 %End
 
 public:
-    enum class LogLevel { Info, Warning, Error, Fatal };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock);
     static void showUnsupportedMessage(QWidget *parent);
@@ -24,7 +23,6 @@ public:
     void setClientId(const QString &clientId);
     void setEndPoint(const QString &endPoint);
     void initSentry(bool enabled, const QString &sentryKey);
-    void logMessage(const QString &value, LogLevel level);
 
     QIcon avatar() const;
     QString avatarFilePath() const;
