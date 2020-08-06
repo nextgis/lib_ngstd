@@ -182,6 +182,8 @@ const QString HTTPAuthBearer::header()
 // NGRequest
 ////////////////////////////////////////////////////////////////////////////////
 
+QString NGRequest::m_detailed_error = "";
+
 NGRequest::NGRequest() : m_connTimeout("15"),
     m_timeout("20"),
     m_maxRetry("3"),
@@ -432,8 +434,11 @@ QString NGRequest::getAuthHeader(const QString &url)
 QString NGRequest::uploadFile(const QString &url, const QString &path,
                               const QString &name)
 {
+    m_detailed_error = "";
+    
     if(atoi(GDALVersionInfo("VERSION_NUM")) < GDAL_COMPUTE_VERSION(2,4,0) ) {
         // Upload files supported only in GDAL >= 2.4
+        m_detailed_error = QString("Unsupported GDAL version = %1").arg(GDALVersionInfo("VERSION_NUM"));
         return "";
     }
     char **options = instance().baseOptions();
@@ -449,6 +454,8 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
+        m_detailed_error = QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 ")
+            .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf);
         CPLHTTPDestroyResult( result );
         return "";
     }
