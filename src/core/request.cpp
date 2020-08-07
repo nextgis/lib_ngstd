@@ -39,7 +39,8 @@
 #include "gdal.h"
 #include "gdal_version.h"
 
-#define Q_CONSTCHAR(x) x.toLatin1().data()
+//#define Q_CONSTCHAR(x) x.toLatin1().data()
+#define Q_CONSTCHAR(x) x.toUtf8().data()
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -448,14 +449,26 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     if(!authHeaderStr.isEmpty()) {
         headers += "\r\n" + authHeaderStr;
     }
-    options = CSLAddNameValue(options, "HEADERS", headers.toUtf8().data());//Q_CONSTCHAR(headers));
-    options = CSLAddNameValue(options, "FORM_FILE_PATH", path.toUtf8().data());//Q_CONSTCHAR(path));
-    options = CSLAddNameValue(options, "FORM_FILE_NAME", name.toUtf8().data());//Q_CONSTCHAR(name));
-    CPLHTTPResult *result = CPLHTTPFetch(url.toUtf8().data(), options);//Q_CONSTCHAR(url), options);
+    
+    /*
+    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
+    options = CSLAddNameValue(options, "FORM_FILE_PATH", Q_CONSTCHAR(path));
+    options = CSLAddNameValue(options, "FORM_FILE_NAME", Q_CONSTCHAR(name));
+    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
+    */
+    QByteArray ba_headers = headers.toUtf8();
+    QByteArray ba_path = path.toUtf8();
+    QByteArray ba_name = name.toUtf8();
+    QByteArray ba_url = url.toUtf8();
+    options = CSLAddNameValue(options, "HEADERS", ba_headers.data());
+    options = CSLAddNameValue(options, "FORM_FILE_PATH", ba_path.data());
+    options = CSLAddNameValue(options, "FORM_FILE_NAME", ba_name.data());
+    CPLHTTPResult *result = CPLHTTPFetch(ba_url.data(), options);
+    
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        m_detailed_error = QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
+        m_detailed_error = QString("CPLHTTPFetch() has failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
             .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf).arg(CPLGetLastErrorMsg());
         CPLHTTPDestroyResult( result );
         return "";
