@@ -39,8 +39,8 @@
 #include "gdal.h"
 #include "gdal_version.h"
 
-//#define Q_CONSTCHAR(x) x.toLatin1().data()
-#define Q_CONSTCHAR(x) x.toUtf8().data()
+#define Q_CONSTCHAR(x) x.toLatin1().data()
+//#define Q_CONSTCHAR(x) x.toStdString().c_str()
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -456,19 +456,19 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     options = CSLAddNameValue(options, "FORM_FILE_NAME", Q_CONSTCHAR(name));
     CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
     */
-    QByteArray ba_headers = headers.toUtf8();
-    QByteArray ba_path = path.toUtf8();
-    QByteArray ba_name = name.toUtf8();
-    QByteArray ba_url = url.toUtf8();
-    options = CSLAddNameValue(options, "HEADERS", ba_headers.data());
-    options = CSLAddNameValue(options, "FORM_FILE_PATH", ba_path.data());
-    options = CSLAddNameValue(options, "FORM_FILE_NAME", ba_name.data());
-    CPLHTTPResult *result = CPLHTTPFetch(ba_url.data(), options);
+    std::string ba_headers = headers.toStdString();
+    std::string ba_path = path.toStdString();
+    std::string ba_name = name.toStdString();
+    std::string ba_url = url.toStdString();
+    options = CSLAddNameValue(options, "HEADERS", ba_headers.c_str());
+    options = CSLAddNameValue(options, "FORM_FILE_PATH", ba_path.c_str());
+    options = CSLAddNameValue(options, "FORM_FILE_NAME", ba_name.c_str());
+    CPLHTTPResult *result = CPLHTTPFetch(ba_url.c_str(), options);
     
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        m_detailed_error = QString("CPLHTTPFetch() has failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
+        m_detailed_error = QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
             .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf).arg(CPLGetLastErrorMsg());
         CPLHTTPDestroyResult( result );
         return "";
