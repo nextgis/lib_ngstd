@@ -56,8 +56,6 @@ public:
                          const QString &proxyPassword = "",
                          const QString &proxyAuth = "ANY");
     static NGRequest &instance();
-    
-    static QString getLastDetailedError() { return m_detailed_error; }
 
 public:
     void addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth);
@@ -65,12 +63,15 @@ public:
     const QString authHeader(const QString &url);
     const QMap<QString, QString> properties(const QString &url) const;
     char **baseOptions() const;
+    QString lastError() const;
+    void resetError();
 
 protected:
     NGRequest();
     ~NGRequest();
     NGRequest(const NGRequest &) = delete;
     NGRequest &operator= (const NGRequest &) = delete;
+    void setErrorMessage(const QString &err);
 
 private:
     QMap<QString, QSharedPointer<IHTTPAuth>> m_auths;
@@ -79,9 +80,8 @@ private:
     QString m_maxRetry;
     QString m_retryDelay;
     QString m_certPem;
-    QMutex m_mutex;
-    
-    static QString m_detailed_error;
+    QMutex m_mutex;    
+    QString m_detailedError;
 };
 
 

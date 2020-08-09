@@ -183,12 +183,11 @@ const QString HTTPAuthBearer::header()
 // NGRequest
 ////////////////////////////////////////////////////////////////////////////////
 
-QString NGRequest::m_detailed_error = "";
-
 NGRequest::NGRequest() : m_connTimeout("15"),
     m_timeout("20"),
     m_maxRetry("3"),
-    m_retryDelay("5")
+    m_retryDelay("5"),
+    m_detailedError("")
 {
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -200,6 +199,11 @@ NGRequest::NGRequest() : m_connTimeout("15"),
 
 NGRequest::~NGRequest()
 {
+}
+
+void NGRequest::setErrorMessage(const QString &err)
+{
+    m_detailedError = err;
 }
 
 char **NGRequest::baseOptions() const
@@ -215,6 +219,16 @@ char **NGRequest::baseOptions() const
 #endif
 
     return options;
+}
+
+QString NGRequest::lastError() const
+{
+    return m_detailedError;
+}
+
+void NGRequest::resetError()
+{
+    m_detailedError.clear();
 }
 
 bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &options)
@@ -436,11 +450,13 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
                               const QString &name)
 {
     CPLErrorReset();
-    m_detailed_error = "";
+    instance().resetError();
     
     if(atoi(GDALVersionInfo("VERSION_NUM")) < GDAL_COMPUTE_VERSION(2,4,0) ) {
         // Upload files supported only in GDAL >= 2.4
-        m_detailed_error = QString("Unsupported GDAL version = %1").arg(GDALVersionInfo("VERSION_NUM"));
+        instance().setErrorMessage(
+                    QString("Unsupported GDAL version = %1").arg(
+                        GDALVersionInfo("VERSION_NUM")));
         return "";
     }
     char **options = instance().baseOptions();
@@ -468,8 +484,9 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     CSLDestroy(options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        m_detailed_error = QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
-            .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf).arg(CPLGetLastErrorMsg());
+        instance().setErrorMessage(
+                    QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
+            .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf).arg(CPLGetLastErrorMsg()));
         CPLHTTPDestroyResult( result );
         return "";
     }
