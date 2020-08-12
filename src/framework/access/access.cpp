@@ -571,7 +571,8 @@ static QMap<QString, QVariant> userInfoFromJWT(const QString &endPoint) {
     if(jwtParts.size() != 3) {
         return result;
     }
-    auto decoded = QByteArray::fromBase64(jwtParts[1].toUtf8(), QByteArray::Base64UrlEncoding);
+    auto decoded = fromBase64(jwtParts[1]);
+    //FIXME: Not present in Qt4 QByteArray::fromBase64(jwtParts[1].toUtf8(), QByteArray::Base64UrlEncoding);
     return memJsonToMap(decoded);
 }
 

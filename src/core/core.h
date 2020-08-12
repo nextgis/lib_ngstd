@@ -38,5 +38,6 @@
 NGCORE_EXPORT const char *getVersion();
 NGCORE_EXPORT QMap<QString, QVariant> jsonToMap(const QString &path);
 NGCORE_EXPORT QMap<QString, QVariant> memJsonToMap(const QString &path);
+NGCORE_EXPORT QString fromBase64(const QString &str);
 
 #endif // NGSTD_CORE_H

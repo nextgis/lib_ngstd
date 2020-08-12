@@ -46,3 +46,18 @@ QMap<QString, QVariant> jsonToMap(const QString &path)
     }
     return QMap<QString, QVariant>();
 }
+
+QString fromBase64(const QString &str) {
+//    Replaces “+” by “-” (minus)
+//    Replaces “/” by “_” (underline)
+//    Does not require a padding character
+//    Forbids line separators
+
+    QString cpy(str);
+    cpy = cpy.replace("-", "+").replace("_", "/");
+    GByte *base64 = reinterpret_cast<GByte*>(CPLStrdup(cpy.toStdString().c_str()));
+    int length = CPLBase64DecodeInPlace(base64);
+    std::string out(reinterpret_cast<const char*>(base64), length);
+    CPLFree(base64);
+    return QString::fromStdString(out);
+}
