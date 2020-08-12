@@ -1,6 +1,6 @@
 /******************************************************************************
 *  Project: NextGIS GIS libraries
-*  Purpose: Framework library
+*  Purpose: Core Library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
 *  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
@@ -17,37 +17,33 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef NGFRAMEWORK_SIGNINBUTTON_H
-#define NGFRAMEWORK_SIGNINBUTTON_H
 
-#include "framework/framework.h"
+#include "core/util.h"
 
-#include <QDialog>
-#include <QToolButton>
 
-#include "access.h"
-
-class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
-{
-    Q_OBJECT
-public:
-    NGSignInButton(const QString &clientId, const QString &scope = "user_info.read",
-                   const QString &endPoint = "https://my.nextgis.com",
-                   NGAccess::AuthSourceType authType = NGAccess::AuthSourceType::NGID,
-                   QWidget * parent = nullptr);
-    virtual ~NGSignInButton() = default;
-    inline QDialog *getDialog () const { return m_signDialog; }
-
-signals:
-    void userInfoUpdated();
-    void supportInfoUpdated();
-
-public slots:
-    void onClick();
-    void onUserInfoUpdated();
-
-private:
-    QDialog *m_signDialog;
-};
-
-#endif // NGFRAMEWORK_SIGNINBUTTON_H
+QMap<QString, QVariant> toMap(const CPLJSONObject &root) {
+    QMap<QString, QVariant> out;
+    for(const CPLJSONObject &child : root.GetChildren()) {
+        QString name = QString::fromStdString(child.GetName());
+        switch(child.GetType()) {
+        case CPLJSONObject::Boolean:
+            out[name] = child.ToBool();
+            break;
+        case CPLJSONObject::String:
+            out[name] = QString::fromUtf8(child.ToString().c_str());
+            break;
+        case CPLJSONObject::Integer:
+            out[name] = child.ToInteger();
+            break;
+        case CPLJSONObject::Long:
+            out[name] = child.ToLong();
+            break;
+        case CPLJSONObject::Double:
+            out[name] = child.ToDouble();
+            break;
+        default:
+            out[name] = QString::fromUtf8(child.ToString().c_str());
+        }
+    }
+    return out;
+}

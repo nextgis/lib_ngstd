@@ -42,16 +42,36 @@
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
+#include "cpl_json.h"
+
 #include "request.h"
 #include "signserver.h"
 #include "version.h"
 
-constexpr const char *apiEndpoint = "/api/v1";
-constexpr const char *tokenEndpoint = "/oauth2/token/";
+constexpr const char *apiEndpointSubpath = "/api/v1";
+constexpr const char *tokenEndpointSubpath = "/oauth2/token/";
+constexpr const char *authEndpointSubpath = "/oauth2/authorize/";
 
 constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
 constexpr const char *settingsFile = "settings.ini";
+
+constexpr const char *defaultScope = "user_info.read";
+constexpr const char *defaultEndpoint = "https://my.nextgis.com";
+constexpr const char *defaultAvatar = ":/icons/person-blue.svg";
+
+
+static QStringList formOriginsList(NGAccess::AuthSourceType type,
+                                   const QString &url1, const QString &url2) {
+    QStringList urls;
+    if(type == NGAccess::AuthSourceType::NGID) {
+        urls << url1 << "https://geoservices.nextgis.com" << "https://nextgis.com" << "https://nextgis.ru";
+    }
+    else {
+        urls << url1 << url2;
+    }
+    return urls;
+}
 
 NGAccess &NGAccess::instance()
 {
@@ -105,9 +125,12 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
-    m_avatar(QIcon(":/icons/person-blue.svg")),
-    m_scope(QLatin1String("user_info.read")),
-    m_endPoint(QLatin1String("https://my.nextgis.com"))
+    m_scope(QLatin1String(defaultScope)),
+    m_endpoint(QLatin1String(defaultEndpoint)),
+    m_authEndpoint(m_endpoint + authEndpointSubpath),
+    m_tokenEndpoint(m_endpoint + tokenEndpointSubpath),
+    m_authType(AuthSourceType::NGID),
+    m_avatar(QIcon(defaultAvatar))
 {
     // Setup license key file
     QFileInfo appDir(QCoreApplication::applicationDirPath());
@@ -141,8 +164,7 @@ QIcon NGAccess::avatar() const
 
 QString NGAccess::avatarFilePath() const
 {
-    return  m_configDir + QDir::separator() +
-            QLatin1String(avatarFile);
+    return m_configDir + QDir::separator() + QLatin1String(avatarFile);
 }
 
 QString NGAccess::firstName() const
@@ -153,6 +175,11 @@ QString NGAccess::firstName() const
 QString NGAccess::lastName() const
 {
     return m_lastName;
+}
+
+QStringList NGAccess::userRoles() const
+{
+    return m_roles;
 }
 
 void NGAccess::setClientId(const QString &clientId)
@@ -194,6 +221,7 @@ void NGAccess::setClientId(const QString &clientId)
 
         m_firstName = settings.value("first_name").toString();
         m_lastName = settings.value("last_name").toString();
+        m_roles = settings.value("roles").toStringList();
 
         // Get access, refresh tokens for network requests
         QString accessToken = settings.value("access_token").toString();
@@ -203,7 +231,7 @@ void NGAccess::setClientId(const QString &clientId)
             QMap<QString, QString> options;
             options["type"] = "bearer";
             options["clientId"] = m_clientId;
-            options["tokenServer"] = m_endPoint + tokenEndpoint;
+            options["tokenServer"] = m_tokenEndpoint;
             options["expiresIn"] = settings.value("expires_in").toString();
 
             QString refreshToken = settings.value("update_token").toString();
@@ -211,8 +239,7 @@ void NGAccess::setClientId(const QString &clientId)
             options["accessToken"] = accessToken;
             options["updateToken"] = refreshToken;
 
-            QStringList urls;
-            urls << m_endPoint + apiEndpoint << "http://map.nextgis.com" << "https://geoservices.nextgis.com" << "https://nextgis.com" << "https://nextgis.ru";
+            QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
 
             if(!NGRequest::addAuth(urls, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
@@ -236,15 +263,40 @@ void NGAccess::setClientId(const QString &clientId)
     }
 }
 
+void NGAccess::setAuthEndpoint(const QString &endpoint)
+{
+    m_authEndpoint = endpoint;
+}
+
 void NGAccess::setScope(const QString &scope)
 {
     m_scope = scope;
 }
 
-void NGAccess::setEndPoint(const QString &endPoint)
+void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
 {
-    if (!endPoint.isEmpty()) {
-        m_endPoint = endPoint;
+    if (endPoint.isEmpty()) {
+        m_authType = AuthSourceType::NGID;
+        m_endpoint = QLatin1String(defaultEndpoint);
+        m_avatar = QIcon(defaultAvatar);
+        m_tokenEndpoint = m_endpoint + QLatin1String(tokenEndpointSubpath);
+        m_authEndpoint = m_endpoint + QLatin1String(authEndpointSubpath);
+        m_userInfoEndpoint.clear();
+    }
+    else {
+        m_endpoint = endPoint;
+        m_authType = type;
+
+        if(type == AuthSourceType::NGID) {
+            m_tokenEndpoint = m_endpoint + QLatin1String(tokenEndpointSubpath);
+            m_authEndpoint = m_endpoint + QLatin1String(authEndpointSubpath);
+            m_userInfoEndpoint = QString("%1%2/user_info/").arg(m_endpoint).arg(apiEndpointSubpath);
+        }
+        else if(type == AuthSourceType::KeyCloakOpenID) {
+            m_tokenEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/token");
+            m_authEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/auth");
+            m_userInfoEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/userinfo");
+        }
     }
 }
 
@@ -255,7 +307,27 @@ void NGAccess::initSentry(bool enabled, const QString &sentryKey)
 
 QString NGAccess::endPoint() const
 {
-    return m_endPoint;
+    return m_endpoint;
+}
+
+QString NGAccess::authEndpoint() const
+{
+    return m_authEndpoint;
+}
+
+QString NGAccess::tokenEndpoint() const
+{
+    return m_tokenEndpoint;
+}
+
+QString NGAccess::userInfoEndpoint() const
+{
+    return m_userInfoEndpoint;
+}
+
+enum NGAccess::AuthSourceType NGAccess::authType() const
+{
+    return m_authType;
 }
 
 void NGAccess::authorize()
@@ -289,7 +361,7 @@ void NGAccess::exit()
 
 void NGAccess::save()
 {
-    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endpoint);
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
 
@@ -332,6 +404,10 @@ QString NGAccess::getPluginSign(const QString &pluginName, const QString &plugin
 
 bool NGAccess::checkSupported()
 {
+    if(m_authType != AuthSourceType::NGID) {
+        return false;
+    }
+
     // Read user id, start/end dates, account type
     QString userId, startDate, endDate, accountType("true"), sign;
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
@@ -471,14 +547,12 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     QMap<QString, QString> options;
     options["type"] = "bearer";
     options["clientId"] = m_clientId;
-    options["tokenServer"] = m_endPoint + tokenEndpoint;
+    options["tokenServer"] = m_tokenEndpoint;
     options["expiresIn"] = "-1";
     options["code"] = code;
     options["redirectUri"] = redirectUri;
 
-    QStringList urls;
-    urls << m_endPoint + apiEndpoint << "http://map.nextgis.com" << "https://geoservices.nextgis.com" << "https://nextgis.com" << "https://nextgis.ru";
-
+    QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
     if(NGRequest::addAuth(urls, options)) {
         updateUserInfo();
         updateSupportInfo();
@@ -487,9 +561,27 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     }
 }
 
-extern void updateUserInfoFunction(const QString &configDir, const QString &licenseDir, const QString &endPoint)
+static QMap<QString, QVariant> userInfoFromJWT(const QString &endPoint) {
+    QMap<QString, QVariant> result;
+    // Update tokens
+    NGRequest::getAuthHeader(endPoint);
+    QMap<QString, QString> properties = NGRequest::instance().properties(endPoint);
+    QString accessToken = properties["accessToken"];
+    QStringList jwtParts = accessToken.split(QLatin1Char('.'), QString::SkipEmptyParts);
+    if(jwtParts.size() != 3) {
+        return result;
+    }
+    auto decoded = QByteArray::fromBase64(jwtParts[1].toUtf8(), QByteArray::Base64UrlEncoding);
+    return memJsonToMap(decoded);
+}
+
+extern void updateUserInfoFunction(const QString &configDir,
+                                   const QString &licenseDir,
+                                   const QString &endPoint,
+                                   enum NGAccess::AuthSourceType type)
 {
-    QString firstName, lastName, email, userId;
+    QString firstName, lastName, email, userId, avatarUrl;
+    QStringList rolesList;
 
     // Check local files before request my.nextgis.com
     QFileInfo licenseJson(QDir(licenseDir).filePath("license.json"));
@@ -498,16 +590,53 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1%2/user_info/").arg(endPoint).arg(apiEndpoint));
-
+        // Get info from jwt
+        result = userInfoFromJWT(endPoint);
+        if(result.empty()) {
+            result = NGRequest::getJsonAsMap(endPoint);
+        }
     }
-    firstName = result["first_name"].toString();
-    lastName = result["last_name"].toString();
-    email = result["email"].toString();
-    userId = result["nextgis_guid"].toString();
 
-    if(email.isEmpty()) {
-        email = firstName + QLatin1String(" ") + lastName;
+    if(type == NGAccess::AuthSourceType::NGID) {
+        firstName = result["first_name"].toString();
+        lastName = result["last_name"].toString();
+        email = result["email"].toString();
+        userId = result["nextgis_guid"].toString();
+
+        if(email.isEmpty()) {
+            email = firstName + QLatin1String(" ") + lastName;
+        }
+
+        QString emailHash = QString(QCryptographicHash::hash(
+                  email.toLower().toLatin1(), QCryptographicHash::Md5).toHex());
+
+        avatarUrl = QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
+                .arg(emailHash);
+    }
+    else if(type == NGAccess::AuthSourceType::KeyCloakOpenID) {
+        firstName = result["given_name"].toString();
+        lastName = result["family_name"].toString();
+        email = result["email"].toString();
+        userId = result["sub"].toString();
+        avatarUrl = result["avatar_url"].toString();
+        if(avatarUrl.isEmpty()) {
+            QString emailHash = QString(QCryptographicHash::hash(
+                      email.toLower().toLatin1(), QCryptographicHash::Md5).toHex());
+            avatarUrl = QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
+                    .arg(emailHash);
+        }
+        // Get roles
+        std::string ra = result["resource_access"].toString().toStdString();
+        if(!ra.empty()) {
+            CPLJSONDocument doc;
+            if(doc.LoadMemory(ra)) {
+                auto root = doc.GetRoot();
+                auto rolesArray = root.GetArray("account/roles");
+                for(int i = 0; i < rolesArray.Size(); ++i) {
+                    rolesList.append(rolesArray[i].ToString().c_str());
+                }
+            }
+        }
     }
 
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
@@ -516,6 +645,7 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
     settings.setValue("user_id", userId);
     settings.setValue("first_name", firstName);
     settings.setValue("last_name", lastName);
+    settings.setValue("roles", rolesList);
 
     // Get avatar
     QString avatarPath = configDir + QDir::separator() + QLatin1String(avatarFile);
@@ -527,15 +657,13 @@ extern void updateUserInfoFunction(const QString &configDir, const QString &lice
         QFile::copy(avatar.absoluteFilePath(), avatarPath);
     }
     else {
-        QString emailHash = QString(QCryptographicHash::hash(
-                                        email.toLower().toLatin1(),
-                                        QCryptographicHash::Md5).toHex());
-        NGRequest::getFile(QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
-                           .arg(emailHash), avatarPath);
+        NGRequest::getFile(avatarUrl, avatarPath);
     }
 }
 
-extern void updateSupportInfoFunction(const QString &configDir, const QString &licenseDir, const QString &endPoint)
+extern void updateSupportInfoFunction(const QString &configDir,
+                                      const QString &licenseDir,
+                                      const QString &endPoint)
 {
     bool supported = false;
     QString sign, start_date, end_date, userId;
@@ -546,7 +674,7 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         result = jsonToMap(licenseJson.absoluteFilePath());
     }
     else {
-        result = NGRequest::getJsonAsMap(QString("%1%2/support_info/").arg(endPoint).arg(apiEndpoint));
+        result = NGRequest::getJsonAsMap(QString("%1%2/support_info/").arg(endPoint).arg(apiEndpointSubpath));
     }
 
     supported = result["supported"].toBool();
@@ -576,14 +704,13 @@ extern void updateSupportInfoFunction(const QString &configDir, const QString &l
         else {
             // Get key file
             QString keyFilePath = configDir + QDir::separator() + QLatin1String(keyFile);
-            NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(endPoint).arg(apiEndpoint), keyFilePath);
+            NGRequest::getFile(QString("%1%2/rsa_public_key/").arg(endPoint).arg(apiEndpointSubpath), keyFilePath);
         }
     }
 }
 
 void NGAccess::onUserInfoUpdated()
 {
-    qDebug() << "onUserInfoUpdated";
     QString settingsFilePath = m_configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
     QString ngUserId = settings.value("user_id").toString();
@@ -601,12 +728,13 @@ void NGAccess::onUserInfoUpdated()
 
         m_firstName = settings.value("first_name").toString();
         m_lastName = settings.value("last_name").toString();
+        m_roles = settings.value("roles").toStringList();
     }
 
     emit userInfoUpdated();
 
     // If token changed, save
-    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
@@ -614,13 +742,12 @@ void NGAccess::onUserInfoUpdated()
 
 void NGAccess::onSupportInfoUpdated()
 {
-    qDebug() << "onSupportInfoUpdated";
     m_supported = checkSupported();
     
     emit supportInfoUpdated();
 
     // If token changed, save
-    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endpoint);
     if(m_updateToken != properties.value("updateToken", "")) {
         save();
     }
@@ -628,19 +755,22 @@ void NGAccess::onSupportInfoUpdated()
 
 void NGAccess::updateUserInfo() const
 {
-    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
+    auto properties = NGRequest::instance().properties(m_endpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
-        m_licenseDir, m_endPoint);
+        m_licenseDir, m_userInfoEndpoint, m_authType);
     m_updateUserInfoWatcher->setFuture(future);
 }
 
 void NGAccess::updateSupportInfo() const
 {
-    auto properties = NGRequest::instance().properties(m_endPoint + apiEndpoint);
+    if(m_authType != AuthSourceType::NGID) {
+        return;
+    }
+    auto properties = NGRequest::instance().properties(m_endpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateSupportInfoFunction, m_configDir,
-        m_licenseDir, m_endPoint);
+        m_licenseDir, m_endpoint);
     m_updateSupportInfoWatcher->setFuture(future);
 }
 

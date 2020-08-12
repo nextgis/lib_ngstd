@@ -19,16 +19,12 @@ public:
     bool isUserAuthorized() const;
     QString getPluginSign(const QString &pluginName, const QString &pluginVersion) const;
 
-    void setScope(const QString &scope);
-    void setClientId(const QString &clientId);
-    void setEndPoint(const QString &endPoint);
-    void initSentry(bool enabled, const QString &sentryKey);
-
     QIcon avatar() const;
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
     QString endPoint() const;
+    QStringList userRoles() const;
 
 signals:
     void userInfoUpdated();

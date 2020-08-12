@@ -1,6 +1,6 @@
 /******************************************************************************
 *  Project: NextGIS GIS libraries
-*  Purpose: Framework library
+*  Purpose: Core Library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
 *  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
@@ -17,37 +17,13 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef NGFRAMEWORK_SIGNINBUTTON_H
-#define NGFRAMEWORK_SIGNINBUTTON_H
+#ifndef NGSTD_UTIL_H
+#define NGSTD_UTIL_H
 
-#include "framework/framework.h"
+#include "core/core.h"
 
-#include <QDialog>
-#include <QToolButton>
+#include "cpl_json.h"
 
-#include "access.h"
+QMap<QString, QVariant> toMap(const CPLJSONObject &root);
 
-class NGFRAMEWORK_EXPORT NGSignInButton : public QToolButton
-{
-    Q_OBJECT
-public:
-    NGSignInButton(const QString &clientId, const QString &scope = "user_info.read",
-                   const QString &endPoint = "https://my.nextgis.com",
-                   NGAccess::AuthSourceType authType = NGAccess::AuthSourceType::NGID,
-                   QWidget * parent = nullptr);
-    virtual ~NGSignInButton() = default;
-    inline QDialog *getDialog () const { return m_signDialog; }
-
-signals:
-    void userInfoUpdated();
-    void supportInfoUpdated();
-
-public slots:
-    void onClick();
-    void onUserInfoUpdated();
-
-private:
-    QDialog *m_signDialog;
-};
-
-#endif // NGFRAMEWORK_SIGNINBUTTON_H
+#endif // NGSTD_UTIL_H

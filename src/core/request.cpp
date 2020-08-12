@@ -3,7 +3,7 @@
 *  Purpose: Core Library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -39,8 +39,21 @@
 #include "gdal.h"
 #include "gdal_version.h"
 
-#define Q_CONSTCHAR(x) x.toLatin1().data()
-//#define Q_CONSTCHAR(x) x.toStdString().c_str()
+// std
+#include <array>
+
+#include "core/util.h"
+
+static CPLStringList getOptions(const QString &url) {
+    CPLStringList options(NGRequest::instance().baseOptions());
+    QString headers = "Accept: */*";
+    QString authHeaderStr = NGRequest::instance().authHeader(url);
+    if(!authHeaderStr.isEmpty()) {
+        headers += "\r\n" + authHeaderStr;
+    }
+    options.AddNameValue("HEADERS", headers.toStdString().c_str());
+    return options;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -134,22 +147,25 @@ const QString HTTPAuthBearer::header()
     }
 
     // 2. Try to update token
-    char **options = m_request->baseOptions();
-    options = CSLAddNameValue(options, "CUSTOMREQUEST", "POST");
-    options = CSLAddNameValue(options, "POSTFIELDS",
-                              CPLSPrintf("grant_type=refresh_token&client_id=%s&refresh_token=%s",
-                                         Q_CONSTCHAR(m_clientId),
-                                         Q_CONSTCHAR(m_updateToken)));
+    auto updateToken = m_updateToken.toStdString();
+    const char *payload = CPLSPrintf("grant_type=refresh_token&client_id=%s&refresh_token=%s",
+                                m_clientId.toStdString().c_str(),
+                                updateToken.c_str());
+    CPLStringList options(m_request->baseOptions());
+    options.AddNameValue("CUSTOMREQUEST", "POST");
+    options.AddNameValue("POSTFIELDS", payload);
 
-    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(m_tokenServer), options);
-    CSLDestroy(options);
+    CPLHTTPResult *result = CPLHTTPFetch(m_tokenServer.toStdString().c_str(), options);
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
+        if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
         CPLHTTPDestroyResult( result );
         qDebug() << "Failed to refresh token. Return last not expired. ";
         return QString("Authorization: Bearer %1").arg(m_accessToken);
+        }
     }
 
+    m_accessToken.clear();
     CPLJSONDocument resultJson;
     if(!resultJson.LoadMemory(result->pabyData, result->nDataLen)) {
         CPLHTTPDestroyResult( result );
@@ -160,16 +176,17 @@ const QString HTTPAuthBearer::header()
 
     // 4. Save new update and access tokens
     CPLJSONObject root = resultJson.GetRoot();
-    if(!EQUAL(root.GetString("error", "").c_str(), "")) {
+    auto err = root.GetString("error", "");
+    if(!err.empty()) {
         qDebug() << "Token is expired. " <<
-                    "\nError:" << QString::fromStdString(root.GetString("error", ""));
+                    "\nError:" << QString::fromStdString(err);
         return "expired";
     }
 
     m_accessToken = QString::fromStdString(
-                root.GetString("access_token", Q_CONSTCHAR(m_accessToken)));
+                root.GetString("access_token", m_accessToken.toStdString()));
     m_updateToken = QString::fromStdString(
-                root.GetString("refresh_token", Q_CONSTCHAR(m_updateToken)));
+                root.GetString("refresh_token", updateToken));
     m_expiresIn = root.GetInteger("expires_in", m_expiresIn);
     m_lastCheck = now;
 
@@ -183,7 +200,8 @@ const QString HTTPAuthBearer::header()
 // NGRequest
 ////////////////////////////////////////////////////////////////////////////////
 
-NGRequest::NGRequest() : m_connTimeout("15"),
+NGRequest::NGRequest() :
+    m_connTimeout("15"),
     m_timeout("20"),
     m_maxRetry("3"),
     m_retryDelay("5"),
@@ -209,13 +227,18 @@ void NGRequest::setErrorMessage(const QString &err)
 char **NGRequest::baseOptions() const
 {
     char **options = nullptr;
-    options = CSLAddNameValue(options, "CONNECTTIMEOUT", Q_CONSTCHAR(m_connTimeout));
-    options = CSLAddNameValue(options, "TIMEOUT", Q_CONSTCHAR(m_timeout));
-    options = CSLAddNameValue(options, "MAX_RETRY", Q_CONSTCHAR(m_maxRetry));
-    options = CSLAddNameValue(options, "RETRY_DELAY", Q_CONSTCHAR(m_retryDelay));
+    auto connTimeout = m_connTimeout.toStdString();
+    options = CSLAddNameValue(options, "CONNECTTIMEOUT", connTimeout.c_str());
+    auto timeout = m_timeout.toStdString();
+    options = CSLAddNameValue(options, "TIMEOUT", timeout.c_str());
+    auto maxRetry = m_maxRetry.toStdString();
+    options = CSLAddNameValue(options, "MAX_RETRY", maxRetry.c_str());
+    auto retryDelay = m_retryDelay.toStdString();
+    options = CSLAddNameValue(options, "RETRY_DELAY", retryDelay.c_str());
 
 #ifdef Q_OS_WIN
-    options = CSLAddNameValue(options, "CAINFO", Q_CONSTCHAR(m_certPem));
+    auto certPem = m_certPem.toStdString();
+    options = CSLAddNameValue(options, "CAINFO", certPem.c_str());
 #endif
 
     return options;
@@ -246,24 +269,27 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
                     .arg(options["code"])
                     .arg(options["redirectUri"])
                     .arg(clientId);
-            char **options = instance().baseOptions();
-            options = CSLAddNameValue(options, "CUSTOMREQUEST", "POST");
-            options = CSLAddNameValue(options, "POSTFIELDS", Q_CONSTCHAR(postPayload));
+            CPLStringList options(instance().baseOptions());
+            auto payload = postPayload.toStdString();
+            options.AddNameValue("CUSTOMREQUEST", "POST");
+            options.AddNameValue("POSTFIELDS", payload.c_str());
 
             time_t now = time(nullptr);
-            bool result = fetchToken.LoadUrl(Q_CONSTCHAR(tokenServer), options);
+            auto tokenServerStd = tokenServer.toStdString();
+            bool result = fetchToken.LoadUrl(tokenServerStd.c_str(), options);
             // qDebug() << "Server: " << info.m_tokenServer << "options:" << postPayload;
-            CSLDestroy(options);
             if(!result) {
                 qDebug() << "Failed to get tokens";
                 return false;
             }
 
             CPLJSONObject root = fetchToken.GetRoot();
+            auto accessTokenStd = accessToken.toStdString();
             accessToken = QString::fromStdString(
-                        root.GetString("access_token", Q_CONSTCHAR(accessToken)));
+                        root.GetString("access_token", accessTokenStd));
+            auto updateTokenStr = updateToken.toStdString();
             updateToken = QString::fromStdString(
-                        root.GetString("refresh_token", Q_CONSTCHAR(updateToken)));
+                        root.GetString("refresh_token", updateTokenStr.c_str()));
             expiresIn = root.GetInteger("expires_in", expiresIn);
             lastCheck = now;
         }
@@ -283,15 +309,8 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
 
 QString NGRequest::getAsString(const QString &url)
 {
-    char **options = instance().baseOptions();
-    QString headers = "Accept: */*";
-    QString authHeaderStr = instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
-    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
-    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
-    CSLDestroy(options);
+    CPLStringList options = getOptions(url);
+    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         CPLHTTPDestroyResult( result );
         return QString();
@@ -303,78 +322,30 @@ QString NGRequest::getAsString(const QString &url)
 
 QString NGRequest::getJsonAsString(const QString &url)
 {
-    char **options = instance().baseOptions();
-    QString headers = "Accept: */*";
-    QString authHeaderStr = instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
-    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
+    CPLStringList options = getOptions(url);
     QString out;
     CPLJSONDocument in;
     if(in.LoadUrl(url.toStdString(), options)) {
-        out = QString::fromStdString(in.SaveAsString());
+        out = QString::fromUtf8(in.SaveAsString().c_str());
     }
-    CSLDestroy(options);
-
     return out;
 }
 
 QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 {
-    char **options = instance().baseOptions();
-    QString headers = "Accept: */*";
-    QString authHeaderStr = instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
-    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
-
-    QMap<QString, QVariant> out;
+    CPLStringList options = getOptions(url);
     CPLJSONDocument in;
     if(in.LoadUrl(url.toStdString(), options)) {
-        CPLJSONObject root = in.GetRoot();
-        for(const CPLJSONObject &child : root.GetChildren()) {
-            QString name = QString::fromStdString(child.GetName());
-            switch(child.GetType()) {
-            case CPLJSONObject::Boolean:
-                out[name] = child.ToBool();
-                break;
-            case CPLJSONObject::String:
-                out[name] = QString::fromStdString(child.ToString());
-                break;
-            case CPLJSONObject::Integer:
-                out[name] = child.ToInteger();
-                break;
-            case CPLJSONObject::Long:
-                out[name] = child.ToLong();
-                break;
-            case CPLJSONObject::Double:
-                out[name] = child.ToDouble();
-                break;
-            default:
-                out[name] = QString::fromStdString(child.ToString());
-            }
-        }
+        return toMap(in.GetRoot());
     }
 
-    CSLDestroy(options);
-
-    return out;
+    return QMap<QString, QVariant>();
 }
 
 bool NGRequest::getFile(const QString &url, const QString &path)
 {
-    char **options = instance().baseOptions();
-    QString headers = "Accept: */*";
-    QString authHeaderStr = instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
-    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
-    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
-    CSLDestroy(options);
-
+    CPLStringList options = getOptions(url);
+    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         CPLHTTPDestroyResult( result );
         return false;
@@ -410,14 +381,16 @@ void NGRequest::removeAuth(const QString &url)
 const QString NGRequest::authHeader(const QString &url)
 {
     QMutexLocker locker(&m_mutex);
-    QString header;
+    if(!m_auths.empty() && url == "any") {
+        return m_auths.first()->header();
+    }
     QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
     for(it = m_auths.begin(); it != m_auths.end(); ++it) {
         if(url.startsWith(it.key())) {
             return it.value()->header();
         }
     }
-    return header;
+    return QString();
 }
 
 /**
@@ -459,30 +432,10 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
                         GDALVersionInfo("VERSION_NUM")));
         return "";
     }
-    char **options = instance().baseOptions();
-    QString headers = "Accept: */*";
-    QString authHeaderStr = instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
-    
-    /*
-    options = CSLAddNameValue(options, "HEADERS", Q_CONSTCHAR(headers));
-    options = CSLAddNameValue(options, "FORM_FILE_PATH", Q_CONSTCHAR(path));
-    options = CSLAddNameValue(options, "FORM_FILE_NAME", Q_CONSTCHAR(name));
-    CPLHTTPResult *result = CPLHTTPFetch(Q_CONSTCHAR(url), options);
-    */
-    std::string ba_headers = headers.toStdString();
-    std::string ba_path = path.toStdString();
-    std::string ba_name = name.toStdString();
-    std::string ba_url = url.toStdString();
-    options = CSLAddNameValue(options, "HEADERS", ba_headers.c_str());
-    options = CSLAddNameValue(options, "FORM_FILE_PATH", ba_path.c_str());
-    options = CSLAddNameValue(options, "FORM_FILE_NAME", ba_name.c_str());
-    CPLHTTPResult *result = CPLHTTPFetch(ba_url.c_str(), options);
-    
-    CSLDestroy(options);
-
+    CPLStringList options = getOptions(url);
+    options.AddNameValue("FORM_FILE_PATH", path.toStdString().c_str());
+    options.AddNameValue("FORM_FILE_NAME", name.toStdString().c_str());
+    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         instance().setErrorMessage(
                     QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")

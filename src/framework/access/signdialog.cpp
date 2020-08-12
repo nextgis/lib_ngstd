@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2019 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ void NGSignDialog::updateContent()
         ui->signButton->hide();
         ui->learnMore->hide();
         ui->userInfo->show();
+        QString supportedText = tr("Supported");
         ui->userInfo->setText(QString("<html><head/><body><p>%1<br>%2</p><p><b>%3</b></p></body></html>")
                               .arg(NGAccess::instance().firstName())
                               .arg(NGAccess::instance().lastName())
-                              .arg(NGAccess::instance().isUserSupported() ?
-                                       tr("Supported") : tr("Unsupported")));
+                              .arg(supportedText));
         ui->avatar->show();
         ui->avatar->setText(QString("<html><head/><body><p><img src=\"%1\" height=\"64\"/></p></body></html>")
                             .arg(NGAccess::instance().avatarFilePath()));
@@ -57,13 +57,18 @@ void NGSignDialog::updateContent()
         // Show user info in widget
         // Name, big avatar, plan
         ui->signButton->setText(tr("Sign out"));
-        ui->learnMore->setText(QString("<a href=\"%1\">%2</a>").arg(NGAccess::instance().endPoint()).arg(tr("Account")));
+        ui->learnMore->setText("");
         ui->userInfo->show();
+        QString supportedText;
+        if(NGAccess::instance().authType() == NGAccess::AuthSourceType::NGID) {
+            ui->learnMore->setText(QString("<a href=\"%1\">%2</a>").arg(NGAccess::instance().endPoint()).arg(tr("Account")));
+            supportedText= NGAccess::instance().isUserSupported() ?
+                                               tr("Supported") : tr("Unsupported");
+        }
         ui->userInfo->setText(QString("<html><head/><body><p>%1<br>%2</p><p><b>%3</b></p></body></html>")
                               .arg(NGAccess::instance().firstName())
                               .arg(NGAccess::instance().lastName())
-                              .arg(NGAccess::instance().isUserSupported() ?
-                                       tr("Supported") : tr("Unsupported")));
+                              .arg(supportedText));
         ui->avatar->show();
         ui->avatar->setText(QString("<html><head/><body><p><img src=\"%1\" height=\"64\"/></p></body></html>")
                             .arg(NGAccess::instance().avatarFilePath()));

@@ -34,6 +34,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
     Q_OBJECT
 public:
     enum class LogLevel { Info, Warning, Error, Fatal };
+    enum class AuthSourceType { NGID, KeyCloakOpenID, Custom };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
     static void showUnsupportedMessage(QWidget *parent = nullptr);
@@ -48,7 +49,16 @@ public:
 
     void setScope(const QString &scope);
     void setClientId(const QString &clientId);
-    void setEndPoint(const QString &endPoint);
+    void setEndPoint(const QString &endpoint, AuthSourceType type = AuthSourceType::NGID);
+    void setAuthEndpoint(const QString &endpoint);
+    void setTokenEndpoint(const QString &endpoint);
+    void setUserInfoEndpoint(const QString &endpoint);
+    QString endPoint() const;
+    QString authEndpoint() const;
+    QString tokenEndpoint() const;
+    QString userInfoEndpoint() const;
+    enum AuthSourceType authType() const;
+
     void initSentry(bool enabled, const QString &sentryKey);
     void logMessage(const QString &value, LogLevel level = LogLevel::Info);
 
@@ -56,7 +66,7 @@ public:
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
-    QString endPoint() const;
+    QStringList userRoles() const;
 
 signals:
     void userInfoUpdated();
@@ -85,13 +95,15 @@ protected:
 private:
     bool m_authorized;
     bool m_supported;
-    QString m_clientId, m_scope, m_endPoint;
+    QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
+    AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
     QString m_firstName, m_lastName;
     mutable QString m_updateToken;
     QString m_licenseDir;
+    QStringList m_roles;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H

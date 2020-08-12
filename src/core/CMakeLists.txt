@@ -25,12 +25,11 @@ project(ngstd_core)
 
 add_definitions(-DINSTALL_LIB_DIR="${INSTALL_LIB_DIR}")
 
-find_anyproject(GDAL VERSION 2.4 REQUIRED)
-
 set(PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/core.h
     ${PROJECT_SOURCE_DIR}/version.h
     ${PROJECT_SOURCE_DIR}/request.h
+    ${PROJECT_SOURCE_DIR}/util.h
 )
 
 set(PRIVATE_HEADERS
@@ -39,6 +38,7 @@ set(PRIVATE_HEADERS
 set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/core.cpp
     ${PROJECT_SOURCE_DIR}/request.cpp
+    ${PROJECT_SOURCE_DIR}/util.cpp
 )
 
 set(TRANSLATIONS

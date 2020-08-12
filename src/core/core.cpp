@@ -3,7 +3,7 @@
 *  Purpose: Core library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -20,42 +20,29 @@
 #include "core/core.h"
 
 #include "core/version.h"
+#include "core/util.h"
 
 #include "cpl_json.h"
+#include "cpl_string.h"
 
 const char* getVersion()
 {
     return NGLIB_VERSION_STRING;
 }
 
+QMap<QString, QVariant> memJsonToMap(const QString &str) {
+    CPLJSONDocument in;
+    if(in.LoadMemory(str.toStdString())) {
+        return toMap(in.GetRoot());
+    }
+    return QMap<QString, QVariant>();
+}
+
 QMap<QString, QVariant> jsonToMap(const QString &path)
 {
-    QMap<QString, QVariant> out;
     CPLJSONDocument in;
     if(in.Load(path.toStdString())) {
-        CPLJSONObject root = in.GetRoot();
-        for(const CPLJSONObject &child : root.GetChildren()) {
-            QString name = QString::fromStdString(child.GetName());
-            switch(child.GetType()) {
-            case CPLJSONObject::Boolean:
-                out[name] = child.ToBool();
-                break;
-            case CPLJSONObject::String:
-                out[name] = QString::fromStdString(child.ToString());
-                break;
-            case CPLJSONObject::Integer:
-                out[name] = child.ToInteger();
-                break;
-            case CPLJSONObject::Long:
-                out[name] = child.ToLong();
-                break;
-            case CPLJSONObject::Double:
-                out[name] = child.ToDouble();
-                break;
-            default:
-                out[name] = QString::fromStdString(child.ToString());
-            }
-        }
+        return toMap(in.GetRoot());
     }
-    return out;
+    return QMap<QString, QVariant>();
 }

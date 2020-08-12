@@ -3,7 +3,7 @@
 *  Purpose: Framework library
 *  Author:  Dmitry Baryshnikov, bishop.dev@gmail.com
 *******************************************************************************
-*  Copyright (C) 2012-2018 NextGIS, info@nextgis.ru
+*  Copyright (C) 2012-2020 NextGIS, info@nextgis.ru
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -18,17 +18,22 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "access.h"
 #include "signbutton.h"
 #include "signdialog.h"
 
 #include <QIcon>
 
-NGSignInButton::NGSignInButton(const QString &clientId, const QString &scope, 
-                               const QString &endPoint, QWidget * parent) :
+// NOTE: If AuthSourceType is custom, before create NGSignInButton must execute
+//       NGAccess::instance().setAuthEndpoint, NGAccess::instance().setTokenEndpoint and
+//       NGAccess::instance().setUserInfoEndpoint
+NGSignInButton::NGSignInButton(const QString &clientId,
+                               const QString &scope,
+                               const QString &endPoint,
+                               NGAccess::AuthSourceType authType,
+                               QWidget * parent) :
     QToolButton (parent)
 {
-    NGAccess::instance().setEndPoint(endPoint);
+    NGAccess::instance().setEndPoint(endPoint, authType);
     NGAccess::instance().setScope(scope);
     NGAccess::instance().setClientId(clientId);
 
