@@ -382,7 +382,8 @@ const QString NGRequest::authHeader(const QString &url)
 {
     QMutexLocker locker(&m_mutex);
     if(!m_auths.empty() && url == "any") {
-        return m_auths.first()->header();
+        auto it = m_auths.constBegin();
+        return it.value()->header();
     }
     QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
     for(it = m_auths.begin(); it != m_auths.end(); ++it) {
