@@ -268,6 +268,16 @@ void NGAccess::setAuthEndpoint(const QString &endpoint)
     m_authEndpoint = endpoint;
 }
 
+void NGAccess::setTokenEndpoint(const QString &endpoint)
+{
+    m_tokenEndpoint = endpoint;
+}
+
+void NGAccess::setUserInfoEndpoint(const QString &endpoint)
+{
+    m_userInfoEndpoint = endpoint;
+}
+
 void NGAccess::setScope(const QString &scope)
 {
     m_scope = scope;
