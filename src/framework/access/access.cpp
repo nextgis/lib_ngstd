@@ -614,7 +614,7 @@ extern void updateUserInfoFunction(const QString &configDir,
         avatarUrl = QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
                 .arg(emailHash);
     }
-    else if(type == NGAccess::AuthSourceType::KeyCloakOpenID) {
+    else if(type == NGAccess::AuthSourceType::KeyCloakOpenID || type == NGAccess::AuthSourceType::Custom) {
         firstName = result["given_name"].toString();
         lastName = result["family_name"].toString();
         email = result["email"].toString();
@@ -642,6 +642,10 @@ extern void updateUserInfoFunction(const QString &configDir,
 
     QString settingsFilePath = configDir + QDir::separator() + QLatin1String(settingsFile);
     QSettings settings(settingsFilePath, QSettings::IniFormat);
+
+    if(userId.isEmpty()) {
+        NGAccess::instance().logMessage(QString("Get user info map size of %1").arg(result.size()), NGAccess::LogLevel::Warning);
+    }
 
     settings.setValue("user_id", userId);
     settings.setValue("first_name", firstName);
