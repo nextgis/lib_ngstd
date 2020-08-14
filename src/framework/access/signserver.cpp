@@ -234,17 +234,17 @@ int NGSignServer::exec()
     // Prepare url
     QUrl url(NGAccess::instance().authEndpoint());
     QList<QPair<QString, QString> > parameters;
-    parameters.append(qMakePair(QLatin1String("response_type"), QLatin1String("code")));
-    parameters.append(qMakePair(QLatin1String("client_id"), m_clientId));
-    parameters.append(qMakePair(QLatin1String("redirect_uri"), m_redirectUri));
+    parameters.append(qMakePair(QString("response_type"), QString("code")));
+    parameters.append(qMakePair(QString("client_id"), m_clientId));
+    parameters.append(qMakePair(QString("redirect_uri"), m_redirectUri));
     if(!m_scope.isEmpty()) {
-        parameters.append(qMakePair(QLatin1String("scope"), m_scope));
+        parameters.append(qMakePair(QString("scope"), m_scope));
     }
     if(!m_verifier.isEmpty()) {
         auto cc = sha256(m_verifier);
         qDebug() << "code_challenge: " << cc;
-        parameters.append(qMakePair(QLatin1String("code_challenge"), cc));
-        parameters.append(qMakePair(QLatin1String("code_challenge_method"), QLatin1String("S256")));
+        parameters.append(qMakePair(QString("code_challenge"), cc));
+        parameters.append(qMakePair(QString("code_challenge_method"), QString("S256")));
     }
 
 #if QT_VERSION < 0x050000
