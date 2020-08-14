@@ -61,3 +61,19 @@ QString fromBase64(const QString &str) {
     CPLFree(base64);
     return QString::fromStdString(out);
 }
+
+QString toBase64(unsigned char *data, int size) {
+    char* base64new = CPLBase64Encode(size, data);
+    QString out(base64new);
+    CPLFree(base64new);
+    out = out.replace("+", "-").replace("/", "_").replace("=", "");
+    return out;
+}
+
+QString unescapeUrl(const QString &str)
+{
+    char* unescaped = CPLUnescapeString(str.toStdString().c_str(), nullptr, CPLES_URL);
+    QString out(unescaped);
+    CPLFree(unescaped);
+    return out;
+}

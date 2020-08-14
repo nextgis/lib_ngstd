@@ -53,10 +53,12 @@ public:
     void setAuthEndpoint(const QString &endpoint);
     void setTokenEndpoint(const QString &endpoint);
     void setUserInfoEndpoint(const QString &endpoint);
+    void setUseCodeChallenge(bool val);
     QString endPoint() const;
     QString authEndpoint() const;
     QString tokenEndpoint() const;
     QString userInfoEndpoint() const;
+    bool useCodeChallenge() const;
     enum AuthSourceType authType() const;
 
     void initSentry(bool enabled, const QString &sentryKey);
@@ -86,7 +88,7 @@ protected:
     bool verifyRSASignature(unsigned char *originalMessage, unsigned int messageLength,
                             unsigned char *signature, unsigned int sigLength,
                             QString &errorMsg) const;
-    void getTokens(const QString &code, const QString &redirectUri);
+    void getTokens(const QString &code, const QString &redirectUri, const QString &verifier);
     void updateUserInfo() const;
     void updateSupportInfo() const;
     QString getPublicKey() const;
@@ -104,6 +106,7 @@ private:
     mutable QString m_updateToken;
     QString m_licenseDir;
     QStringList m_roles;
+    bool m_codeChallenge;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H

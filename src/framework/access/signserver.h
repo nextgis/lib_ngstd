@@ -33,6 +33,7 @@ public:
 
     QString code() const;
     QString redirectUri() const;
+    QString verifier() const;
 
 signals:
 
@@ -45,8 +46,7 @@ private slots:
 private:
     QString m_code;
     QString m_redirectUri;
-    QString m_replyContent;
-    QString m_clientId, m_scope;
+    QString m_clientId, m_scope, m_verifier;
     QTcpServer *m_listenServer;
 
     // QDialog interface

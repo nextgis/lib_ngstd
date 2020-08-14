@@ -130,7 +130,8 @@ NGAccess::NGAccess() :
     m_authEndpoint(m_endpoint + authEndpointSubpath),
     m_tokenEndpoint(m_endpoint + tokenEndpointSubpath),
     m_authType(AuthSourceType::NGID),
-    m_avatar(QIcon(defaultAvatar))
+    m_avatar(QIcon(defaultAvatar)),
+    m_codeChallenge(false)
 {
     // Setup license key file
     QFileInfo appDir(QCoreApplication::applicationDirPath());
@@ -147,7 +148,6 @@ NGAccess::NGAccess() :
 #else
     m_licenseDir = QLatin1String("/usr/share/license");
 #endif
-
 
     m_updateUserInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateUserInfoWatcher, SIGNAL(finished()), this,
@@ -184,7 +184,7 @@ QStringList NGAccess::userRoles() const
 
 void NGAccess::setClientId(const QString &clientId)
 {
-    m_clientId = clientId;
+    m_clientId = clientId.trimmed();
 
     QString config;
 #if defined(Q_OS_MACOS) || defined(Q_OS_MAC) // In Qt 4.8 Q_OS_MAC
@@ -265,22 +265,27 @@ void NGAccess::setClientId(const QString &clientId)
 
 void NGAccess::setAuthEndpoint(const QString &endpoint)
 {
-    m_authEndpoint = endpoint;
+    m_authEndpoint = endpoint.trimmed();
 }
 
 void NGAccess::setTokenEndpoint(const QString &endpoint)
 {
-    m_tokenEndpoint = endpoint;
+    m_tokenEndpoint = endpoint.trimmed();
 }
 
 void NGAccess::setUserInfoEndpoint(const QString &endpoint)
 {
-    m_userInfoEndpoint = endpoint;
+    m_userInfoEndpoint = endpoint.trimmed();
+}
+
+void NGAccess::setUseCodeChallenge(bool val)
+{
+    m_codeChallenge = val;
 }
 
 void NGAccess::setScope(const QString &scope)
 {
-    m_scope = scope;
+    m_scope = scope.trimmed();
 }
 
 void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
@@ -294,7 +299,7 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
         m_userInfoEndpoint.clear();
     }
     else {
-        m_endpoint = endPoint;
+        m_endpoint = endPoint.trimmed();
         m_authType = type;
 
         if(type == AuthSourceType::NGID) {
@@ -335,6 +340,11 @@ QString NGAccess::userInfoEndpoint() const
     return m_userInfoEndpoint;
 }
 
+bool NGAccess::useCodeChallenge() const
+{
+    return m_codeChallenge;
+}
+
 enum NGAccess::AuthSourceType NGAccess::authType() const
 {
     return m_authType;
@@ -346,7 +356,7 @@ void NGAccess::authorize()
     NGSignServer listenServer(m_clientId, m_scope);
     listenServer.exec();
 
-    getTokens(listenServer.code(), listenServer.redirectUri());
+    getTokens(listenServer.code(), listenServer.redirectUri(), listenServer.verifier());
 }
 
 void NGAccess::exit()
@@ -546,13 +556,14 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
     return result == 1;
 }
 
-void NGAccess::getTokens(const QString &code, const QString &redirectUri)
+void NGAccess::getTokens(const QString &code, const QString &redirectUri,
+                         const QString &verifier)
 {
     if(code.isEmpty()) {
         return;
     }
 
-    qDebug() << "code: " << code << "\nuri:" << redirectUri;
+    qDebug() << "code: " << code << "\nuri: " << redirectUri << "\nverifier: " << verifier;
 
     QMap<QString, QString> options;
     options["type"] = "bearer";
@@ -561,6 +572,9 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri)
     options["expiresIn"] = "-1";
     options["code"] = code;
     options["redirectUri"] = redirectUri;
+    if(!verifier.isEmpty()) {
+        options["codeVerifier"] = verifier;
+    }
 
     QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
     if(NGRequest::addAuth(urls, options)) {

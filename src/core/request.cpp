@@ -262,6 +262,7 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
         QString tokenServer = options["tokenServer"];
         QString accessToken = options["accessToken"];
         QString updateToken = options["updateToken"];
+        QString verify = options["codeVerifier"];
         time_t lastCheck = 0;
         if(expiresIn == -1) {
             CPLJSONDocument fetchToken;
@@ -269,6 +270,9 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
                     .arg(options["code"])
                     .arg(options["redirectUri"])
                     .arg(clientId);
+            if(!verify.isEmpty()) {
+                postPayload += "&code_verifier=" + verify;
+            }
             CPLStringList options(instance().baseOptions());
             auto payload = postPayload.toStdString();
             options.AddNameValue("CUSTOMREQUEST", "POST");
@@ -277,7 +281,7 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
             time_t now = time(nullptr);
             auto tokenServerStd = tokenServer.toStdString();
             bool result = fetchToken.LoadUrl(tokenServerStd.c_str(), options);
-            // qDebug() << "Server: " << info.m_tokenServer << "options:" << postPayload;
+            qDebug() << "Server: " << tokenServer << "\noptions:" << postPayload;
             if(!result) {
                 qDebug() << "Failed to get tokens";
                 return false;
