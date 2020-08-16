@@ -596,12 +596,12 @@ static QMap<QString, QVariant> userInfoFromJWT(const QString &endPoint) {
         return result;
     }
     auto decoded = fromBase64(jwtParts[1]);
-    //FIXME: Not present in Qt4 QByteArray::fromBase64(jwtParts[1].toUtf8(), QByteArray::Base64UrlEncoding);
     return memJsonToMap(decoded);
 }
 
 extern void updateUserInfoFunction(const QString &configDir,
                                    const QString &licenseDir,
+                                   const QString &clientId,
                                    const QString &endPoint,
                                    enum NGAccess::AuthSourceType type)
 {
@@ -656,7 +656,7 @@ extern void updateUserInfoFunction(const QString &configDir,
             CPLJSONDocument doc;
             if(doc.LoadMemory(ra)) {
                 auto root = doc.GetRoot();
-                auto rolesArray = root.GetArray("account/roles");
+                auto rolesArray = root.GetArray(clientId.toStdString() + "/roles");
                 for(int i = 0; i < rolesArray.Size(); ++i) {
                     rolesList.append(rolesArray[i].ToString().c_str());
                 }
@@ -787,7 +787,7 @@ void NGAccess::updateUserInfo() const
     auto properties = NGRequest::instance().properties(m_endpoint);
     m_updateToken = properties.value("updateToken", "");
     QFuture<void> future = QtConcurrent::run(updateUserInfoFunction, m_configDir,
-        m_licenseDir, m_userInfoEndpoint, m_authType);
+        m_licenseDir, m_clientId, m_userInfoEndpoint, m_authType);
     m_updateUserInfoWatcher->setFuture(future);
 }
 
