@@ -182,6 +182,16 @@ QStringList NGAccess::userRoles() const
     return m_roles;
 }
 
+QString NGAccess::userId() const
+{
+    return m_userId;
+}
+
+QString NGAccess::email() const
+{
+    return m_email;
+}
+
 void NGAccess::setClientId(const QString &clientId)
 {
     m_clientId = clientId.trimmed();
@@ -221,6 +231,8 @@ void NGAccess::setClientId(const QString &clientId)
 
         m_firstName = settings.value("first_name").toString();
         m_lastName = settings.value("last_name").toString();
+        m_userId = settings.value("user_id").toString();
+        m_email = settings.value("email").toString();
         m_roles = settings.value("roles").toStringList();
 
         // Get access, refresh tokens for network requests
@@ -674,6 +686,7 @@ extern void updateUserInfoFunction(const QString &configDir,
     settings.setValue("user_id", userId);
     settings.setValue("first_name", firstName);
     settings.setValue("last_name", lastName);
+    settings.setValue("email", email);
     settings.setValue("roles", rolesList);
 
     // Get avatar
@@ -757,6 +770,8 @@ void NGAccess::onUserInfoUpdated()
 
         m_firstName = settings.value("first_name").toString();
         m_lastName = settings.value("last_name").toString();
+        m_userId = settings.value("user_id").toString();
+        m_email = settings.value("email").toString();
         m_roles = settings.value("roles").toStringList();
     }
 

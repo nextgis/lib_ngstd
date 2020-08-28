@@ -23,6 +23,8 @@ public:
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
+    QString userId() const;
+    QString email() const;
     QString endPoint() const;
     QStringList userRoles() const;
 

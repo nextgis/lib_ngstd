@@ -68,6 +68,8 @@ public:
     QString avatarFilePath() const;
     QString firstName() const;
     QString lastName() const;
+    QString userId() const;
+    QString email() const;
     QStringList userRoles() const;
 
 signals:
@@ -102,7 +104,7 @@ private:
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
-    QString m_firstName, m_lastName;
+    QString m_firstName, m_lastName, m_userId, m_email;
     mutable QString m_updateToken;
     QString m_licenseDir;
     QStringList m_roles;
