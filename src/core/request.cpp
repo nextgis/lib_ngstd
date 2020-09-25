@@ -142,6 +142,7 @@ const QString HTTPAuthBearer::header()
     // 1. Check if expires if not return current access token
     time_t now = time(nullptr);
     double seconds = difftime(now, m_lastCheck);
+    seconds -= 2; // Two seconds sorter expiration
     if(seconds < m_expiresIn) {
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
@@ -340,6 +341,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
     CPLStringList options = getOptions(url);
     CPLJSONDocument in;
     if(in.LoadUrl(url.toStdString(), options)) {
+        qDebug() << QString::fromStdString(in.GetRoot().Format(CPLJSONObject::Pretty));
         return toMap(in.GetRoot());
     }
 
