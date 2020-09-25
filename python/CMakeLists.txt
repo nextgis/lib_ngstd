@@ -23,7 +23,7 @@ if(BUILD_QT4)
 
     find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
 
-    find_anyproject(SIP REQUIRED)
+    find_anyproject(SIP REQUIRED VERSION 4.19.8 EXACT)
     find_anyproject(PyQt4 REQUIRED)
 
     include(SIPMacros)
