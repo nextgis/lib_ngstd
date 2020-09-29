@@ -61,7 +61,7 @@ void NGSignDialog::updateContent()
         ui->userInfo->show();
         QString supportedText;
         if(NGAccess::instance().authType() == NGAccess::AuthSourceType::NGID) {
-            ui->learnMore->setText(QString("<a href=\"%1\">%2</a>").arg(NGAccess::instance().endPoint()).arg(tr("Account")));
+            ui->learnMore->setText(QString("<a href=\"%1/profile\">%2</a>").arg(NGAccess::instance().endPoint()).arg(tr("Account")));
             supportedText= NGAccess::instance().isUserSupported() ?
                                                tr("Supported") : tr("Unsupported");
         }
