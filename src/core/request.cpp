@@ -341,7 +341,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
     CPLStringList options = getOptions(url);
     CPLJSONDocument in;
     if(in.LoadUrl(url.toStdString(), options)) {
-        qDebug() << QString::fromStdString(in.GetRoot().Format(CPLJSONObject::Pretty));
+        qDebug() << QString::fromStdString(in.GetRoot().Format(CPLJSONObject::PrettyFormat::Pretty));
         return toMap(in.GetRoot());
     }
 

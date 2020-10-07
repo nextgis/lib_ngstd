@@ -26,19 +26,19 @@ QMap<QString, QVariant> toMap(const CPLJSONObject &root) {
     for(const CPLJSONObject &child : root.GetChildren()) {
         QString name = QString::fromStdString(child.GetName());
         switch(child.GetType()) {
-        case CPLJSONObject::Boolean:
+        case CPLJSONObject::Type::Boolean:
             out[name] = child.ToBool();
             break;
-        case CPLJSONObject::String:
+        case CPLJSONObject::Type::String:
             out[name] = QString::fromUtf8(child.ToString().c_str());
             break;
-        case CPLJSONObject::Integer:
+        case CPLJSONObject::Type::Integer:
             out[name] = child.ToInteger();
             break;
-        case CPLJSONObject::Long:
+        case CPLJSONObject::Type::Long:
             out[name] = child.ToLong();
             break;
-        case CPLJSONObject::Double:
+        case CPLJSONObject::Type::Double:
             out[name] = child.ToDouble();
             break;
         default:
