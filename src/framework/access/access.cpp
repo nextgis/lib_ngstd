@@ -327,9 +327,9 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
     }
 }
 
-void NGAccess::initSentry(bool enabled, const QString &sentryKey)
+void NGAccess::initSentry(bool enabled, const QString &sentryKey, const QString &version)
 {
-    SentryReporter::instance().init(enabled, sentryKey);
+    SentryReporter::instance().init(enabled, sentryKey, version);
 }
 
 QString NGAccess::endPoint() const

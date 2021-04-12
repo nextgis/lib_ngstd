@@ -61,7 +61,7 @@ public:
     bool useCodeChallenge() const;
     enum AuthSourceType authType() const;
 
-    void initSentry(bool enabled, const QString &sentryKey);
+    void initSentry(bool enabled, const QString &sentryKey, const QString &version);
     void logMessage(const QString &value, LogLevel level = LogLevel::Info);
 
     QIcon avatar() const;

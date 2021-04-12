@@ -30,7 +30,7 @@ public:
 
     static SentryReporter &instance();
 
-    void init(bool enabled, const QString &sentryKey);
+    void init(bool enabled, const QString &sentryKey, const QString &version);
     void sendMessage(const QString &message, Level level = Level::Info);
 
 private:
