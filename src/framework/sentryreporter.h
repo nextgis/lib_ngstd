@@ -26,7 +26,7 @@ class SentryReporter
 {
     Q_DISABLE_COPY(SentryReporter)
 public:
-    enum class Level { Info, Warning, Error, Fatal };
+    enum class Level { Debug, Info, Warning, Error, Fatal };
 
     static SentryReporter &instance();
 

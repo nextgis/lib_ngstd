@@ -56,6 +56,9 @@ sentry_level_e SentryReporter::toNativeLevel(SentryReporter::Level level)
         return SENTRY_LEVEL_ERROR;
     case SentryReporter::Level::Fatal:
         return SENTRY_LEVEL_FATAL;
+    case SentryReporter::Level::Debug:
+    default:
+        return SENTRY_LEVEL_DEBUG;
     }
 }
 
