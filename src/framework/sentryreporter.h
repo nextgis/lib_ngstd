@@ -42,6 +42,7 @@ private:
 
     bool m_enabled = false;
     bool m_initialized = false;
+    QString m_releaseVersion;
     sentry_options_t *m_options;
 };
 

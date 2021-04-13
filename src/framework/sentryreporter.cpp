@@ -19,10 +19,14 @@ void SentryReporter::init(bool enabled, const QString &sentryKey, const QString 
 {
     m_enabled = enabled;
 
+    if (!version.isEmpty()) {
+        m_releaseVersion = version;
+    }
+
     if (!sentryKey.isEmpty()) {
         m_options = sentry_options_new();
 
-        sentry_options_set_release(m_options, version.toLocal8Bit().constData());
+        sentry_options_set_release(m_options, m_releaseVersion.toLocal8Bit().constData());
         sentry_options_set_dsn(m_options, sentryKey.toLocal8Bit().constData());
         sentry_options_set_database_path(m_options, getConfigPath(sentryKey).toLocal8Bit().constData());
 
