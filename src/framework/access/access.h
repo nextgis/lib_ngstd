@@ -33,7 +33,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
     Q_OBJECT
 public:
-    enum class LogLevel { Info, Warning, Error, Fatal };
+    enum class LogLevel { Debug, Info, Warning, Error, Fatal };
     enum class AuthSourceType { NGID, KeyCloakOpenID, Custom };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
@@ -61,7 +61,7 @@ public:
     bool useCodeChallenge() const;
     enum AuthSourceType authType() const;
 
-    void initSentry(bool enabled, const QString &sentryKey);
+    void initSentry(bool enabled, const QString &sentryKey, const QString &version = "");
     void logMessage(const QString &value, LogLevel level = LogLevel::Info);
 
     QIcon avatar() const;

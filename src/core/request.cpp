@@ -142,7 +142,7 @@ const QString HTTPAuthBearer::header()
     // 1. Check if expires if not return current access token
     time_t now = time(nullptr);
     double seconds = difftime(now, m_lastCheck);
-    seconds -= 2; // Two seconds sorter expiration
+    seconds += 2; // Two seconds addition to expiration
     if(seconds < m_expiresIn) {
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }

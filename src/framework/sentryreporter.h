@@ -26,11 +26,11 @@ class SentryReporter
 {
     Q_DISABLE_COPY(SentryReporter)
 public:
-    enum class Level { Info, Warning, Error, Fatal };
+    enum class Level { Debug, Info, Warning, Error, Fatal };
 
     static SentryReporter &instance();
 
-    void init(bool enabled, const QString &sentryKey);
+    void init(bool enabled, const QString &sentryKey, const QString &version);
     void sendMessage(const QString &message, Level level = Level::Info);
 
 private:
@@ -42,6 +42,7 @@ private:
 
     bool m_enabled = false;
     bool m_initialized = false;
+    QString m_releaseVersion;
     sentry_options_t *m_options;
 };
 

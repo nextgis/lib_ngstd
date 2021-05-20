@@ -15,15 +15,21 @@ SentryReporter::~SentryReporter()
     sentry_shutdown();
 }
 
-void SentryReporter::init(bool enabled, const QString &sentryKey)
+void SentryReporter::init(bool enabled, const QString &sentryKey, const QString &version)
 {
     m_enabled = enabled;
 
+    if (!version.isEmpty()) {
+        m_releaseVersion = version;
+    }
+
     if (!sentryKey.isEmpty()) {
         m_options = sentry_options_new();
-        sentry_options_set_release(m_options, QString::number(NGLIB_VERSION_NUMBER).toLocal8Bit().data());
-        sentry_options_set_dsn(m_options, sentryKey.toLocal8Bit().data());
-        sentry_options_set_database_path(m_options, getConfigPath(sentryKey).toLocal8Bit().data());
+
+        sentry_options_set_release(m_options, m_releaseVersion.toLocal8Bit().constData());
+        sentry_options_set_dsn(m_options, sentryKey.toLocal8Bit().constData());
+        sentry_options_set_database_path(m_options, getConfigPath(sentryKey).toLocal8Bit().constData());
+
         m_initialized = !sentry_init(m_options); // sentry_init returns 0 on success
     }
 }
@@ -34,7 +40,7 @@ void SentryReporter::sendMessage(const QString &message, Level level /* = Level:
         return;
     }
 
-    auto event = sentry_value_new_message_event(toNativeLevel(level), LIB_NAME, message.toLocal8Bit().data());
+    auto event = sentry_value_new_message_event(toNativeLevel(level), LIB_NAME, message.toLocal8Bit().constData());
     sentry_capture_event(event);
 }
 
@@ -50,6 +56,9 @@ sentry_level_e SentryReporter::toNativeLevel(SentryReporter::Level level)
         return SENTRY_LEVEL_ERROR;
     case SentryReporter::Level::Fatal:
         return SENTRY_LEVEL_FATAL;
+    case SentryReporter::Level::Debug:
+    default:
+        return SENTRY_LEVEL_DEBUG;
     }
 }
 

@@ -332,9 +332,9 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
     }
 }
 
-void NGAccess::initSentry(bool enabled, const QString &sentryKey)
+void NGAccess::initSentry(bool enabled, const QString &sentryKey, const QString &version)
 {
-    SentryReporter::instance().init(enabled, sentryKey);
+    SentryReporter::instance().init(enabled, sentryKey, version);
 }
 
 QString NGAccess::endPoint() const
@@ -838,6 +838,9 @@ void NGAccess::logMessage(const QString &value, LogLevel level)
     }
     else if(level == LogLevel::Fatal) {
         slevel = SentryReporter::Level::Fatal;
+    }
+    else if(level == LogLevel::Debug) {
+        slevel = SentryReporter::Level::Debug;
     }
     SentryReporter::instance().sendMessage(value, slevel);
 }
