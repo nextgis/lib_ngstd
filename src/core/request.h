@@ -59,7 +59,7 @@ public:
 
 public:
     void addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth);
-    void removeAuth(const QString &url);
+    void removeAuth(const QString &url, const QString &logoutUrl);
     const QString authHeader(const QString &url);
     const QMap<QString, QString> properties(const QString &url) const;
     char **baseOptions() const;

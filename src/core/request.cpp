@@ -160,9 +160,9 @@ const QString HTTPAuthBearer::header()
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
-        CPLHTTPDestroyResult( result );
-        qDebug() << "Failed to refresh token. Return last not expired. ";
-        return QString("Authorization: Bearer %1").arg(m_accessToken);
+            CPLHTTPDestroyResult( result );
+            qDebug() << "Failed to refresh token. Return last not expired. ";
+            return QString("Authorization: Bearer %1").arg(m_accessToken);
         }
     }
 
@@ -379,8 +379,26 @@ void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
     m_auths[url] = auth;
 }
 
-void NGRequest::removeAuth(const QString &url)
+void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
+    if(!logoutUrl.empty()) {
+        auto updateToken = m_updateToken.toStdString();
+        const char *payload = CPLSPrintf("client_id=%s&refresh_token=%s",
+                                m_clientId.toStdString().c_str(),
+                                updateToken.c_str());
+        CPLStringList options(m_request->baseOptions());
+        options.AddNameValue("CUSTOMREQUEST", "POST");
+        options.AddNameValue("POSTFIELDS", payload);
+        options.AddNameValue("HEADERS", "Content-Type: application/x-www-form-urlencoded");
+
+        CPLHTTPResult *result = CPLHTTPFetch(logoutUrl.toStdString().c_str(), options);
+
+        if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
+        if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
+            qDebug() << "Failed to logout.";
+        }
+        CPLHTTPDestroyResult( result );
+    }
     m_auths.remove(url);
 }
 

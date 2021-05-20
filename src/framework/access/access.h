@@ -99,7 +99,7 @@ protected:
 private:
     bool m_authorized;
     bool m_supported;
-    QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
+    QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_logoutEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
     AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;

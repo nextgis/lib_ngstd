@@ -51,6 +51,7 @@
 constexpr const char *apiEndpointSubpath = "/api/v1";
 constexpr const char *tokenEndpointSubpath = "/oauth2/token/";
 constexpr const char *authEndpointSubpath = "/oauth2/authorize/";
+constexpr const char *logoutEndpointSubpath = "/api/v1/logout";
 
 constexpr const char *avatarFile = "avatar";
 constexpr const char *keyFile = "public.key";
@@ -129,6 +130,7 @@ NGAccess::NGAccess() :
     m_endpoint(QLatin1String(defaultEndpoint)),
     m_authEndpoint(m_endpoint + authEndpointSubpath),
     m_tokenEndpoint(m_endpoint + tokenEndpointSubpath),
+    m_logoutEndpoint(m_endpoint + logoutEndpointSubpath),
     m_authType(AuthSourceType::NGID),
     m_avatar(QIcon(defaultAvatar)),
     m_codeChallenge(false)
@@ -308,6 +310,7 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
         m_avatar = QIcon(defaultAvatar);
         m_tokenEndpoint = m_endpoint + QLatin1String(tokenEndpointSubpath);
         m_authEndpoint = m_endpoint + QLatin1String(authEndpointSubpath);
+        m_logoutEndpoint = m_endpoint + QLatin1String(logoutEndpointSubpath);
         m_userInfoEndpoint.clear();
     }
     else {
@@ -317,11 +320,13 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
         if(type == AuthSourceType::NGID) {
             m_tokenEndpoint = m_endpoint + QLatin1String(tokenEndpointSubpath);
             m_authEndpoint = m_endpoint + QLatin1String(authEndpointSubpath);
+            m_logoutEndpoint = m_endpoint + QLatin1String(logoutEndpointSubpath);
             m_userInfoEndpoint = QString("%1%2/user_info/").arg(m_endpoint).arg(apiEndpointSubpath);
         }
         else if(type == AuthSourceType::KeyCloakOpenID) {
             m_tokenEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/token");
             m_authEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/auth");
+            m_logoutEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/logout");
             m_userInfoEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/userinfo");
         }
     }
@@ -386,9 +391,12 @@ void NGAccess::exit()
     settings.setValue("user_id", "");
 
     settings.sync();
+    // logout
+    NGRequest::removeAuth(m_endpoint, m_logoutEndpoint);
 
     emit userInfoUpdated();
     emit supportInfoUpdated();
+
 }
 
 void NGAccess::save()

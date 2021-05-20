@@ -195,7 +195,7 @@ void NGSignServer::onGetReply()
 
     // Add localized content.
     QString messageBody;
-    if(result ==1) {
+    if(result == 1) {
         messageBody = tr("You have successfully signed in <br> at <span>%1</span> application")
             .arg(qApp->applicationName());
     }
@@ -221,7 +221,7 @@ void NGSignServer::onGetReply()
     socket->disconnectFromHost();
 
     if(result == 0) {
-    SentryReporter::instance().sendMessage(QString("NGSignServer::onGetReply: data - %1, error - %2")
+        SentryReporter::instance().sendMessage(QString("NGSignServer::onGetReply: data - %1, error - %2")
             .arg(dataStr).arg(errorMsg));
     }
 
