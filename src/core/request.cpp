@@ -381,23 +381,28 @@ void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 
 void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
-    if(!logoutUrl.empty()) {
-        auto updateToken = m_updateToken.toStdString();
-        const char *payload = CPLSPrintf("client_id=%s&refresh_token=%s",
-                                m_clientId.toStdString().c_str(),
-                                updateToken.c_str());
-        CPLStringList options(m_request->baseOptions());
-        options.AddNameValue("CUSTOMREQUEST", "POST");
-        options.AddNameValue("POSTFIELDS", payload);
-        options.AddNameValue("HEADERS", "Content-Type: application/x-www-form-urlencoded");
+    if(!logoutUrl.isEmpty()) {
+        auto prop = properties(url);
+        if(!prop.empty()) {
+            auto updateToken = prop["updateToken"].toStdString();
+            auto clientId = prop["clientId"].toStdString();
+            const char *payload = CPLSPrintf("client_id=%s&refresh_token=%s",
+                                    clientId.c_str(),
+                                    updateToken.c_str());
+            CPLStringList options(baseOptions());
+            options.AddNameValue("CUSTOMREQUEST", "POST");
+            options.AddNameValue("POSTFIELDS", payload);
+            options.AddNameValue("HEADERS", "Content-Type: application/x-www-form-urlencoded");
 
-        CPLHTTPResult *result = CPLHTTPFetch(logoutUrl.toStdString().c_str(), options);
+            CPLHTTPResult *result = CPLHTTPFetch(logoutUrl.toStdString().c_str(), options);
 
-        if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
-            qDebug() << "Failed to logout.";
+            if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
+                if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
+                    qDebug() << "Failed to logout.";
+                }
+            }
+            CPLHTTPDestroyResult( result );
         }
-        CPLHTTPDestroyResult( result );
     }
     m_auths.remove(url);
 }
