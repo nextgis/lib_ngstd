@@ -43,7 +43,6 @@ class NGCORE_EXPORT NGRequest
 
 public:
     static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
-    static bool removeAuth(const QString &url, const QString &logoutUrl);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
     static QString getJsonAsString(const QString &url);
     static QString getAsString(const QString &url);

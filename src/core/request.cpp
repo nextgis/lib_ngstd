@@ -442,11 +442,6 @@ QString NGRequest::getAuthHeader(const QString &url)
     return instance().authHeader(url);
 }
 
-void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
-{
-    return instance().removeAuth(url, logoutUrl);
-}
-
 /**
  * @brief Upload file to specified url
  * @param url URL to upload file

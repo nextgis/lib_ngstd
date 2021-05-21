@@ -392,7 +392,7 @@ void NGAccess::exit()
 
     settings.sync();
     // logout
-    NGRequest::removeAuth(m_endpoint, m_logoutEndpoint);
+    NGRequest::instance().removeAuth(m_endpoint, m_logoutEndpoint);
 
     emit userInfoUpdated();
     emit supportInfoUpdated();
