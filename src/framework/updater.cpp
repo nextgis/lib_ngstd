@@ -63,7 +63,7 @@ void NGUpdater::checkUpdates()
 
     const QString path = updaterPath();
     QStringList args;
-    args << "--checkupdates";
+    args << "check-updates";
     m_maintainerProcess->start(path, args);
 }
 
