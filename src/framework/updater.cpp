@@ -85,6 +85,13 @@ void NGUpdater::maintainerFinished(int /*code*/, QProcess::ExitStatus /*status*/
     QProcess *prc = static_cast<QProcess*>(sender());
 
     QByteArray data = prc->readAllStandardOutput();
+
+    int pos = data.indexOf("<updates");
+    if (pos != -1)
+    {
+        data = data.right(data.length() - pos);
+    }
+
     QXmlStreamReader xml(QString::fromUtf8(data));
     while (!xml.atEnd() && !xml.hasError()) {
         QXmlStreamReader::TokenType token = xml.readNext();
