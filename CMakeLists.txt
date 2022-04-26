@@ -132,6 +132,9 @@ set(CMAKE_AUTORCC ON)
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network Svg LinguistTools)
 if(WITH_ZLIB_EXTERNAL)
+    # ZLIB needed for uic, rcc, lrelease and lupdate
+    find_anyproject(ZLIB REQUIRED)
+    
     get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
     get_target_property(RCC_PATH Qt5::lrelease IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)

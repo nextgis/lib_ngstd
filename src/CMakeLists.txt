@@ -21,11 +21,6 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-if(WITH_ZLIB_EXTERNAL)
-    # ZLIB needed for uic, rcc, lrelease and lupdate
-    find_anyproject(ZLIB REQUIRED)
-endif()
-
 find_anyproject(GDAL REQUIRED)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfigFullLocal.cmake.in
