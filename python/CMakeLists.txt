@@ -23,8 +23,7 @@ find_anyproject(PyQt5 REQUIRED)
 
 set(SIP_INCLUDE_DIRS ${PYQT5_PYTHON_DIR}/PyQt5/bindings)
 set(NGSTD_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build)
-
-get_filename_component(NGSTD_TARGET_DIR ${CMAKE_BINARY_DIR}/${NGSTD_PYTHON_DIR} PATH)
+set(NGSTD_TARGET_DIR ${CMAKE_CURRENT_BINARY_DIR}/target)
 
 get_property(Qt5Core_INCLUDE_DIRS TARGET Qt5::Core PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 foreach(_INC_DIR ${Qt5Core_INCLUDE_DIRS})
@@ -75,10 +74,15 @@ add_custom_target(build_py ALL
 )
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-    foreach(PY_MODULE "core;framework")
+    foreach(PY_MODULE core framework)
         file(GLOB_RECURSE PY_FILES "${PY_MODULE}/*.py")
         install(FILES ${PY_FILES} DESTINATION "${NGSTD_PYTHON_DIR}/${PY_MODULE}")
     endforeach()
+    
+    file(GLOB_RECURSE PYD_FILES ${NGSTD_BUILD_DIR}/*.pyd)
+    install(FILES ${PYD_FILES} DESTINATION "${NGSTD_PYTHON_DIR}")
+    file(GLOB_RECURSE LIB_FILES ${NGSTD_BUILD_DIR}/*.lib)
+    install(FILES ${LIB_FILES} DESTINATION "${NGSTD_PYTHON_DIR}")
 
     install(FILES __init__.py DESTINATION "${NGSTD_PYTHON_DIR}")
     install(FILES loader/ximport.py DESTINATION "${NGSTD_PYTHON_DIR}")
