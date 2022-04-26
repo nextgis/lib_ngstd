@@ -1,12 +1,3 @@
-# Find PyQt5
-# ~~~~~~~~~~
-# Copyright (c) 2007-2008, Simon Edwards <simon@simonzone.com>
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-#
-# PyQt5 website: http://www.riverbankcomputing.co.uk/pyqt/index.php
-#
-# Find the installed version of PyQt5. FindPyQt5 should only be called after
 ################################################################################
 # Project:  NextGIS GIS libraries
 # Purpose:  CMake build scripts
