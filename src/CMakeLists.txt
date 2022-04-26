@@ -26,7 +26,7 @@ if(WITH_ZLIB_EXTERNAL)
     find_anyproject(ZLIB REQUIRED)
 endif()
 
-find_anyproject(GDAL VERSION 2.4 REQUIRED)
+find_anyproject(GDAL REQUIRED)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/PackageConfigFullLocal.cmake.in
     ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY

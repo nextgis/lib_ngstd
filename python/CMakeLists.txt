@@ -19,71 +19,63 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #***************************************************************************
 
-if(BUILD_QT4)
+find_anyproject(PyQt5 REQUIRED)
 
-    find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtNetwork QtSvg)
+set(SIP_INCLUDE_DIRS ${PYQT5_PYTHON_DIR}/PyQt5/bindings)
+set(NGSTD_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build)
 
-    find_anyproject(SIP REQUIRED VERSION 4.19.8 EXACT)
-    find_anyproject(PyQt4 REQUIRED)
+get_filename_component(NGSTD_TARGET_DIR ${CMAKE_INSTALL_PREFIX}/${NGSTD_PYTHON_DIR} PATH)
 
-    include(SIPMacros)
+get_property(Qt5Core_INCLUDE_DIRS TARGET Qt5::Core PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+foreach(_INC_DIR ${Qt5Core_INCLUDE_DIRS})
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "\"${_INC_DIR}\",")
+endforeach()
+get_property(Qt5Widgets_INCLUDE_DIRS TARGET Qt5::Widgets PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+foreach(_INC_DIR ${Qt5Widgets_INCLUDE_DIRS})
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "\"${_INC_DIR}\",")
+endforeach()
+get_property(Qt5Gui_INCLUDE_DIRS TARGET Qt5::Gui PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+foreach(_INC_DIR ${Qt5Gui_INCLUDE_DIRS})
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} "\"${_INC_DIR}\",")
+endforeach()
 
-    # setup SIP variables
-    set(PYQT_SIP_FLAGS ${PYQT4_SIP_FLAGS})
-    set(PYQT_SIP_DIR ${PYQT4_SIP_DIR})
+set(INCLUDE_DIRS ${INCLUDE_DIRS} "\"${CMAKE_SOURCE_DIR}/src\",\"${CMAKE_SOURCE_DIR}/src/core\"")
 
-    set(SIP_INCLUDES ${PYQT_SIP_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-    set(SIP_CONCAT_PARTS 4)
-    separate_arguments(PYQT_SIP_FLAGS)
+string(REPLACE ";" "," INCLUDE_DIRS ${INCLUDE_DIRS})
 
-    include_directories(
-        ${NGSTD_SOURCE_DIR}/src
-        ${NGSTD_BINARY_DIR}
-        ${NGSTD_BINARY_DIR}/src
-        ${PYTHON_INCLUDE_PATH}
-    )
+get_property(QT_QMAKE_EXECUTABLE TARGET Qt5::qmake PROPERTY IMPORTED_LOCATION)
+get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
+get_filename_component(QT_ROOT_DIR "${QT_BIN_DIR}" PATH)
 
-    set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES}
-        QT5_SUPPORT CHIMERA_NULL_VARIANT_CONVERSION ANDROID ARM HAVE_TOUCH
-        MOBILITY_LOCATION
-    )
+set(LIBRARY_DIRS "\"${QT_ROOT_DIR}/lib\",\"${CMAKE_BINARY_DIR}/src/core/${CMAKE_BUILD_TYPE}\",\"${CMAKE_BINARY_DIR}/src/framework/${CMAKE_BUILD_TYPE}\"")
 
-    if(PYQT4_VERSION_NUM LESS 263680)	# 0x040600
-        set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} PROXY_FACTORY)
-    endif()
+configure_file(${CMAKE_SOURCE_DIR}/cmake/pyproject.toml.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml @ONLY
+)
 
-    if(NOT PYQT4_VERSION_NUM LESS 263941 AND QT4_BUILD)	# 0x040705
-        set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} QSETINT_CONVERSION)
-    endif()
+# Find sip-install
+execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} -m site --user-base
+    RESULT_VARIABLE _process_status
+    OUTPUT_VARIABLE _process_output
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-    if(NOT PYQT4_VERSION_NUM LESS 264194)	# 0x040802
-        set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} QSETTYPE_CONVERSION)
-    endif()
+if(${_process_status} EQUAL 0)
+    string(STRIP ${_process_output} BASE_PATH)
+endif()
 
-    if(PYQT4_VERSION_NUM LESS 264196)       # 0x040804
-        set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} QLISTCONSTPTR_CONVERSION)
-    endif()
+find_program(SIP_INSTALL_EXECUTABLE sip-install PATHS ${BASE_PATH}/bin)
 
-    if(NOT PYQT4_VERSION_NUM LESS 264453)	# 0x040905
-        set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} QVECTORINT_CONVERSION)
-    endif()
+add_custom_target(build_py ALL
+    COMMAND ${SIP_INSTALL_EXECUTABLE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS ngstd_core ngstd_framework
+    VERBATIM
+)
 
-    set(PY_MODULES
-        core
-        framework
-    )
-
-    foreach(PY_MODULE ${PY_MODULES})
-        file(GLOB_RECURSE sip_files_${PY_MODULE} ${PY_MODULE}/*.sip)
-        set(SIP_EXTRA_FILES_DEPEND ${sip_files_${PY_MODULE}})
-        set(SIP_EXTRA_OPTIONS ${PYQT_SIP_FLAGS} -o -a ${CMAKE_CURRENT_BINARY_DIR}/ngstd.${PY_MODULE}.api)
-
-        # FIXME: Now support only PyQt4 and BUILD_QT4
-        set(MODULES_SIP ${MODULES_SIP} ngstd_${PY_MODULE}4)
-        add_sip_python_module(ngstd._${PY_MODULE} ${PY_MODULE}/${PY_MODULE}.sip ${MODULES_SIP} Qt4::QtGui Qt4::QtCore)
-
-        add_custom_target(py${PY_MODULE} ALL)
-        add_dependencies(py${PY_MODULE} python_module_ngstd__${PY_MODULE})
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+    foreach(PY_MODULE "core;framework")
         file(GLOB_RECURSE PY_FILES "${PY_MODULE}/*.py")
         install(FILES ${PY_FILES} DESTINATION "${NGSTD_PYTHON_DIR}/${PY_MODULE}")
     endforeach()

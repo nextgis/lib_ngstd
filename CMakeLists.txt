@@ -88,13 +88,17 @@ configure_file(cmake/cmake_uninstall.cmake.in
 set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
-option(BUILD_QT5 "Build qt5 library" ON)
-option(BUILD_QT4 "Build qt4 library" OFF)
 option(WITH_BINDINGS "Build python bindings" OFF)
 
 if(WITH_BINDINGS)
-    find_package(PythonInterp 2.7 REQUIRED)
-    find_package(PythonLibs 2.7 REQUIRED)
+    find_package(Python3 COMPONENTS Interpreter Development)
+
+    if(${Python3_FOUND})
+        set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+        set(PYTHON_LIBRARY ${Python3_LIBRARIES})
+        set(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
+        set(PYTHON_VERSION_MINOR ${Python3_VERSION_MINOR})
+    endif()
 
     if(OSX_FRAMEWORK)
         set(NGSTD_PYTHON_DIR "Library/Python/${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PROJECT_NAME}")
@@ -106,10 +110,6 @@ if(WITH_BINDINGS)
 endif()
 
 include(FindAnyProject)
-
-# if(BUILD_QT4)
-#     find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtSvg)
-# endif()
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -125,11 +125,36 @@ set(NGLIBS
     framework
 )
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network Svg LinguistTools)
+if(WITH_ZLIB_EXTERNAL)
+    get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
+    get_target_property(RCC_PATH Qt5::lrelease IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
+    if(WIN32)
+        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+        set(ENV{PATH} "$ENV{PATH};${PATH_DIR}")
+        if(EXISTS ${ZLIB_IMPORTED_LOCATION})
+            file(COPY ${ZLIB_IMPORTED_LOCATION} DESTINATION ${QT_BIN_DIR})
+        endif()
+    elseif(OSX_FRAMEWORK)
+        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
+        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
+        if(EXISTS ${PATH_DIR})
+            file(COPY ${PATH_DIR} DESTINATION ${QT_BIN_DIR}/Frameworks)
+        endif()
+    endif()
+endif()
+
 add_subdirectory(src)
 if(WITH_BINDINGS)
     add_subdirectory(python)
 endif()
-add_subdirectory(translations)
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 

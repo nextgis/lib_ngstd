@@ -1,5 +1,5 @@
 %Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
+%Import QtWidgets/QtWidgetsmod.sip
 
 class NGAccess : public QObject
 {

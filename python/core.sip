@@ -1,7 +1,7 @@
 %Module(name=ngstd._core,
         keyword_arguments="Optional")
 
-%Include request.sip
+%Include core/request.sip
 
 %ModuleHeaderCode
 #include <core/core.h>
