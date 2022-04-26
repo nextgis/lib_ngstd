@@ -8,7 +8,7 @@ version = "@VERSION@"
 author = "NextGIS"
 
 [tool.sip.project]
-sip-include-dirs = ["@SIP_INCLUDE_DIRS@"]
+sip-include-dirs = ["@PYQT5_SIP_DIR@"]
 abi-version = "12"
 build-dir = "@NGSTD_BUILD_DIR@"
 target-dir = "@NGSTD_TARGET_DIR@"
