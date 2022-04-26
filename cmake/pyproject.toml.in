@@ -9,6 +9,7 @@ author = "NextGIS"
 
 [tool.sip.project]
 sip-include-dirs = ["@SIP_INCLUDE_DIRS@"]
+abi-version = "12"
 build-dir = "@NGSTD_BUILD_DIR@"
 target-dir = "@NGSTD_TARGET_DIR@"
 sip-module = "ngstd.sip"
