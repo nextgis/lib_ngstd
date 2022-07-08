@@ -9,17 +9,3 @@ author = "NextGIS"
 
 [tool.sip.project]
 sip-include-dirs = ["@PYQT5_SIP_DIR@"]
-abi-version = "12"
-build-dir = "@NGSTD_BUILD_DIR@"
-target-dir = "@NGSTD_TARGET_DIR@"
-sip-module = "ngstd.sip"
-
-[tool.sip.bindings.core]
-include-dirs = [@INCLUDE_DIRS@]
-library-dirs = [@LIBRARY_DIRS@]
-libraries = ["ngstd_core_i", "Qt5Core"]
-
-[tool.sip.bindings.framework]
-include-dirs = [@INCLUDE_DIRS@]
-library-dirs = [@LIBRARY_DIRS@]
-libraries = ["ngstd_framework_i", "Qt5Core", "Qt5Gui", "Qt5Widgets"]
