@@ -69,7 +69,7 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/pyproject.toml.in
 add_custom_target(build_py ALL
     COMMAND ${SIP_INSTALL_EXECUTABLE} ${CONFIGURE_ARGS}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${LIB_NAME}
+    DEPENDS ngstd_core ngstd_framework
     VERBATIM
 )
 
