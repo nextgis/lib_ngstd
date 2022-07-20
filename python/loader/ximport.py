@@ -340,23 +340,15 @@ def _get_module_code(self, fullname):
     else:
         raise XImportError("can't find module {!r}".format(fullname), name=fullname)
 
-# Replace any occurrences of '\r\n?' in the input string with '\n'.
-# This converts DOS and Mac line endings to Unix line endings.
-def _normalize_line_endings(source):
-    source = source.replace(b'\r\n', b'\n')
-    source = source.replace(b'\r', b'\n')
-    return source
-
 # Given a string buffer containing Python source code, compile it
 # and return a code object.
 def _compile_source(pathname, source):
-    source = _normalize_line_endings(source)
     return compile(source, pathname, 'exec', dont_inherit=True)
 
 
 # Given a path to a Zip file and a toc_entry, return the (uncompressed) data.
 def _get_data(self, toc_entry):
-    return self.zf.read(toc_entry[1])
+    return self.zf.read(toc_entry[1]).decode("utf-8")
 
 class _XImportResourceReader:
     """Private class used to support XImport.get_resource_reader().
