@@ -5,7 +5,7 @@
     <name>NGAccess</name>
     <message>
         <location filename="../src/framework/access/access.cpp" line="90"/>
-        <source>&lt;a href=&quot;https://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
+        <source>&lt;a href=&quot;https://nextgis.com/pricing-base/&quot;&gt;Learn more ...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -139,7 +139,7 @@
     <message>
         <location filename="../src/framework/access/signdialog.ui" line="87"/>
         <location filename="../src/framework/access/signdialog.cpp" line="42"/>
-        <source>&lt;a href=&quot;https://nextgis.com/pricing/&quot;&gt;Learn more ...&lt;/a&gt;</source>
+        <source>&lt;a href=&quot;https://nextgis.com/pricing-base/&quot;&gt;Learn more ...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

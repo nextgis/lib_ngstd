@@ -79,7 +79,7 @@ void NGSignDialog::updateContent()
     else {
         // Show sign in button and explaration
         ui->signButton->setText(tr("Sign in"));
-        ui->learnMore->setText(tr("<a href=\"https://nextgis.com/pricing/\">Learn more ...</a>"));
+        ui->learnMore->setText(tr("<a href=\"https://nextgis.com/pricing-base/\">Learn more ...</a>"));
         ui->avatar->hide();
         ui->userInfo->hide();
         ui->ngLogo->show();

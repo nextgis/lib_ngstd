@@ -109,7 +109,7 @@ QIcon NGAccess::lockIcon(const QIcon &origin, const QSize &originSize,
 void NGAccess::showUnsupportedMessage(QWidget *parent)
 {
     //Get link to pricing for current locale
-    QString pricingLink(tr("<a href=\"https://nextgis.com/pricing/\">Learn more ...</a>"));
+    QString pricingLink(tr("<a href=\"https://nextgis.com/pricing-base/\">Learn more ...</a>"));
 
     if (!instance().isUserAuthorized()) {
         QMessageBox::warning(parent, tr("Unsupported"),
