@@ -47,10 +47,6 @@
 static CPLStringList getOptions(const QString &url) {
     CPLStringList options(NGRequest::instance().baseOptions());
     QString headers = "Accept: */*";
-    QString authHeaderStr = NGRequest::instance().authHeader(url);
-    if(!authHeaderStr.isEmpty()) {
-        headers += "\r\n" + authHeaderStr;
-    }
     options.AddNameValue("HEADERS", headers.toStdString().c_str());
     return options;
 }
@@ -208,6 +204,12 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
+    CPLHTTPSetAuthHeaderCallback([this](const char *pszURL) -> std::string
+    {
+        QMutexLocker locker(&m_authHeaderCallbackMutex);
+        return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
+    });
+
 #ifdef Q_OS_WIN
     // Add SSL cert path
     const QString &certPemPath = QCoreApplication::applicationDirPath() + QDir::separator() + QLatin1String("..\\share\\ssl\\certs");
@@ -218,6 +220,7 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
+    CPLHTTPSetAuthHeaderCallback(nullptr);
 }
 
 void NGRequest::setErrorMessage(const QString &err)
