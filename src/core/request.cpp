@@ -59,7 +59,6 @@ static QRecursiveMutex gMutex;
 
 static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
 {
-    QMutexLocker locker(&gMutex);
     if (!pszURL)
         return "";
     return NGRequest::instance().authHeader(QString(pszURL)).toStdString();

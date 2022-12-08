@@ -80,7 +80,6 @@ private:
     QString m_maxRetry;
     QString m_retryDelay;
     QString m_certPem;
-    QMutex m_authHeaderCallbackMutex;    
     QString m_detailedError;
 };
 
