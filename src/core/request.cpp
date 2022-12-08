@@ -51,6 +51,30 @@ static CPLStringList getOptions(const QString &url) {
     return options;
 }
 
+static QRecursiveMutex gMutex;    
+
+////////////////////////////////////////////////////////////////////////////////
+// Authorization header callback
+////////////////////////////////////////////////////////////////////////////////
+
+static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
+{
+    QMutexLocker locker(&gMutex);
+    if (!pszURL)
+        return "";
+    return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
+};
+
+static void InstallAuthHeaderCallback()
+{
+    CPLHTTPSetAuthHeaderCallback(gAuthHeaderCallback);
+}
+
+static void RemoveAuthHeaderCallback()
+{
+    CPLHTTPSetAuthHeaderCallback(nullptr);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +176,11 @@ const QString HTTPAuthBearer::header()
     options.AddNameValue("CUSTOMREQUEST", "POST");
     options.AddNameValue("POSTFIELDS", payload);
 
+    RemoveAuthHeaderCallback();
+
     CPLHTTPResult *result = CPLHTTPFetch(m_tokenServer.toStdString().c_str(), options);
+
+    InstallAuthHeaderCallback();
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
@@ -204,11 +232,7 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
-    CPLHTTPSetAuthHeaderCallback([this](const char *pszURL) -> std::string
-    {
-        QMutexLocker locker(&m_authHeaderCallbackMutex);
-        return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
-    });
+    InstallAuthHeaderCallback();
 
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -220,7 +244,7 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
-    CPLHTTPSetAuthHeaderCallback(nullptr);
+    RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
@@ -341,6 +365,8 @@ QString NGRequest::getJsonAsString(const QString &url)
 
 QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 {
+    QMutexLocker locker(&gMutex);
+
     CPLStringList options = getOptions(url);
     CPLJSONDocument in;
     if(in.LoadUrl(url.toStdString(), options)) {
@@ -353,6 +379,8 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 
 bool NGRequest::getFile(const QString &url, const QString &path)
 {
+    QMutexLocker locker(&gMutex);
+
     CPLStringList options = getOptions(url);
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
@@ -412,7 +440,8 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 
 const QString NGRequest::authHeader(const QString &url)
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&gMutex);
+
     if(!m_auths.empty() && url == "any") {
         auto it = m_auths.constBegin();
         return it.value()->header();
