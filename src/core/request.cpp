@@ -283,6 +283,8 @@ void NGRequest::resetError()
 
 bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &options)
 {
+    QMutexLocker locker(&gMutex);
+
     if(options["type"] == "bearer") {
         int expiresIn = options["expiresIn"].toInt();
         QString clientId = options["clientId"];
@@ -340,6 +342,8 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
 
 QString NGRequest::getAsString(const QString &url)
 {
+    QMutexLocker locker(&gMutex);
+
     CPLStringList options = getOptions(url);
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
@@ -353,6 +357,8 @@ QString NGRequest::getAsString(const QString &url)
 
 QString NGRequest::getJsonAsString(const QString &url)
 {
+    QMutexLocker locker(&gMutex);
+
     CPLStringList options = getOptions(url);
     QString out;
     CPLJSONDocument in;
@@ -411,6 +417,8 @@ void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 
 void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
+    QMutexLocker locker(&gMutex);
+
     if(!logoutUrl.isEmpty()) {
         auto prop = properties(url);
         if(!prop.empty()) {
@@ -483,6 +491,8 @@ QString NGRequest::getAuthHeader(const QString &url)
 QString NGRequest::uploadFile(const QString &url, const QString &path,
                               const QString &name)
 {
+    QMutexLocker locker(&gMutex);
+
     CPLErrorReset();
     instance().resetError();
     
