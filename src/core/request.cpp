@@ -337,7 +337,28 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
         }
         return true;
     }
+    else if (options["type"] == "basic") {
+        QString login = options["login"];
+        QString password = options["password"];
+
+        QSharedPointer<IHTTPAuth> authPtr(new HTTPAuthBasic(login, password));
+        foreach(const QString &url, urls) {
+            instance().addAuth(url, authPtr);
+        }
+        return true;
+    }
+
     return false;
+}
+ 
+bool NGRequest::addAuthURL(const QString &basicUrl, const QString &newUrl)
+{
+    return instance().addAuthURLImpl(basicUrl, newUrl);
+}
+
+void NGRequest::removeAuthURL(const QString &url)
+{
+    instance().removeAuthURLImpl(url);
 }
 
 QString NGRequest::getAsString(const QString &url)
@@ -442,6 +463,24 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
             CPLHTTPDestroyResult( result );
         }
     }
+    m_auths.remove(url);
+}
+
+bool NGRequest::addAuthURLImpl(const QString &basicUrl, const QString &newUrl)
+{
+    QMutexLocker locker(&gMutex);
+
+    auto it = m_auths.find(basicUrl);
+    if (it != m_auths.end()) {
+        addAuth(newUrl, it.value());
+        return true;
+    }
+    return false;
+}
+
+void NGRequest::removeAuthURLImpl(const QString &url)
+{
+    QMutexLocker locker(&gMutex);
     m_auths.remove(url);
 }
 

@@ -8,6 +8,8 @@ class NGRequest
 
 public:
     static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
+    static bool addAuthURL(const QString &basicUrl, const QString &newUrl);
+    static void removeAuthURL(const QString &url);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
     static QString getJsonAsString(const QString &url);
     static QString getAsString(const QString &url);

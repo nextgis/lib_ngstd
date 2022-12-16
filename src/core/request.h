@@ -43,6 +43,8 @@ class NGCORE_EXPORT NGRequest
 
 public:
     static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
+    static bool addAuthURL(const QString &basicUrl, const QString &newUrl);
+    static void removeAuthURL(const QString &url);
     static QMap<QString, QVariant> getJsonAsMap(const QString &url);
     static QString getJsonAsString(const QString &url);
     static QString getAsString(const QString &url);
@@ -74,6 +76,9 @@ protected:
     void setErrorMessage(const QString &err);
 
 private:
+    bool addAuthURLImpl(const QString &basicUrl, const QString &newUrl);
+    void removeAuthURLImpl(const QString &url);
+
     QMap<QString, QSharedPointer<IHTTPAuth>> m_auths;
     QString m_connTimeout;
     QString m_timeout;
