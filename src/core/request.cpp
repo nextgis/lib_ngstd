@@ -492,9 +492,15 @@ const QString NGRequest::authHeader(const QString &url)
         auto it = m_auths.constBegin();
         return it.value()->header();
     }
+
+    auto removeScheme = [](const QString &url) -> QString
+    {
+        return QUrl(url).toString(QUrl::RemoveScheme);
+    };
+
     QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
     for(it = m_auths.begin(); it != m_auths.end(); ++it) {
-        if(url.startsWith(it.key())) {
+        if(removeScheme(url).startsWith(removeScheme(it.key()))) {
             return it.value()->header();
         }
     }
