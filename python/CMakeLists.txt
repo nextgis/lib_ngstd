@@ -48,19 +48,21 @@ set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting INCLUDEPATH+=${PROJECT_SOUR
 set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting INCLUDEPATH+=${PROJECT_SOURCE_DIR}/src/core)
 set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting INCLUDEPATH+=${PROJECT_SOURCE_DIR}/src/framework)
 
-string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+if(WIN32)
+    string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 
-get_target_property(QT_CORE_LIB Qt5::Core IMPORTED_IMPLIB_${BUILD_TYPE})
-set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_CORE_LIB}")
+    get_target_property(QT_CORE_LIB Qt5::Core IMPORTED_IMPLIB_${BUILD_TYPE})
+    set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_CORE_LIB}")
 
-get_target_property(QT_WIDGETS_LIB Qt5::Widgets IMPORTED_IMPLIB_${BUILD_TYPE})
-set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_WIDGETS_LIB}")
+    get_target_property(QT_WIDGETS_LIB Qt5::Widgets IMPORTED_IMPLIB_${BUILD_TYPE})
+    set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_WIDGETS_LIB}")
 
-get_target_property(QT_GUI_LIB Qt5::Gui IMPORTED_IMPLIB_${BUILD_TYPE})
-set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_GUI_LIB}")
+    get_target_property(QT_GUI_LIB Qt5::Gui IMPORTED_IMPLIB_${BUILD_TYPE})
+    set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_GUI_LIB}")
 
-set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/core/${CMAKE_BUILD_TYPE}/ngstd_core_i.lib")
-set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/framework/${CMAKE_BUILD_TYPE}/ngstd_framework_i.lib")
+    set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/core/${CMAKE_BUILD_TYPE}/ngstd_core_i.lib")
+    set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/framework/${CMAKE_BUILD_TYPE}/ngstd_framework_i.lib")
+endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/pyproject.toml.in
     ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml @ONLY
