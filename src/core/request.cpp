@@ -31,6 +31,7 @@
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
 #include <QMutex>
+#include <QRecursiveMutex>
 #include <QMutexLocker>
 #include <QUrl>
 
