@@ -169,6 +169,24 @@ function(find_anyproject name)
                 string(REPLACE "\\" "/" PYQT5_SIP_DIR ${PYQT5_SIP_DIR})
                 set(PYQT5_SIP_DIR ${PYQT5_SIP_DIR} PARENT_SCOPE)
             endif()
+            
+            # AUTOMOC enabled targets need to know the Qt major and minor version they’re working with.
+            if (${name} STREQUAL "Qt5")
+                string(SUBSTRING ${QT5_VERSION} 0 1 Qt5Core_MAJOR)
+                string(REGEX MATCH ".([0-9]+)" Qt5Core_MINOR_ ${QT5_VERSION})
+                string(REGEX MATCH "[0-9]+" Qt5Core_MINOR ${Qt5Core_MINOR_})
+
+                set(Qt5Core_VERSION_MAJOR ${Qt5Core_MAJOR} PARENT_SCOPE)
+                set(Qt5Core_VERSION_MINOR ${Qt5Core_MINOR} PARENT_SCOPE)
+                
+                set(Qt5Sql_PRIVATE_INCLUDE_DIRS ${Qt5Sql_PRIVATE_INCLUDE_DIRS} PARENT_SCOPE)
+                
+                mark_as_advanced(${IS_FOUND}
+                    Qt5Core_VERSION_MAJOR
+                    Qt5Core_VERSION_MINOR
+                    Qt5Sql_PRIVATE_INCLUDE_DIRS
+                )                
+            endif()
 
             if(${UPPER_NAME}_LIBRARIES)
                 set(${UPPER_NAME}_LIBRARIES ${${UPPER_NAME}_LIBRARIES} CACHE INTERNAL "library ${name}")
