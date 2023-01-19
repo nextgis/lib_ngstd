@@ -30,9 +30,6 @@
 #include <QFile>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
-#include <QMutex>
-#include <QRecursiveMutex>
-#include <QMutexLocker>
 #include <QUrl>
 
 #include "cpl_http.h"
@@ -45,14 +42,24 @@
 
 #include "core/util.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#   include <mutex>
+    static std::recursive_mutex gMutex;
+#   define MUTEX_LOCKER std::lock_guard<std::recursive_mutex> locker(gMutex)
+#else
+#   include <QRecursiveMutex>
+#   include <QMutexLocker>
+    static QRecursiveMutex gMutex;    
+#   define MUTEX_LOCKER QMutexLocker locker(&gMutex)
+#endif
+
+
 static CPLStringList getOptions(const QString &url) {
     CPLStringList options(NGRequest::instance().baseOptions());
     QString headers = "Accept: */*";
     options.AddNameValue("HEADERS", headers.toStdString().c_str());
     return options;
 }
-
-static QRecursiveMutex gMutex;    
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization header callback
@@ -284,7 +291,7 @@ void NGRequest::resetError()
 
 bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &options)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     if(options["type"] == "bearer") {
         int expiresIn = options["expiresIn"].toInt();
@@ -364,7 +371,7 @@ void NGRequest::removeAuthURL(const QString &url)
 
 QString NGRequest::getAsString(const QString &url)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     CPLStringList options = getOptions(url);
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
@@ -379,7 +386,7 @@ QString NGRequest::getAsString(const QString &url)
 
 QString NGRequest::getJsonAsString(const QString &url)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     CPLStringList options = getOptions(url);
     QString out;
@@ -392,7 +399,7 @@ QString NGRequest::getJsonAsString(const QString &url)
 
 QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     CPLStringList options = getOptions(url);
     CPLJSONDocument in;
@@ -406,7 +413,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 
 bool NGRequest::getFile(const QString &url, const QString &path)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     CPLStringList options = getOptions(url);
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
@@ -439,7 +446,7 @@ void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 
 void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     if(!logoutUrl.isEmpty()) {
         auto prop = properties(url);
@@ -469,7 +476,7 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 
 bool NGRequest::addAuthURLImpl(const QString &basicUrl, const QString &newUrl)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     auto it = m_auths.find(basicUrl);
     if (it != m_auths.end()) {
@@ -481,13 +488,13 @@ bool NGRequest::addAuthURLImpl(const QString &basicUrl, const QString &newUrl)
 
 void NGRequest::removeAuthURLImpl(const QString &url)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
     m_auths.remove(url);
 }
 
 const QString NGRequest::authHeader(const QString &url)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     if(!m_auths.empty() && url == "any") {
         auto it = m_auths.constBegin();
@@ -537,7 +544,7 @@ QString NGRequest::getAuthHeader(const QString &url)
 QString NGRequest::uploadFile(const QString &url, const QString &path,
                               const QString &name)
 {
-    QMutexLocker locker(&gMutex);
+    MUTEX_LOCKER;
 
     CPLErrorReset();
     instance().resetError();
