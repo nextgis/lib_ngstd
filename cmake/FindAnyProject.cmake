@@ -168,6 +168,9 @@ function(find_anyproject name)
             if(${name} STREQUAL "PyQt5")
                 string(REPLACE "\\" "/" PYQT5_SIP_DIR ${PYQT5_SIP_DIR})
                 set(PYQT5_SIP_DIR ${PYQT5_SIP_DIR} PARENT_SCOPE)
+                
+                string(REPLACE "\\" "/" PYQT5_SIP_FLAGS ${PYQT5_SIP_DIR})
+                set(PYQT5_SIP_FLAGS ${PYQT5_SIP_FLAGS} PARENT_SCOPE)
             endif()
             
             # AUTOMOC enabled targets need to know the Qt major and minor version they’re working with.
