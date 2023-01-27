@@ -19,8 +19,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #***************************************************************************
 
-find_anyproject(PyQt5 REQUIRED)
 find_package(SIP REQUIRED)
+find_anyproject(PyQt5 REQUIRED)
 
 if (SIP_INSTALL_EXECUTABLE)
     set(TMP_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/inst")
