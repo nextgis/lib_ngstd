@@ -74,16 +74,9 @@ if (SIP_INSTALL_EXECUTABLE)
         DEPENDS ngstd_core ngstd_framework
         VERBATIM
     )
-
+    
     if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-        foreach(PY_MODULE core framework)
-            install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PY_MODULE}/__init__.py DESTINATION "${NGSTD_PYTHON_DIR}/${PY_MODULE}")
-        endforeach()
-        
         install(DIRECTORY ${TMP_INSTALL_PREFIX}/ngstd/ DESTINATION "${NGSTD_PYTHON_DIR}")
-
-        install(FILES __init__.py DESTINATION "${NGSTD_PYTHON_DIR}")
-        install(FILES loader/ximport.py DESTINATION "${NGSTD_PYTHON_DIR}")
     endif()
 else(SIP_INSTALL_EXECUTABLE)
     include(SIPMacros)
@@ -96,3 +89,12 @@ else(SIP_INSTALL_EXECUTABLE)
     GENERATE_SIP_PYTHON_MODULE_CODE(ngstd._framework framework/framework.sip "${sip_files_framework}" cpp_files)
     BUILD_SIP_PYTHON_MODULE(ngstd._framework framework/framework.sip ${cpp_files} "")
 endif(SIP_INSTALL_EXECUTABLE)
+
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+    foreach(PY_MODULE core framework)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PY_MODULE}/__init__.py DESTINATION "${NGSTD_PYTHON_DIR}/${PY_MODULE}")
+    endforeach()
+
+    install(FILES __init__.py DESTINATION "${NGSTD_PYTHON_DIR}")
+    install(FILES loader/ximport.py DESTINATION "${NGSTD_PYTHON_DIR}")
+endif()
