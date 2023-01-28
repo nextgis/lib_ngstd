@@ -90,31 +90,6 @@ MACRO(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES CPP_FILES
     ADD_DEFINITIONS( /bigobj )
   ENDIF(MSVC)
 
-  IF (SIP_BUILD_EXECUTABLE)
-
-    FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build/${_child_module_name})    # Output goes in this dir.
-
-    FOREACH(CONCAT_NUM RANGE 0 ${SIP_CONCAT_PARTS} )
-      IF( ${CONCAT_NUM} LESS ${SIP_CONCAT_PARTS} )
-        SET(_sip_output_files ${_sip_output_files} ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build/${_child_module_name}/sip${_child_module_name}part${CONCAT_NUM}.cpp )
-      ENDIF( ${CONCAT_NUM} LESS ${SIP_CONCAT_PARTS} )
-    ENDFOREACH(CONCAT_NUM RANGE 0 ${SIP_CONCAT_PARTS} )
-
-    SET(SIPCMD ${SIP_BUILD_EXECUTABLE} --no-protected-is-public --pep484-pyi --no-make --concatenate=${SIP_CONCAT_PARTS} --qmake=${QMAKE_EXECUTABLE} --include-dir=${CMAKE_CURRENT_BINARY_DIR} --include-dir=${PYQT5_SIP_DIR} --include-dir=${QSCI_SIP_DIR} ${SIP_BUILD_EXTRA_OPTIONS})
-
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_sip_output_files}
-      COMMAND ${CMAKE_COMMAND} -E echo ${message}
-      COMMAND ${SIPCMD}
-      COMMAND ${CMAKE_COMMAND} -E touch ${_sip_output_files}
-      WORKING_DIRECTORY ${_module_path}
-      MAIN_DEPENDENCY ${_configured_module_sip}
-      DEPENDS ${SIP_EXTRA_FILES_DEPEND}
-      VERBATIM
-    )
-
-  ELSE (SIP_BUILD_EXECUTABLE)
-
     FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_module_path})    # Output goes in this dir.
 
     SET(_sip_includes)
@@ -155,8 +130,6 @@ MACRO(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES CPP_FILES
       DEPENDS ${SIP_EXTRA_FILES_DEPEND}
       VERBATIM
     )
-
-  ENDIF (SIP_BUILD_EXECUTABLE)
 
   ADD_CUSTOM_TARGET(generate_sip_${MODULE_NAME}_cpp_files DEPENDS ${_sip_output_files})
 

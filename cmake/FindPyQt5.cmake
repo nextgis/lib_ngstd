@@ -25,7 +25,7 @@ ELSE(EXISTS PYQT5_VERSION_STR)
   IF(SIP_BUILD_EXECUTABLE)
     # SIP >= 5.0 path
 
-    FILE(GLOB _pyqt5_metadata "${Python_SITEARCH}/PyQt5-*.dist-info/METADATA")
+    FILE(GLOB _pyqt5_metadata "${Python3_SITEARCH}/PyQt5-*.dist-info/METADATA")
     IF(_pyqt5_metadata)
       FILE(READ ${_pyqt5_metadata} _pyqt5_metadata_contents)
       STRING(REGEX REPLACE ".*\nVersion: ([^\n]+).*$" "\\1" PYQT5_VERSION_STR ${_pyqt5_metadata_contents})
@@ -34,8 +34,9 @@ ELSE(EXISTS PYQT5_VERSION_STR)
     ENDIF(_pyqt5_metadata)
 
     IF(PYQT5_VERSION_STR)
-      SET(PYQT5_MOD_DIR "${Python_SITEARCH}/PyQt5")
-      SET(PYQT5_SIP_DIR "${Python_SITEARCH}/PyQt5/bindings")
+      EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import PyQt5.QtCore; import os; print(os.path.dirname(PyQt5.__file__))" OUTPUT_VARIABLE PYQT5_MOD_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+      SET(PYQT5_SIP_DIR "${PYQT5_MOD_DIR}/bindings")
+      
       FIND_PROGRAM(__pyuic5 "pyuic5")
       GET_FILENAME_COMPONENT(PYQT5_BIN_DIR ${__pyuic5} DIRECTORY)
 

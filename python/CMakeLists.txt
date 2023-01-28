@@ -63,7 +63,7 @@ if (SIP_INSTALL_EXECUTABLE)
         set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/core/${CMAKE_BUILD_TYPE}/ngstd_core_i.lib")
         set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/framework/${CMAKE_BUILD_TYPE}/ngstd_framework_i.lib")
     endif()
-
+    
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pyproject.toml.in
         ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml @ONLY
     )

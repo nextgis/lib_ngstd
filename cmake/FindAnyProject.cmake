@@ -169,8 +169,10 @@ function(find_anyproject name)
                 string(REPLACE "\\" "/" PYQT5_SIP_DIR ${PYQT5_SIP_DIR})
                 set(PYQT5_SIP_DIR ${PYQT5_SIP_DIR} PARENT_SCOPE)
                 
-                string(REPLACE "\\" "/" PYQT5_SIP_FLAGS ${PYQT5_SIP_FLAGS})
-                set(PYQT5_SIP_FLAGS ${PYQT5_SIP_FLAGS} PARENT_SCOPE)
+                if(PYQT5_SIP_FLAGS)
+                    string(REPLACE "\\" "/" PYQT5_SIP_FLAGS ${PYQT5_SIP_FLAGS})
+                    set(PYQT5_SIP_FLAGS ${PYQT5_SIP_FLAGS} PARENT_SCOPE)
+                endif()
             endif()
             
             # AUTOMOC enabled targets need to know the Qt major and minor version they’re working with.
