@@ -85,6 +85,8 @@ void NGSignDialog::updateContent()
         ui->ngLogo->show();
         ui->descriptionText->show();
     }
+
+    ui->signButton->setEnabled(NGAccess::instance().isUserAuthorized() || NGAccess::instance().isEndpointAvailable());
 }
 
 QPushButton *NGSignDialog::getSignButton () const

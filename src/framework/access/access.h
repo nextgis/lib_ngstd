@@ -27,6 +27,7 @@
 #include <QFutureWatcher>
 #include <QIcon>
 #include <QObject>
+#include <QTimer>
 
 
 class NGFRAMEWORK_EXPORT NGAccess : public QObject
@@ -45,6 +46,8 @@ public:
     bool isUserSupported() const;
     bool isUserAuthorized() const;
     bool isEnterprise() const;
+    bool isEndpointAvailable() const;
+
     QString getPluginSign(const QString &app, const QString &plugin) const;
 
     void setScope(const QString &scope);
@@ -54,6 +57,7 @@ public:
     void setTokenEndpoint(const QString &endpoint);
     void setUserInfoEndpoint(const QString &endpoint);
     void setUseCodeChallenge(bool val);
+    void setCheckEndpointTimeout(int);
     QString endPoint() const;
     QString authEndpoint() const;
     QString tokenEndpoint() const;
@@ -72,9 +76,13 @@ public:
     QString email() const;
     QStringList userRoles() const;
 
+public slots:
+    void checkEndpoint(const QString &endpoint = QString());
+
 signals:
     void userInfoUpdated();
     void supportInfoUpdated();
+    void endpointAvailableUpdated();
 
 private slots:
     void onUserInfoUpdated();
@@ -99,7 +107,10 @@ protected:
 private:
     bool m_authorized;
     bool m_supported;
+    bool m_endpointAvailable;
+    QTimer m_checkTimer;
     QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_logoutEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
+    QString m_testEndpoint;
     AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;

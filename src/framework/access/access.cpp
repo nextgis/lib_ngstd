@@ -126,6 +126,8 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
+    m_endpointAvailable(false),
+    m_testEndpoint(m_endpoint),
     m_scope(QLatin1String(defaultScope)),
     m_endpoint(QLatin1String(defaultEndpoint)),
     m_authEndpoint(m_endpoint + authEndpointSubpath),
@@ -157,6 +159,8 @@ NGAccess::NGAccess() :
     m_updateSupportInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateSupportInfoWatcher, SIGNAL(finished()), this,
             SLOT(onSupportInfoUpdated()));
+    connect(&m_checkTimer, SIGNAL(timeout()), this,
+            SLOT(checkEndpoint()));
 }
 
 QIcon NGAccess::avatar() const
@@ -297,6 +301,15 @@ void NGAccess::setUseCodeChallenge(bool val)
     m_codeChallenge = val;
 }
 
+void NGAccess::setCheckEndpointTimeout(int timeout)
+{
+    if (timeout <= 0) {
+        m_checkTimer.stop();
+    }
+
+    m_checkTimer.start(timeout);
+}
+
 void NGAccess::setScope(const QString &scope)
 {
     m_scope = scope.trimmed();
@@ -412,6 +425,24 @@ void NGAccess::save()
     settings.sync();
 }
 
+void NGAccess::checkEndpoint(const QString &endpoint)
+{
+    if (!endpoint.isNull())
+        m_testEndpoint = endpoint;
+
+    QString typedEndpoint = QString("%1/api/v1/version").arg(m_testEndpoint);
+    if (authType() == AuthSourceType::KeyCloakOpenID)
+        typedEndpoint = QString("%1/realms/{realm}/.well-known/openid-configuration").arg(m_testEndpoint);
+
+    //DEBUG
+    typedEndpoint = m_testEndpoint;
+
+    m_endpointAvailable = NGRequest::checkURL(typedEndpoint);
+
+    emit endpointAvailableUpdated();
+    emit userInfoUpdated();
+}
+
 bool NGAccess::isFunctionAvailable(const QString &/*app*/, const QString &/*func*/) const
 {
     // TODO: Add more complicated logic which func or app is supported for authorized user
@@ -432,6 +463,11 @@ bool NGAccess::isEnterprise() const
 {
     QFileInfo licenseJson(QDir(m_licenseDir).filePath("license.json"));
     return licenseJson.exists() && licenseJson.isFile();
+}
+
+bool NGAccess::isEndpointAvailable() const
+{
+    return m_endpointAvailable;
 }
 
 QString NGAccess::getPluginSign(const QString &pluginName, const QString &pluginVersion) const

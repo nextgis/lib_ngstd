@@ -619,3 +619,29 @@ void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &prox
         CPLSetConfigOption("GDAL_PROXY_AUTH", nullptr);
     }
 }
+
+bool NGRequest::checkURL(const QString &url)
+{
+//    MUTEX_LOCKER;
+
+    CPLStringList options(NGRequest::instance().baseOptions());
+
+    options.SetNameValue("CUSTOMREQUEST", "HEAD");
+    options.SetNameValue("NO_BODY", "true");
+    options.SetNameValue("HEADERS", "Accept: */*");
+
+    options.SetNameValue("CONNECTTIMEOUT", "3");
+    options.SetNameValue("TIMEOUT", "5");
+    options.SetNameValue("MAX_RETRY", "0");
+    options.SetNameValue("RETRY_DELAY", "0");
+
+    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
+
+    if(result->nStatus != 0  || result->pszErrBuf != nullptr) {
+        CPLHTTPDestroyResult( result );
+        return false;
+    }
+
+    CPLHTTPDestroyResult(result);
+    return true;
+}

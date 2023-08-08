@@ -22,6 +22,8 @@
 #include "signdialog.h"
 
 #include <QIcon>
+#include <QPainter>
+#include <QPushButton>
 
 // NOTE: If AuthSourceType is custom, before create NGSignInButton must execute
 //       NGAccess::instance().setAuthEndpoint, NGAccess::instance().setTokenEndpoint and
@@ -37,12 +39,7 @@ NGSignInButton::NGSignInButton(const QString &clientId,
     NGAccess::instance().setScope(scope);
     NGAccess::instance().setClientId(clientId);
 
-    if(NGAccess::instance().isUserAuthorized()) {
-        setIcon(NGAccess::instance().avatar());
-    }
-    else {
-        setIcon(QIcon(":/icons/person-blue.svg"));
-    }
+    onUserInfoUpdated();
 
     connect(this, SIGNAL(clicked()), this, SLOT(onClick()));
     connect(&NGAccess::instance(), SIGNAL(userInfoUpdated()), this, SLOT(onUserInfoUpdated()));
@@ -70,11 +67,20 @@ void NGSignInButton::onClick()
 
 void NGSignInButton::onUserInfoUpdated()
 {
-    if(NGAccess::instance().isUserAuthorized()) {
-        setIcon(NGAccess::instance().avatar());
+    QIcon userIcon = (NGAccess::instance().isUserAuthorized() ?
+                          NGAccess::instance().avatar() :
+                          QIcon(":/icons/person-blue.svg") );
+
+    if (!NGAccess::instance().isEndpointAvailable()) {
+        QPixmap pixmap = userIcon.pixmap(userIcon.actualSize(QSize(64, 64)));
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::red);
+        painter.setBrush(Qt::red);
+        painter.drawEllipse(0, 0, 32, 32);
+        userIcon = QIcon(pixmap);
     }
-    else {
-        setIcon(QIcon(":/icons/person-blue.svg"));
-    }
+
+    setIcon(userIcon);
+
     emit userInfoUpdated();
 }

@@ -57,6 +57,7 @@ public:
                          int proxyPort = 0, const QString &proxyUser = "",
                          const QString &proxyPassword = "",
                          const QString &proxyAuth = "ANY");
+    static bool checkURL(const QString &url);
     static NGRequest &instance();
 
 public:
