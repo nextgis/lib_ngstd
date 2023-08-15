@@ -39,6 +39,9 @@ NGSignInButton::NGSignInButton(const QString &clientId,
     NGAccess::instance().setScope(scope);
     NGAccess::instance().setClientId(clientId);
 
+    QTimer::singleShot(500, [] () {
+        NGAccess::instance().checkEndpoint();
+    });
     onUserInfoUpdated();
 
     connect(this, SIGNAL(clicked()), this, SLOT(onClick()));

@@ -29,6 +29,16 @@
 #include <QObject>
 #include <QTimer>
 
+class SignInEvent : public QObject
+{
+    Q_OBJECT
+
+public:
+    SignInEvent(QObject *parent = nullptr);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+};
 
 class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
@@ -75,6 +85,7 @@ public:
     QString userId() const;
     QString email() const;
     QStringList userRoles() const;
+    QObject* getSignInEventFilter();
 
 public slots:
     void checkEndpoint(const QString &endpoint = QString());
@@ -110,7 +121,7 @@ private:
     bool m_endpointAvailable;
     QTimer m_checkTimer;
     QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_logoutEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
-    QString m_testEndpoint;
+    SignInEvent *m_signInEvent;
     AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;

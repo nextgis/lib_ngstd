@@ -127,7 +127,7 @@ NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
     m_endpointAvailable(false),
-    m_testEndpoint(m_endpoint),
+    m_signInEvent(new SignInEvent(this)),
     m_scope(QLatin1String(defaultScope)),
     m_endpoint(QLatin1String(defaultEndpoint)),
     m_authEndpoint(m_endpoint + authEndpointSubpath),
@@ -186,6 +186,11 @@ QString NGAccess::lastName() const
 QStringList NGAccess::userRoles() const
 {
     return m_roles;
+}
+
+QObject *NGAccess::getSignInEventFilter()
+{
+    return m_signInEvent;
 }
 
 QString NGAccess::userId() const
@@ -427,15 +432,14 @@ void NGAccess::save()
 
 void NGAccess::checkEndpoint(const QString &endpoint)
 {
+    QString testEndpoint = m_endpoint;
+
     if (!endpoint.isNull())
-        m_testEndpoint = endpoint;
+        testEndpoint = endpoint;
 
-    QString typedEndpoint = QString("%1/api/v1/version").arg(m_testEndpoint);
+    QString typedEndpoint = QString("%1/api/v1/settings/ping/").arg(testEndpoint);
     if (authType() == AuthSourceType::KeyCloakOpenID)
-        typedEndpoint = QString("%1/realms/{realm}/.well-known/openid-configuration").arg(m_testEndpoint);
-
-    //DEBUG
-    typedEndpoint = m_testEndpoint;
+        typedEndpoint = QString("%1/auth/realms/master/.well-known/openid-configuration").arg(testEndpoint);
 
     m_endpointAvailable = NGRequest::checkURL(typedEndpoint);
 
@@ -879,4 +883,23 @@ void NGAccess::logMessage(const QString &value, LogLevel level)
         slevel = SentryReporter::Level::Debug;
     }
     SentryReporter::instance().sendMessage(value, slevel);
+}
+
+SignInEvent::SignInEvent(QObject *parent) : QObject(parent)
+{
+}
+
+bool SignInEvent::eventFilter(QObject *obj, QEvent *event)
+{
+    NGAccess* ngAccess = qobject_cast<NGAccess*>(parent());
+//    QAbstractButton* signIn = qobject_cast<QAbstractButton*>(obj);
+
+    if (ngAccess && !ngAccess->isUserAuthorized()) {
+        if (event->type() == QEvent::Show) {
+            ngAccess->checkEndpoint();
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
 }

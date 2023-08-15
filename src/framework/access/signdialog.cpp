@@ -27,6 +27,7 @@ NGSignDialog::NGSignDialog(QWidget *parent) :
     ui(new Ui::NGSignDialog)
 {
     ui->setupUi(this);
+    ui->signButton->installEventFilter(NGAccess::instance().getSignInEventFilter());
     updateContent();
 }
 
