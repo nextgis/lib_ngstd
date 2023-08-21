@@ -56,8 +56,13 @@
 
 static CPLStringList getOptions(const QString &url) {
     CPLStringList options(NGRequest::instance().baseOptions());
-    QString headers = "Accept: */*";
-    options.AddNameValue("HEADERS", headers.toStdString().c_str());
+    QStringList headers;
+
+    headers.append("Accept: */*");
+    if (!NGRequest::getAuthHeader(url).isNull())
+        headers.append(NGRequest::getAuthHeader(url));
+
+    options.AddNameValue("HEADERS", headers.join("\r\n").toStdString().c_str());
     return options;
 }
 
@@ -69,6 +74,7 @@ static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
 {
     if (!pszURL)
         return "";
+
     return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
 };
 
@@ -183,11 +189,11 @@ const QString HTTPAuthBearer::header()
     options.AddNameValue("CUSTOMREQUEST", "POST");
     options.AddNameValue("POSTFIELDS", payload);
 
-    RemoveAuthHeaderCallback();
+//    RemoveAuthHeaderCallback();
 
     CPLHTTPResult *result = CPLHTTPFetch(m_tokenServer.toStdString().c_str(), options);
 
-    InstallAuthHeaderCallback();
+//    InstallAuthHeaderCallback();
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
@@ -239,7 +245,7 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
-    InstallAuthHeaderCallback();
+//    InstallAuthHeaderCallback();
 
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -251,7 +257,7 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
-    RemoveAuthHeaderCallback();
+//    RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
@@ -630,8 +636,8 @@ bool NGRequest::checkURL(const QString &url)
     options.SetNameValue("NO_BODY", "true");
     options.SetNameValue("HEADERS", "Accept: */*");
 
-    options.SetNameValue("CONNECTTIMEOUT", "3");
-    options.SetNameValue("TIMEOUT", "5");
+//    options.SetNameValue("CONNECTTIMEOUT", "3");
+//    options.SetNameValue("TIMEOUT", "5");
     options.SetNameValue("MAX_RETRY", "0");
     options.SetNameValue("RETRY_DELAY", "0");
 

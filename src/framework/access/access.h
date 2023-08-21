@@ -73,6 +73,7 @@ public:
     QString tokenEndpoint() const;
     QString userInfoEndpoint() const;
     bool useCodeChallenge() const;
+    bool checkEndpoint(const QString &endpoint = QString());
     enum AuthSourceType authType() const;
 
     void initSentry(bool enabled, const QString &sentryKey, const QString &version = "");
@@ -88,7 +89,8 @@ public:
     QObject* getSignInEventFilter();
 
 public slots:
-    void checkEndpoint(const QString &endpoint = QString());
+    void checkEndpointAsync(const QString &endpoint = QString());
+    void onUpdateCheckEndpoint();
 
 signals:
     void userInfoUpdated();
@@ -126,6 +128,7 @@ private:
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
+    QFutureWatcher<bool> *m_updateCheckEndpointWatcher;
     QString m_firstName, m_lastName, m_userId, m_email;
     mutable QString m_updateToken;
     QString m_licenseDir;

@@ -40,7 +40,7 @@ NGSignInButton::NGSignInButton(const QString &clientId,
     NGAccess::instance().setClientId(clientId);
 
     QTimer::singleShot(500, [] () {
-        NGAccess::instance().checkEndpoint();
+        NGAccess::instance().checkEndpointAsync();
     });
     onUserInfoUpdated();
 
