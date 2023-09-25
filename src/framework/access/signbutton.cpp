@@ -25,6 +25,8 @@
 #include <QPainter>
 #include <QPushButton>
 
+constexpr int CHECK_ENDPOINT_AVAILABILITY_DELAY_MS = 500;
+
 // NOTE: If AuthSourceType is custom, before create NGSignInButton must execute
 //       NGAccess::instance().setAuthEndpoint, NGAccess::instance().setTokenEndpoint and
 //       NGAccess::instance().setUserInfoEndpoint
@@ -39,7 +41,7 @@ NGSignInButton::NGSignInButton(const QString &clientId,
     NGAccess::instance().setScope(scope);
     NGAccess::instance().setClientId(clientId);
 
-    QTimer::singleShot(500, [] () {
+    QTimer::singleShot(CHECK_ENDPOINT_AVAILABILITY_DELAY_MS, [] () {
         NGAccess::instance().checkEndpointAsync();
     });
     onUserInfoUpdated();

@@ -438,26 +438,28 @@ bool NGAccess::checkEndpoint(const QString &endpoint)
     QString testEndpoint = (endpoint.isNull() ? m_endpoint : endpoint);
 
     if (authType() == AuthSourceType::NGID)
-      testEndpoint = QString("%1/api/v1/settings/ping/").arg(testEndpoint);
+        testEndpoint = QString("%1/api/v1/settings/ping/").arg(testEndpoint);
     else if (authType() == AuthSourceType::KeyCloakOpenID)
-      testEndpoint = QString("%1/auth/realms/master/.well-known/openid-configuration").arg(testEndpoint);
+        testEndpoint = QString("%1/auth/realms/master/.well-known/openid-configuration").arg(testEndpoint);
+    else
+        return true;
 
     return NGRequest::checkURL(testEndpoint);
 }
 
 void NGAccess::checkEndpointAsync(const QString &endpoint)
 {
-  QFuture<bool> future = QtConcurrent::run(this, &NGAccess::checkEndpoint, endpoint);
-  m_updateCheckEndpointWatcher->setFuture(future);
+    QFuture<bool> future = QtConcurrent::run(this, &NGAccess::checkEndpoint, endpoint);
+    m_updateCheckEndpointWatcher->setFuture(future);
 }
 
 void NGAccess::onUpdateCheckEndpoint()
 {
-  if (auto watcher = dynamic_cast<QFutureWatcher<bool>*>(sender()))
-    m_endpointAvailable = watcher->future().result();
+    if (auto watcher = dynamic_cast<QFutureWatcher<bool>*>(sender()))
+        m_endpointAvailable = watcher->future().result();
 
-  emit endpointAvailableUpdated();
-  emit userInfoUpdated();
+    emit endpointAvailableUpdated();
+    emit userInfoUpdated();
 }
 
 bool NGAccess::isFunctionAvailable(const QString &/*app*/, const QString &/*func*/) const
@@ -484,7 +486,7 @@ bool NGAccess::isEnterprise() const
 
 bool NGAccess::isEndpointAvailable() const
 {
-  return m_endpointAvailable;
+    return m_endpointAvailable;
 }
 
 QString NGAccess::getPluginSign(const QString &pluginName, const QString &pluginVersion) const

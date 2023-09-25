@@ -189,11 +189,11 @@ const QString HTTPAuthBearer::header()
     options.AddNameValue("CUSTOMREQUEST", "POST");
     options.AddNameValue("POSTFIELDS", payload);
 
-//    RemoveAuthHeaderCallback();
+    RemoveAuthHeaderCallback();
 
     CPLHTTPResult *result = CPLHTTPFetch(m_tokenServer.toStdString().c_str(), options);
 
-//    InstallAuthHeaderCallback();
+    InstallAuthHeaderCallback();
 
     if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
         if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
@@ -245,7 +245,7 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
-//    InstallAuthHeaderCallback();
+    InstallAuthHeaderCallback();
 
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -257,7 +257,7 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
-//    RemoveAuthHeaderCallback();
+    RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
@@ -642,12 +642,8 @@ bool NGRequest::checkURL(const QString &url)
     options.SetNameValue("RETRY_DELAY", "0");
 
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
-
-    if(result->nStatus != 0  || result->pszErrBuf != nullptr) {
-        CPLHTTPDestroyResult( result );
-        return false;
-    }
+    auto isSuccess = result->nStatus == 0 && result->pszErrBuf == nullptr;
 
     CPLHTTPDestroyResult(result);
-    return true;
+    return isSuccess;
 }
