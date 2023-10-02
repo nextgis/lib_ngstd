@@ -126,6 +126,8 @@ void NGAccess::showUnsupportedMessage(QWidget *parent)
 NGAccess::NGAccess() :
     m_authorized(false),
     m_supported(false),
+    m_endpointAvailable(false),
+    m_signInEvent(new SignInEvent(this)),
     m_scope(QLatin1String(defaultScope)),
     m_endpoint(QLatin1String(defaultEndpoint)),
     m_authEndpoint(m_endpoint + authEndpointSubpath),
@@ -157,6 +159,11 @@ NGAccess::NGAccess() :
     m_updateSupportInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateSupportInfoWatcher, SIGNAL(finished()), this,
             SLOT(onSupportInfoUpdated()));
+    m_updateCheckEndpointWatcher = new QFutureWatcher<bool>(this);
+    connect(m_updateCheckEndpointWatcher, SIGNAL(finished()), this,
+            SLOT(onUpdateCheckEndpoint()));
+    connect(&m_checkTimer, SIGNAL(timeout()), this,
+            SLOT(checkEndpointAsync()));
 }
 
 QIcon NGAccess::avatar() const
@@ -182,6 +189,11 @@ QString NGAccess::lastName() const
 QStringList NGAccess::userRoles() const
 {
     return m_roles;
+}
+
+QObject *NGAccess::getSignInEventFilter()
+{
+    return m_signInEvent;
 }
 
 QString NGAccess::userId() const
@@ -295,6 +307,15 @@ void NGAccess::setUserInfoEndpoint(const QString &endpoint)
 void NGAccess::setUseCodeChallenge(bool val)
 {
     m_codeChallenge = val;
+}
+
+void NGAccess::setCheckEndpointTimeout(int timeout)
+{
+    if (timeout <= 0) {
+        m_checkTimer.stop();
+    }
+
+    m_checkTimer.start(timeout);
 }
 
 void NGAccess::setScope(const QString &scope)
@@ -412,6 +433,35 @@ void NGAccess::save()
     settings.sync();
 }
 
+bool NGAccess::checkEndpoint(const QString &endpoint)
+{
+    QString testEndpoint = (endpoint.isNull() ? m_endpoint : endpoint);
+
+    if (authType() == AuthSourceType::NGID)
+        testEndpoint = QString("%1/api/v1/settings/ping/").arg(testEndpoint);
+    else if (authType() == AuthSourceType::KeyCloakOpenID)
+        testEndpoint = QString("%1/auth/realms/master/.well-known/openid-configuration").arg(testEndpoint);
+    else
+        return true;
+
+    return NGRequest::checkURL(testEndpoint);
+}
+
+void NGAccess::checkEndpointAsync(const QString &endpoint)
+{
+    QFuture<bool> future = QtConcurrent::run(this, &NGAccess::checkEndpoint, endpoint);
+    m_updateCheckEndpointWatcher->setFuture(future);
+}
+
+void NGAccess::onUpdateCheckEndpoint()
+{
+    if (auto watcher = dynamic_cast<QFutureWatcher<bool>*>(sender()))
+        m_endpointAvailable = watcher->future().result();
+
+    emit endpointAvailableUpdated();
+    emit userInfoUpdated();
+}
+
 bool NGAccess::isFunctionAvailable(const QString &/*app*/, const QString &/*func*/) const
 {
     // TODO: Add more complicated logic which func or app is supported for authorized user
@@ -432,6 +482,11 @@ bool NGAccess::isEnterprise() const
 {
     QFileInfo licenseJson(QDir(m_licenseDir).filePath("license.json"));
     return licenseJson.exists() && licenseJson.isFile();
+}
+
+bool NGAccess::isEndpointAvailable() const
+{
+    return m_endpointAvailable;
 }
 
 QString NGAccess::getPluginSign(const QString &pluginName, const QString &pluginVersion) const
@@ -843,4 +898,23 @@ void NGAccess::logMessage(const QString &value, LogLevel level)
         slevel = SentryReporter::Level::Debug;
     }
     SentryReporter::instance().sendMessage(value, slevel);
+}
+
+SignInEvent::SignInEvent(QObject *parent) : QObject(parent)
+{
+}
+
+bool SignInEvent::eventFilter(QObject *obj, QEvent *event)
+{
+    NGAccess* ngAccess = qobject_cast<NGAccess*>(parent());
+//    QAbstractButton* signIn = qobject_cast<QAbstractButton*>(obj);
+
+    if (ngAccess && !ngAccess->isUserAuthorized()) {
+        if (event->type() == QEvent::Show) {
+            ngAccess->checkEndpointAsync();
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
 }

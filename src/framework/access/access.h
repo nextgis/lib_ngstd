@@ -27,7 +27,18 @@
 #include <QFutureWatcher>
 #include <QIcon>
 #include <QObject>
+#include <QTimer>
 
+class SignInEvent : public QObject
+{
+    Q_OBJECT
+
+public:
+    SignInEvent(QObject *parent = nullptr);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+};
 
 class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
@@ -45,6 +56,8 @@ public:
     bool isUserSupported() const;
     bool isUserAuthorized() const;
     bool isEnterprise() const;
+    bool isEndpointAvailable() const;
+
     QString getPluginSign(const QString &app, const QString &plugin) const;
 
     void setScope(const QString &scope);
@@ -54,11 +67,13 @@ public:
     void setTokenEndpoint(const QString &endpoint);
     void setUserInfoEndpoint(const QString &endpoint);
     void setUseCodeChallenge(bool val);
+    void setCheckEndpointTimeout(int);
     QString endPoint() const;
     QString authEndpoint() const;
     QString tokenEndpoint() const;
     QString userInfoEndpoint() const;
     bool useCodeChallenge() const;
+    bool checkEndpoint(const QString &endpoint = QString());
     enum AuthSourceType authType() const;
 
     void initSentry(bool enabled, const QString &sentryKey, const QString &version = "");
@@ -71,10 +86,16 @@ public:
     QString userId() const;
     QString email() const;
     QStringList userRoles() const;
+    QObject* getSignInEventFilter();
+
+public slots:
+    void checkEndpointAsync(const QString &endpoint = QString());
+    void onUpdateCheckEndpoint();
 
 signals:
     void userInfoUpdated();
     void supportInfoUpdated();
+    void endpointAvailableUpdated();
 
 private slots:
     void onUserInfoUpdated();
@@ -99,11 +120,15 @@ protected:
 private:
     bool m_authorized;
     bool m_supported;
+    bool m_endpointAvailable;
+    QTimer m_checkTimer;
     QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_logoutEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
+    SignInEvent *m_signInEvent;
     AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
+    QFutureWatcher<bool> *m_updateCheckEndpointWatcher;
     QString m_firstName, m_lastName, m_userId, m_email;
     mutable QString m_updateToken;
     QString m_licenseDir;

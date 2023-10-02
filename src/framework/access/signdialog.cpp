@@ -27,6 +27,7 @@ NGSignDialog::NGSignDialog(QWidget *parent) :
     ui(new Ui::NGSignDialog)
 {
     ui->setupUi(this);
+    ui->signButton->installEventFilter(NGAccess::instance().getSignInEventFilter());
     updateContent();
 }
 
@@ -85,6 +86,11 @@ void NGSignDialog::updateContent()
         ui->ngLogo->show();
         ui->descriptionText->show();
     }
+
+    const bool isUserAuthorized = NGAccess::instance().isUserAuthorized();
+    const bool isEndpointAvailable = NGAccess::instance().isEndpointAvailable();
+
+    ui->signButton->setEnabled(isUserAuthorized || (!isUserAuthorized && isEndpointAvailable));
 }
 
 QPushButton *NGSignDialog::getSignButton () const

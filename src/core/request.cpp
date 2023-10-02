@@ -56,8 +56,13 @@
 
 static CPLStringList getOptions(const QString &url) {
     CPLStringList options(NGRequest::instance().baseOptions());
-    QString headers = "Accept: */*";
-    options.AddNameValue("HEADERS", headers.toStdString().c_str());
+    QStringList headers;
+
+    headers.append("Accept: */*");
+    if (!NGRequest::getAuthHeader(url).isNull())
+        headers.append(NGRequest::getAuthHeader(url));
+
+    options.AddNameValue("HEADERS", headers.join("\r\n").toStdString().c_str());
     return options;
 }
 
@@ -69,6 +74,7 @@ static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
 {
     if (!pszURL)
         return "";
+
     return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
 };
 
@@ -618,4 +624,26 @@ void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &prox
         CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", nullptr);
         CPLSetConfigOption("GDAL_PROXY_AUTH", nullptr);
     }
+}
+
+bool NGRequest::checkURL(const QString &url)
+{
+//    MUTEX_LOCKER;
+
+    CPLStringList options(NGRequest::instance().baseOptions());
+
+    options.SetNameValue("CUSTOMREQUEST", "HEAD");
+    options.SetNameValue("NO_BODY", "true");
+    options.SetNameValue("HEADERS", "Accept: */*");
+
+//    options.SetNameValue("CONNECTTIMEOUT", "3");
+//    options.SetNameValue("TIMEOUT", "5");
+    options.SetNameValue("MAX_RETRY", "0");
+    options.SetNameValue("RETRY_DELAY", "0");
+
+    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
+    auto isSuccess = result->nStatus == 0 && result->pszErrBuf == nullptr;
+
+    CPLHTTPDestroyResult(result);
+    return isSuccess;
 }
