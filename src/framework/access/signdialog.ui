@@ -6,116 +6,99 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>279</width>
-    <height>183</height>
+    <width>316</width>
+    <height>223</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="signButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>150</y>
-     <width>120</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sign in/out</string>
-   </property>
-  </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>130</y>
-     <width>261</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="ngLogo">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>261</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/ng_logo_bw_dark.svg&quot; height=&quot;20&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="scaledContents">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="descriptionText">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>251</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sign in with your NextGIS account to get extended capabilities</string>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="learnMore">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>100</y>
-     <width>251</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
-   </property>
-   <property name="text">
-    <string>&lt;a href=&quot;https://nextgis.com/pricing-base/&quot;&gt;Learn more ...&lt;/a&gt;</string>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="avatar">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>15</y>
-     <width>64</width>
-     <height>64</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="userInfo">
-   <property name="geometry">
-    <rect>
-     <x>89</x>
-     <y>15</y>
-     <width>171</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="ngLogo">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/ng_logo_bw_dark.svg&quot; height=&quot;20&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="avatar">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="userInfo">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionText">
+     <property name="text">
+      <string>Sign in with your NextGIS account to get extended capabilities</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="learnMore">
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>&lt;a href=&quot;https://nextgis.com/pricing-base/&quot;&gt;Learn more ...&lt;/a&gt;</string>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="errorText">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>We're unable to connect to authorization server. Make sure your connection settings are correct under:
+ - Settings-&gt;Options-&gt;NextGIS
+ - Settings-&gt;Options-&gt;Network
+or contact your system administrator.</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="signButton">
+     <property name="text">
+      <string>Sign in/out</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections>

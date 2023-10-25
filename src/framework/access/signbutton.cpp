@@ -26,6 +26,9 @@
 #include <QPushButton>
 
 constexpr int CHECK_ENDPOINT_AVAILABILITY_DELAY_MS = 500;
+//FIXME список размеров получать из приложения накладно, проще сделать 2 доп. svg. c маркерами
+// ... хотя данной реализации можно рисовать на пользовательском значке тоже
+const QList<QSize> SIGNBUTTON_ICON_SIZES = { QSize(16,16), QSize(24,24), QSize(32,32), QSize(48,48), QSize(64,64) };
 
 // NOTE: If AuthSourceType is custom, before create NGSignInButton must execute
 //       NGAccess::instance().setAuthEndpoint, NGAccess::instance().setTokenEndpoint and
@@ -76,16 +79,21 @@ void NGSignInButton::onUserInfoUpdated()
                           NGAccess::instance().avatar() :
                           QIcon(":/icons/person-blue.svg") );
 
-    if (!NGAccess::instance().isEndpointAvailable()) {
-        QPixmap pixmap = userIcon.pixmap(userIcon.actualSize(QSize(64, 64)));
-        QPainter painter(&pixmap);
-        painter.setPen(Qt::red);
-        painter.setBrush(Qt::red);
-        painter.drawEllipse(0, 0, 32, 32);
-        userIcon = QIcon(pixmap);
+    QIcon userIconMarked;
+
+    //draw available marker
+    const auto markerColor = NGAccess::instance().isEndpointAvailable() ? Qt::darkGreen : Qt::darkRed;
+    for (const QSize &size : SIGNBUTTON_ICON_SIZES) {
+      QPixmap pixmap = userIcon.pixmap(size);
+      QPainter painter(&pixmap);
+      painter.setPen(Qt::lightGray);
+      painter.setBrush(markerColor);
+      const int markerSize = pixmap.width() / 2.2;
+      painter.drawEllipse(pixmap.width() - markerSize, pixmap.height() - markerSize, markerSize, markerSize);
+      userIconMarked.addPixmap(pixmap);
     }
 
-    setIcon(userIcon);
+    setIcon(userIconMarked);
 
     emit userInfoUpdated();
 }

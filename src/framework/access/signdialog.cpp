@@ -53,6 +53,7 @@ void NGSignDialog::updateContent()
 
         ui->ngLogo->hide();
         ui->descriptionText->hide();
+        ui->errorText->hide();
     }
     else if(NGAccess::instance().isUserAuthorized()) {
         // Show user info in widget
@@ -76,6 +77,7 @@ void NGSignDialog::updateContent()
 
         ui->ngLogo->hide();
         ui->descriptionText->hide();
+        ui->errorText->hide();
     }
     else {
         // Show sign in button and explaration
@@ -85,6 +87,7 @@ void NGSignDialog::updateContent()
         ui->userInfo->hide();
         ui->ngLogo->show();
         ui->descriptionText->show();
+        ui->errorText->setHidden(NGAccess::instance().isEndpointAvailable());
     }
 
     const bool isUserAuthorized = NGAccess::instance().isUserAuthorized();
