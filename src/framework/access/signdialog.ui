@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
-    <height>223</height>
+    <width>300</width>
+    <height>296</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="ngLogo">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/ng_logo_bw_dark.svg&quot; height=&quot;20&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -28,6 +34,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="avatar">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -35,6 +47,12 @@
      </item>
      <item>
       <widget class="QLabel" name="userInfo">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -44,6 +62,12 @@
    </item>
    <item>
     <widget class="QLabel" name="descriptionText">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Sign in with your NextGIS account to get extended capabilities</string>
      </property>
@@ -54,6 +78,12 @@
    </item>
    <item>
     <widget class="QLabel" name="learnMore">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="cursor">
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
@@ -92,11 +122,41 @@ or contact your system administrator.</string>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="signButton">
-     <property name="text">
-      <string>Sign in/out</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="signButton">
+       <property name="text">
+        <string>Sign in/out</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
