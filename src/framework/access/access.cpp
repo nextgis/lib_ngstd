@@ -335,7 +335,7 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
         m_userInfoEndpoint.clear();
     }
     else {
-        m_endpoint = endPoint.trimmed();
+        m_endpoint = QString(endPoint.trimmed()).remove(QRegularExpression("/+$"));
         m_authType = type;
 
         if(type == AuthSourceType::NGID) {
