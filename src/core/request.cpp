@@ -632,17 +632,27 @@ bool NGRequest::checkURL(const QString &url)
 
     CPLStringList options(NGRequest::instance().baseOptions());
 
-    options.SetNameValue("CUSTOMREQUEST", "HEAD");
-    options.SetNameValue("NO_BODY", "true");
+    options.SetNameValue("CUSTOMREQUEST", "GET");
+    options.SetNameValue("NO_BODY", "false");
     options.SetNameValue("HEADERS", "Accept: */*");
 
-//    options.SetNameValue("CONNECTTIMEOUT", "3");
-//    options.SetNameValue("TIMEOUT", "5");
+    options.SetNameValue("CONNECTTIMEOUT", "5");
+    options.SetNameValue("TIMEOUT", "10");
     options.SetNameValue("MAX_RETRY", "0");
     options.SetNameValue("RETRY_DELAY", "0");
 
     CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
     auto isSuccess = result->nStatus == 0 && result->pszErrBuf == nullptr;
+
+    //check result body for conformity /api/v1/rsa_public_key/ endpoint
+    if (isSuccess) {
+      std::string responseBody(result->pabyData, result->pabyData + result->nDataLen);
+
+      bool isContainRsaPublicKey = responseBody.find("-----BEGIN PUBLIC KEY-----") != std::string::npos &&
+             responseBody.find("-----END PUBLIC KEY-----") != std::string::npos;
+
+      isSuccess &= isContainRsaPublicKey;
+    }
 
     CPLHTTPDestroyResult(result);
     return isSuccess;
