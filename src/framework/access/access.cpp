@@ -350,6 +350,12 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
             m_logoutEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/logout");
             m_userInfoEndpoint = m_endpoint + QLatin1String("/protocol/openid-connect/userinfo");
         }
+        else if(type == AuthSourceType::Blitz) {
+            m_tokenEndpoint = m_endpoint + QLatin1String("/blitz/oauth/te");
+            m_authEndpoint = m_endpoint + QLatin1String("/blitz/oauth/ae");
+            m_logoutEndpoint = m_endpoint + QLatin1String("/blitz/oauth/logout");
+            m_userInfoEndpoint = m_endpoint + QLatin1String("/blitz/oauth/me");
+        }
     }
 }
 
@@ -713,7 +719,7 @@ extern void updateUserInfoFunction(const QString &configDir,
         avatarUrl = QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
                 .arg(emailHash);
     }
-    else if(type == NGAccess::AuthSourceType::KeyCloakOpenID || type == NGAccess::AuthSourceType::Custom) {
+    else if(type == NGAccess::AuthSourceType::KeyCloakOpenID || type == NGAccess::AuthSourceType::Custom || type == NGAccess::AuthSourceType::Blitz) {
         firstName = result["given_name"].toString();
         lastName = result["family_name"].toString();
         email = result["email"].toString();

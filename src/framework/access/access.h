@@ -45,7 +45,7 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
     Q_OBJECT
 public:
     enum class LogLevel { Debug, Info, Warning, Error, Fatal };
-    enum class AuthSourceType { NGID, KeyCloakOpenID, Custom };
+    enum class AuthSourceType { NGID, KeyCloakOpenID, Custom, Blitz };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
     static void showUnsupportedMessage(QWidget *parent = nullptr);
