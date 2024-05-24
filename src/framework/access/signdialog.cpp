@@ -90,10 +90,10 @@ void NGSignDialog::updateContent()
         ui->errorText->setHidden(NGAccess::instance().isEndpointAvailable());
     }
 
-    const bool isUserAuthorized = NGAccess::instance().isUserAuthorized();
-    const bool isEndpointAvailable = NGAccess::instance().isEndpointAvailable();
+//    const bool isUserAuthorized = NGAccess::instance().isUserAuthorized();
+//    const bool isEndpointAvailable = NGAccess::instance().isEndpointAvailable();
 
-    ui->signButton->setEnabled(isUserAuthorized || (!isUserAuthorized && isEndpointAvailable));
+//    ui->signButton->setEnabled(isUserAuthorized || (!isUserAuthorized && isEndpointAvailable));
 }
 
 QPushButton *NGSignDialog::getSignButton () const
