@@ -446,7 +446,7 @@ bool NGAccess::checkEndpoint(const QString &endpoint)
     if (authType() == AuthSourceType::NGID)
         testEndpoint = QString("%1/api/v1/rsa_public_key/").arg(testEndpoint);
     else if (authType() == AuthSourceType::KeyCloakOpenID)
-        testEndpoint = QString("%1/auth/realms/master/.well-known/openid-configuration").arg(testEndpoint);
+        testEndpoint = QString("%1/.well-known/openid-configuration").arg(testEndpoint);
     else
         return true;
 
