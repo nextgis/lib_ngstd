@@ -40,8 +40,6 @@
 
 #include "logger.h"
 
-#include <Windows.h>
-
 constexpr const char *msgColor = "#eef5fd";
 constexpr const char *errColor = "#fdeeee";
 constexpr const char *contentStr = "<html>"
