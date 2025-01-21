@@ -53,6 +53,7 @@ set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/navigationwidget.cpp
     ${PROJECT_SOURCE_DIR}/navigationpane.cpp
     ${PROJECT_SOURCE_DIR}/styledbar.cpp
+    ${PROJECT_SOURCE_DIR}/logger.cpp
 )
 
 set(ACCESS_HHEADERS
@@ -64,6 +65,7 @@ set(ACCESS_HHEADERS
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     ${PROJECT_SOURCE_DIR}/access/signserver.h
     ${PROJECT_SOURCE_DIR}/sentryreporter.h
+    ${PROJECT_SOURCE_DIR}/logger.h
 )
 
 set(ACCESS_CSOURCES

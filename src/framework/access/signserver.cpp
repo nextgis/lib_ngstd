@@ -25,6 +25,7 @@
 #include <QTcpSocket>
 #include <QThread>
 #include <QUrl>
+#include <QTimer>
 #if QT_VERSION >= 0x050000
 #include <QUrlQuery>
 #endif // QT_VERSION >= 0x050000
@@ -37,7 +38,9 @@
 
 #include "core/core.h"
 
-#include "framework/sentryreporter.h"
+#include "logger.h"
+
+#include <Windows.h>
 
 constexpr const char *msgColor = "#eef5fd";
 constexpr const char *errColor = "#fdeeee";
@@ -102,7 +105,9 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     QProgressDialog(parent),
     m_redirectUri(redirectUriStr),
     m_clientId(clientId),
-    m_scope(scope)
+    m_scope(scope),
+    m_logger(new Logger(m_clientId, "Authorization Logging", this)),
+    m_timer(new QTimer(this))
 {
     setLabelText(tr("Please sign in\nvia the opened browser..."));
     setWindowModality(Qt::ApplicationModal);
@@ -115,16 +120,34 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     // Start listen server
     m_listenServer = new QTcpServer(this);
     bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
-    if(!result) {
-        SentryReporter::instance().sendMessage(QString("NGSignServer listen: 127.0.0.1:%1 result: %2")
-                .arg(QString::number(listenPort), result ? "ok" : "bad"), SentryReporter::Level::Error);
+    m_logger->add(QString("LISTEN result = %1, error = %2").arg(result ? "GOOD" : "BAD", m_listenServer->errorString()));
+
+    if (result)
+    {
+        connect(m_timer, &QTimer::timeout, this, [this]()
+            {
+                m_logger->add("TIMEOUT");
+                m_logger->send();
+            });
+        m_timer->start(30 * 1000); // 30 sec
+    }
+    else
+    {
+        m_logger->send();
     }
 
     connect(m_listenServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+    connect(m_listenServer, &QTcpServer::acceptError, this, [this](QAbstractSocket::SocketError err)
+        {
+            m_timer->stop();
+            m_logger->add(QString("ACCEPT_ERROR: %1").arg(QString::number(static_cast<int>(err))));
+            m_logger->send();
+        });
 }
 
 NGSignServer::~NGSignServer()
 {
+    m_logger->send();
     m_listenServer->close();
 }
 
@@ -145,26 +168,28 @@ QString NGSignServer::verifier() const
 
 void NGSignServer::onIncomingConnection()
 {
+    m_logger->add("ON_INCOMING_CONNECTION");
+
     QTcpSocket *socket = m_listenServer->nextPendingConnection();
     connect(socket, SIGNAL(readyRead()), this, SLOT(onGetReply()), Qt::UniqueConnection);
     connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
-
-//    SentryReporter::instance().sendMessage(QString("NGSignServer::onIncomingConnection %1:%2")
-//            .arg(socket->peerAddress().toString(), QString::number(socket->peerPort())));
 }
 
 void NGSignServer::onGetReply()
 {
+    m_timer->stop();
+    m_logger->add("ON_GET_REPLY");
+
     if (!m_listenServer->isListening()) {
-        SentryReporter::instance().sendMessage("NGSignServer::onGetReply. Server is not listening",
-                                               SentryReporter::Level::Error);
+        m_logger->add("ON_GET_REPLY status = ERROR: server is not listening");
+        m_logger->send();
         return;
     }
 
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) {
-        SentryReporter::instance().sendMessage("NGSignServer::onGetReply. Socket is null",
-                                               SentryReporter::Level::Error);
+        m_logger->add("ON_GET_REPLY status = ERROR:  socket is null");
+        m_logger->send();
         return;
     }
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -173,6 +198,7 @@ void NGSignServer::onGetReply()
     int result = 0;
     QString dataStr(data);
     QString errorMsg;
+
     auto lines = dataStr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     auto params = lines[0].split(QRegExp("[\\s?&]"),QString::SkipEmptyParts);
     for(const auto &param : params) {
@@ -187,7 +213,6 @@ void NGSignServer::onGetReply()
             break;
         }
     }
-
 
     QByteArray reply;
     reply.append("HTTP/1.0 200 OK \r\n");
@@ -219,11 +244,9 @@ void NGSignServer::onGetReply()
     socket->waitForBytesWritten();
 
     socket->disconnectFromHost();
+    socket->deleteLater();
 
-    if(result == 0) {
-        SentryReporter::instance().sendMessage(QString("NGSignServer::onGetReply: data - %1, error - %2")
-            .arg(dataStr).arg(errorMsg));
-    }
+    m_logger->add(QString("ON_GET_REPLY status = %1, code = %2, error = %3").arg(result ? "GOOD" : "BAD", m_code, errorMsg));
 
     // Close dialog
     done(result);
@@ -255,13 +278,8 @@ int NGSignServer::exec()
     url.setQuery(query);
 #endif
 
-    // Open external browser
-//    qDebug() << url.toString();
     bool result = QDesktopServices::openUrl(url);
-    if(!result) {
-        SentryReporter::instance().sendMessage(QString("QDesktopServices::openUrl %1, result: %2")
-            .arg(url.toString(), result ? "ok" : "bad"), SentryReporter::Level::Error);
-    }
+    m_logger->add(QString("EXEC status = %1, url = %2").arg(result ? "GOOD" : "BAD", url.toDisplayString()));
 
     return QProgressDialog::exec();
 }
