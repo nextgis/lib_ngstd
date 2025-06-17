@@ -129,7 +129,7 @@ void NGUpdater::startUpdate(const QString &projectPath)
 	arguments << qApp->applicationFilePath();
 	if(!projectPath.isEmpty()) {
 		arguments << "--launch-options";
-		arguments << projectPath;
+		arguments << QString("\"%1\"").arg(projectPath);
 	}
 
 	QProcess::startDetached( program, arguments	);
