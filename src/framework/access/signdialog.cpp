@@ -22,12 +22,17 @@
 
 #include "access.h"
 
+#include <QIcon>
+
 NGSignDialog::NGSignDialog(QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint | Qt::Popup),
     ui(new Ui::NGSignDialog)
 {
     ui->setupUi(this);
+    ui->settingsButton->setIcon(QIcon(":images/themes/default/console/iconProcessingConsole.svg"));
     ui->signButton->installEventFilter(NGAccess::instance().getSignInEventFilter());
+    connect(ui->settingsButton, &QPushButton::clicked,
+            this, &NGSignDialog::onSettingsClicked);
     updateContent();
 }
 
@@ -109,5 +114,11 @@ void NGSignDialog::onSignClicked()
     else {
         NGAccess::instance().authorize();
     }
+    hide();
+}
+
+void NGSignDialog::onSettingsClicked()
+{
+    emit settingsRequested();
     hide();
 }
