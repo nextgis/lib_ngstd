@@ -19,8 +19,12 @@ public:
 
     QPushButton *getSignButton () const;
 
+signals:
+    void settingsRequested();
+
 private slots:
     void onSignClicked();
+    void onSettingsClicked();
 
 private:
     Ui::NGSignDialog *ui;
