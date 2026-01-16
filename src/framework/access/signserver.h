@@ -23,7 +23,6 @@
 #include <QProgressDialog>
 #include <QTcpServer>
 
-class Logger;
 class QTimer;
 
 class Q_DECL_HIDDEN NGSignServer : public QProgressDialog
@@ -51,7 +50,6 @@ private:
     QString m_redirectUri;
     QString m_clientId, m_scope, m_verifier;
     QTcpServer *m_listenServer;
-    Logger* m_logger = {};
     QTimer* m_timer = {};
 
     // QDialog interface

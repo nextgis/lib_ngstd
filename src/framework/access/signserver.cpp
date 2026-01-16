@@ -60,6 +60,34 @@ constexpr const char *contentStr = "<html>"
 constexpr unsigned short listenPort = 65020;
 constexpr const char *redirectUriStr = "http://127.0.0.1:65020";
 
+namespace
+{
+void logAuth(const BaseLogger::LogLevel level, const QString &clientId, const QString &message, const bool flush = false)
+{
+    auto &logger = getLogger();
+    const auto payload = QStringLiteral("Authorization [%1] %2").arg(clientId, message);
+
+    switch (level)
+    {
+    case BaseLogger::LogLevel::Debug:
+        logger.debug(payload);
+        break;
+    case BaseLogger::LogLevel::Info:
+        logger.info(payload);
+        break;
+    case BaseLogger::LogLevel::Warning:
+        logger.warning(payload);
+        break;
+    case BaseLogger::LogLevel::Critical:
+        logger.critical(payload);
+        break;
+    }
+
+    if (flush)
+        logger.flush();
+}
+}
+
 
 static std::string toHex(unsigned char *value, int size)
 {
@@ -104,7 +132,6 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     m_redirectUri(redirectUriStr),
     m_clientId(clientId),
     m_scope(scope),
-    m_logger(new Logger(m_clientId, "Authorization Logging", this)),
     m_timer(new QTimer(this))
 {
     setLabelText(tr("Please sign in\nvia the opened browser..."));
@@ -118,34 +145,37 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     // Start listen server
     m_listenServer = new QTcpServer(this);
     bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
-    m_logger->add(QString("LISTEN result = %1, error = %2").arg(result ? "GOOD" : "BAD", m_listenServer->errorString()));
+    const auto listenMsg = QString("Listen result = %1, error = %2")
+                                  .arg(result ? "Success" : "Failed", m_listenServer->errorString());
+    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+            m_clientId, listenMsg);
 
     if (result)
     {
         connect(m_timer, &QTimer::timeout, this, [this]()
             {
-                m_logger->add("TIMEOUT");
-                m_logger->send();
+                logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+                        QStringLiteral("Timeout while waiting for authorization reply"), true);
             });
         m_timer->start(30 * 1000); // 30 sec
     }
     else
     {
-        m_logger->send();
+        getLogger().flush();
     }
 
     connect(m_listenServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
     connect(m_listenServer, &QTcpServer::acceptError, this, [this](QAbstractSocket::SocketError err)
         {
             m_timer->stop();
-            m_logger->add(QString("ACCEPT_ERROR: %1").arg(QString::number(static_cast<int>(err))));
-            m_logger->send();
+            logAuth(BaseLogger::LogLevel::Critical, m_clientId,
+                    QString("Accept error: %1").arg(QString::number(static_cast<int>(err))), true);
         });
 }
 
 NGSignServer::~NGSignServer()
 {
-    m_logger->send();
+    getLogger().flush();
     m_listenServer->close();
 }
 
@@ -166,7 +196,8 @@ QString NGSignServer::verifier() const
 
 void NGSignServer::onIncomingConnection()
 {
-    m_logger->add("ON_INCOMING_CONNECTION");
+    logAuth(BaseLogger::LogLevel::Info, m_clientId,
+            QStringLiteral("Incoming connection received"));
 
     QTcpSocket *socket = m_listenServer->nextPendingConnection();
     connect(socket, SIGNAL(readyRead()), this, SLOT(onGetReply()), Qt::UniqueConnection);
@@ -176,18 +207,19 @@ void NGSignServer::onIncomingConnection()
 void NGSignServer::onGetReply()
 {
     m_timer->stop();
-    m_logger->add("ON_GET_REPLY");
+    logAuth(BaseLogger::LogLevel::Info, m_clientId,
+            QStringLiteral("Processing authorization reply"));
 
     if (!m_listenServer->isListening()) {
-        m_logger->add("ON_GET_REPLY status = ERROR: server is not listening");
-        m_logger->send();
+        logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+                QStringLiteral("Authorization server is not listening"), true);
         return;
     }
 
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) {
-        m_logger->add("ON_GET_REPLY status = ERROR:  socket is null");
-        m_logger->send();
+        logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+                QStringLiteral("Authorization reply socket is null"), true);
         return;
     }
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -244,7 +276,10 @@ void NGSignServer::onGetReply()
     socket->disconnectFromHost();
     socket->deleteLater();
 
-    m_logger->add(QString("ON_GET_REPLY status = %1, code = %2, error = %3").arg(result ? "GOOD" : "BAD", m_code, errorMsg));
+    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+            m_clientId,
+            QString("Authorization reply status = %1, code = %2, error = %3")
+                .arg(result ? "Success" : "Failed", m_code, errorMsg));
 
     // Close dialog
     done(result);
@@ -277,7 +312,10 @@ int NGSignServer::exec()
 #endif
 
     bool result = QDesktopServices::openUrl(url);
-    m_logger->add(QString("EXEC status = %1, url = %2").arg(result ? "GOOD" : "BAD", url.toDisplayString()));
+    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+            m_clientId,
+            QString("Open authorization URL status = %1, url = %2")
+                .arg(result ? "Success" : "Failed", url.toDisplayString()));
 
     return QProgressDialog::exec();
 }

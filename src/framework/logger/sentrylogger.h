@@ -18,44 +18,40 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
+#ifndef NGFRAMEWORK_SENTRYLOGGER_H
+#define NGFRAMEWORK_SENTRYLOGGER_H
 
-#include <QByteArray>
+#include "logger/loggerdecorator.h"
 
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
+#include <QMutex>
+#include <QTimer>
 
-namespace
+class NGFRAMEWORK_EXPORT SentryLogger : public LoggerDecorator
 {
-std::shared_ptr<BaseLogger> g_logger;
+    Q_OBJECT
 
-void applyEnvironmentLogLevel(BaseLogger &logger)
-{
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
-        return;
+public:
+    explicit SentryLogger(std::shared_ptr<BaseLogger> wrapped, QObject *parent = nullptr);
+    ~SentryLogger() override;
 
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
+    void flush() override;
 
-BaseLogger &getLogger()
-{
-    if (!g_logger)
-    {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
-    }
+protected:
+    void log(LogLevel level, const QString &msg) override;
 
-    return *g_logger;
-}
+private:
+    void appendMessage(LogLevel level, const QString &formattedMessage);
+    void sendBuffered(const QString &payload, LogLevel level);
 
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
-{
-    g_logger = logger;
+    static constexpr int kMaxBufferedLines = 1000;
+    static constexpr int kFlushIntervalMs = 10 * 1000;
 
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
-}
+    QTimer m_flushTimer;
+    QMutex m_mutex;
+    QString m_buffer;
+    int m_lineCount = 0;
+    LogLevel m_highestBufferedLevel = LogLevel::Debug;
+};
+
+#endif // NGFRAMEWORK_SENTRYLOGGER_H
 

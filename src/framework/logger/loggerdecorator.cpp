@@ -18,44 +18,44 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
+#include "logger/loggerdecorator.h"
 
-#include <QByteArray>
-
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
-
-namespace
+LoggerDecorator::LoggerDecorator(std::shared_ptr<BaseLogger> wrapped, QObject *parent)
+    : BaseLogger(parent)
+    , m_wrapped(std::move(wrapped))
 {
-std::shared_ptr<BaseLogger> g_logger;
+}
 
-void applyEnvironmentLogLevel(BaseLogger &logger)
+void LoggerDecorator::flush()
 {
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
+    if (m_wrapped)
+        m_wrapped->flush();
+}
+
+void LoggerDecorator::log(const BaseLogger::LogLevel level, const QString &msg)
+{
+    if (!m_wrapped)
         return;
 
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
-
-BaseLogger &getLogger()
-{
-    if (!g_logger)
+    switch (level)
     {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
+    case LogLevel::Debug:
+        m_wrapped->debug(msg);
+        break;
+    case LogLevel::Info:
+        m_wrapped->info(msg);
+        break;
+    case LogLevel::Warning:
+        m_wrapped->warning(msg);
+        break;
+    case LogLevel::Critical:
+        m_wrapped->critical(msg);
+        break;
     }
-
-    return *g_logger;
 }
 
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
+std::shared_ptr<BaseLogger> LoggerDecorator::wrapped() const
 {
-    g_logger = logger;
-
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
+    return m_wrapped;
 }
 

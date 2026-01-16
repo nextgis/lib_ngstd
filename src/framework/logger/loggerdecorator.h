@@ -18,44 +18,30 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
+#ifndef NGFRAMEWORK_LOGGERDECORATOR_H
+#define NGFRAMEWORK_LOGGERDECORATOR_H
 
-#include <QByteArray>
+#include "logger/baselogger.h"
 
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
+#include <memory>
 
-namespace
+class NGFRAMEWORK_EXPORT LoggerDecorator : public BaseLogger
 {
-std::shared_ptr<BaseLogger> g_logger;
+    Q_OBJECT
 
-void applyEnvironmentLogLevel(BaseLogger &logger)
-{
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
-        return;
+public:
+    explicit LoggerDecorator(std::shared_ptr<BaseLogger> wrapped, QObject *parent = nullptr);
 
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
+    void flush() override;
 
-BaseLogger &getLogger()
-{
-    if (!g_logger)
-    {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
-    }
+protected:
+    void log(LogLevel level, const QString &msg) override;
 
-    return *g_logger;
-}
+    std::shared_ptr<BaseLogger> wrapped() const;
 
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
-{
-    g_logger = logger;
+private:
+    std::shared_ptr<BaseLogger> m_wrapped;
+};
 
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
-}
+#endif // NGFRAMEWORK_LOGGERDECORATOR_H
 

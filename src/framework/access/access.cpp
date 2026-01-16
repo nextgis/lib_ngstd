@@ -46,6 +46,7 @@
 
 #include "request.h"
 #include "signserver.h"
+#include "logger.h"
 #include "version.h"
 
 constexpr const char *apiEndpointSubpath = "/api/v1";
@@ -887,21 +888,27 @@ void NGAccess::updateSupportInfo() const
 
 void NGAccess::logMessage(const QString &value, LogLevel level)
 {
-    // Unknown levels will be info
-    SentryReporter::Level slevel = SentryReporter::Level::Info;
-    if(level == LogLevel::Warning) {
-        slevel = SentryReporter::Level::Warning;
+    auto &logger = getLogger();
+    const auto payload = QStringLiteral("[NGAccess] %1").arg(value);
+
+    switch (level)
+    {
+    case LogLevel::Debug:
+        logger.debug(payload);
+        break;
+    case LogLevel::Info:
+        logger.info(payload);
+        break;
+    case LogLevel::Warning:
+        logger.warning(payload);
+        break;
+    case LogLevel::Error:
+        logger.critical(payload);
+        break;
+    case LogLevel::Fatal:
+        logger.critical(QStringLiteral("[NGAccess] FATAL %1").arg(value));
+        break;
     }
-    else if(level == LogLevel::Error) {
-        slevel = SentryReporter::Level::Error;
-    }
-    else if(level == LogLevel::Fatal) {
-        slevel = SentryReporter::Level::Fatal;
-    }
-    else if(level == LogLevel::Debug) {
-        slevel = SentryReporter::Level::Debug;
-    }
-    SentryReporter::instance().sendMessage(value, slevel);
 }
 
 SignInEvent::SignInEvent(QObject *parent) : QObject(parent)
