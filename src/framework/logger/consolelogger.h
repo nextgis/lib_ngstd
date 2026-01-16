@@ -18,44 +18,21 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
+#ifndef NGFRAMEWORK_CONSOLELOGGER_H
+#define NGFRAMEWORK_CONSOLELOGGER_H
 
-#include <QByteArray>
+#include "logger/baselogger.h"
 
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
-
-namespace
+class NGFRAMEWORK_EXPORT ConsoleLogger : public BaseLogger
 {
-std::shared_ptr<BaseLogger> g_logger;
+    Q_OBJECT
 
-void applyEnvironmentLogLevel(BaseLogger &logger)
-{
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
-        return;
+public:
+    using BaseLogger::BaseLogger;
 
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
+protected:
+    void log(LogLevel level, const QString &msg) override;
+};
 
-BaseLogger &getLogger()
-{
-    if (!g_logger)
-    {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
-    }
-
-    return *g_logger;
-}
-
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
-{
-    g_logger = logger;
-
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
-}
+#endif // NGFRAMEWORK_CONSOLELOGGER_H
 

@@ -18,44 +18,15 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
-
-#include <QByteArray>
-
 #include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
 
-namespace
+#include <QTextStream>
+
+void ConsoleLogger::log(const BaseLogger::LogLevel level, const QString &msg)
 {
-std::shared_ptr<BaseLogger> g_logger;
-
-void applyEnvironmentLogLevel(BaseLogger &logger)
-{
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
-        return;
-
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
-
-BaseLogger &getLogger()
-{
-    if (!g_logger)
-    {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
-    }
-
-    return *g_logger;
-}
-
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
-{
-    g_logger = logger;
-
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
+    QTextStream stream(
+        (level == LogLevel::Warning || level == LogLevel::Critical) ? stderr : stdout,
+        QIODevice::WriteOnly);
+    stream << formatMessage(level, msg) << Qt::endl;
 }
 

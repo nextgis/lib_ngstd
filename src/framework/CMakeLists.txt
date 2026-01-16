@@ -46,6 +46,7 @@ set(PRIVATE_HEADERS
 set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/updater.cpp
     ${PROJECT_SOURCE_DIR}/sentryreporter.cpp
+    ${PROJECT_SOURCE_DIR}/logger.cpp
     ${PROJECT_SOURCE_DIR}/application.cpp
     ${PROJECT_SOURCE_DIR}/mainwindow.cpp
     ${PROJECT_SOURCE_DIR}/style.cpp
@@ -53,7 +54,10 @@ set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/navigationwidget.cpp
     ${PROJECT_SOURCE_DIR}/navigationpane.cpp
     ${PROJECT_SOURCE_DIR}/styledbar.cpp
-    ${PROJECT_SOURCE_DIR}/logger.cpp
+    ${PROJECT_SOURCE_DIR}/logger/baselogger.cpp
+    ${PROJECT_SOURCE_DIR}/logger/consolelogger.cpp
+    ${PROJECT_SOURCE_DIR}/logger/loggerdecorator.cpp
+    ${PROJECT_SOURCE_DIR}/logger/sentrylogger.cpp
 )
 
 set(ACCESS_HHEADERS
@@ -65,6 +69,10 @@ set(ACCESS_HHEADERS
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     ${PROJECT_SOURCE_DIR}/access/signserver.h
     ${PROJECT_SOURCE_DIR}/sentryreporter.h
+    ${PROJECT_SOURCE_DIR}/logger/baselogger.h
+    ${PROJECT_SOURCE_DIR}/logger/consolelogger.h
+    ${PROJECT_SOURCE_DIR}/logger/loggerdecorator.h
+    ${PROJECT_SOURCE_DIR}/logger/sentrylogger.h
     ${PROJECT_SOURCE_DIR}/logger.h
 )
 

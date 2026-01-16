@@ -18,44 +18,51 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger.h"
+#ifndef NGFRAMEWORK_BASELOGGER_H
+#define NGFRAMEWORK_BASELOGGER_H
 
-#include <QByteArray>
+#include "framework.h"
 
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
+#include <QObject>
+#include <QString>
 
-namespace
+class NGFRAMEWORK_EXPORT BaseLogger : public QObject
 {
-std::shared_ptr<BaseLogger> g_logger;
+    Q_OBJECT
 
-void applyEnvironmentLogLevel(BaseLogger &logger)
-{
-    const auto envValue = qgetenv("NGSTD_LOGGING_LEVEL");
-    if (envValue.isEmpty())
-        return;
-
-    logger.setLevel(QString::fromLocal8Bit(envValue));
-}
-}
-
-BaseLogger &getLogger()
-{
-    if (!g_logger)
+public:
+    enum class LogLevel
     {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
-        applyEnvironmentLogLevel(*g_logger);
-    }
+        Debug = 0,
+        Info,
+        Warning,
+        Critical
+    };
 
-    return *g_logger;
-}
+    explicit BaseLogger(QObject *parent = nullptr);
 
-void setLogger(const std::shared_ptr<BaseLogger> &logger)
-{
-    g_logger = logger;
+    void debug(const QString &msg);
+    void info(const QString &msg);
+    void warning(const QString &msg);
+    void critical(const QString &msg);
 
-    if (g_logger)
-        applyEnvironmentLogLevel(*g_logger);
-}
+    void setLevel(LogLevel level);
+    void setLevel(const QString &levelStr);
+    LogLevel level() const;
+
+    virtual void flush();
+
+    static QString formatMessage(LogLevel level, const QString &msg);
+
+protected:
+    virtual void log(LogLevel level, const QString &msg) = 0;
+    void write(LogLevel level, const QString &msg, bool force = false);
+
+private:
+    bool shouldLog(LogLevel level) const;
+
+    LogLevel m_level;
+};
+
+#endif // NGFRAMEWORK_BASELOGGER_H
 
