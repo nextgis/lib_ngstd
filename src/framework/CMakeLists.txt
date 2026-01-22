@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #***************************************************************************
 
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(ngstd_framework)
 
@@ -83,11 +83,11 @@ file(DOWNLOAD https://rm.nextgis.com/api/sign_code ${PROJECT_BINARY_DIR}/access/
 file(STRINGS ${PROJECT_BINARY_DIR}/access/sign.cpp SIGN_LINES LIMIT_COUNT 2)
 if(EXISTS ${PROJECT_BINARY_DIR}/access/sign.cpp AND SIGN_LINES)
     message(STATUS "Success get sign code ===================================")
-    set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
+    set(ACCESS_CSOURCES ${ACCESS_CSOURCES}
         ${PROJECT_BINARY_DIR}/access/sign.cpp
     )
 else()
-    set(ACCESS_CSOURCES ${ACCESS_CSOURCES} 
+    set(ACCESS_CSOURCES ${ACCESS_CSOURCES}
         ${PROJECT_SOURCE_DIR}/access/sign.cpp
     )
 endif()
