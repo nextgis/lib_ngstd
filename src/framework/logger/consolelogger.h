@@ -21,7 +21,7 @@
 #ifndef NGFRAMEWORK_CONSOLELOGGER_H
 #define NGFRAMEWORK_CONSOLELOGGER_H
 
-#include "logger/baselogger.h"
+#include "framework/logger/baselogger.h"
 
 class NGFRAMEWORK_EXPORT ConsoleLogger : public BaseLogger
 {
@@ -31,8 +31,7 @@ public:
     using BaseLogger::BaseLogger;
 
 protected:
-    void log(LogLevel level, const QString &msg) override;
+    void write(LogLevel level, const QString &msg) override;
 };
 
 #endif // NGFRAMEWORK_CONSOLELOGGER_H
-

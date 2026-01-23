@@ -62,29 +62,15 @@ constexpr const char *redirectUriStr = "http://127.0.0.1:65020";
 
 namespace
 {
-void logAuth(const BaseLogger::LogLevel level, const QString &clientId, const QString &message, const bool flush = false)
+void logAuth(const LogLevel level, const QString &clientId, const QString &message, const bool flush = false)
 {
-    auto &logger = getLogger();
-    const auto payload = QStringLiteral("Authorization [%1] %2").arg(clientId, message);
+    auto logger = getLogger();
+    const auto payload = QStringLiteral("[Authorization] [%1] %2").arg(clientId, message);
 
-    switch (level)
-    {
-    case BaseLogger::LogLevel::Debug:
-        logger.debug(payload);
-        break;
-    case BaseLogger::LogLevel::Info:
-        logger.info(payload);
-        break;
-    case BaseLogger::LogLevel::Warning:
-        logger.warning(payload);
-        break;
-    case BaseLogger::LogLevel::Critical:
-        logger.critical(payload);
-        break;
-    }
+    logger->log(level, payload);
 
     if (flush)
-        logger.flush();
+        logger->flush();
 }
 }
 
@@ -145,37 +131,42 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     // Start listen server
     m_listenServer = new QTcpServer(this);
     bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
-    const auto listenMsg = QString("Listen result = %1, error = %2")
-                                  .arg(result ? "Success" : "Failed", m_listenServer->errorString());
-    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+
+    auto listenMsg = QString("Listen result = %1").arg(result ? "Success" : "Failed");
+    if (!result)
+    {
+        listenMsg += QString(", error: %1").arg(m_listenServer->errorString());
+    }
+
+    logAuth(result ? LogLevel::Debug : LogLevel::Warning,
             m_clientId, listenMsg);
 
     if (result)
     {
         connect(m_timer, &QTimer::timeout, this, [this]()
             {
-                logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+                logAuth(LogLevel::Warning, m_clientId,
                         QStringLiteral("Timeout while waiting for authorization reply"), true);
             });
         m_timer->start(30 * 1000); // 30 sec
     }
     else
     {
-        getLogger().flush();
+        getLogger()->flush();
     }
 
     connect(m_listenServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
     connect(m_listenServer, &QTcpServer::acceptError, this, [this](QAbstractSocket::SocketError err)
         {
             m_timer->stop();
-            logAuth(BaseLogger::LogLevel::Critical, m_clientId,
+            logAuth(LogLevel::Critical, m_clientId,
                     QString("Accept error: %1").arg(QString::number(static_cast<int>(err))), true);
         });
 }
 
 NGSignServer::~NGSignServer()
 {
-    getLogger().flush();
+    getLogger()->flush();
     m_listenServer->close();
 }
 
@@ -196,7 +187,7 @@ QString NGSignServer::verifier() const
 
 void NGSignServer::onIncomingConnection()
 {
-    logAuth(BaseLogger::LogLevel::Info, m_clientId,
+    logAuth(LogLevel::Debug, m_clientId,
             QStringLiteral("Incoming connection received"));
 
     QTcpSocket *socket = m_listenServer->nextPendingConnection();
@@ -207,18 +198,18 @@ void NGSignServer::onIncomingConnection()
 void NGSignServer::onGetReply()
 {
     m_timer->stop();
-    logAuth(BaseLogger::LogLevel::Info, m_clientId,
+    logAuth(LogLevel::Info, m_clientId,
             QStringLiteral("Processing authorization reply"));
 
     if (!m_listenServer->isListening()) {
-        logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+        logAuth(LogLevel::Critical, m_clientId,
                 QStringLiteral("Authorization server is not listening"), true);
         return;
     }
 
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) {
-        logAuth(BaseLogger::LogLevel::Warning, m_clientId,
+        logAuth(LogLevel::Critical, m_clientId,
                 QStringLiteral("Authorization reply socket is null"), true);
         return;
     }
@@ -276,7 +267,7 @@ void NGSignServer::onGetReply()
     socket->disconnectFromHost();
     socket->deleteLater();
 
-    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+    logAuth(result ? LogLevel::Info : LogLevel::Warning,
             m_clientId,
             QString("Authorization reply status = %1, code = %2, error = %3")
                 .arg(result ? "Success" : "Failed", m_code, errorMsg));
@@ -312,7 +303,7 @@ int NGSignServer::exec()
 #endif
 
     bool result = QDesktopServices::openUrl(url);
-    logAuth(result ? BaseLogger::LogLevel::Info : BaseLogger::LogLevel::Warning,
+    logAuth(result ? LogLevel::Info : LogLevel::Warning,
             m_clientId,
             QString("Open authorization URL status = %1, url = %2")
                 .arg(result ? "Success" : "Failed", url.toDisplayString()));

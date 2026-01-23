@@ -18,12 +18,25 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger/loggerdecorator.h"
+#include "framework/logger/loggerdecorator.h"
 
 LoggerDecorator::LoggerDecorator(std::shared_ptr<BaseLogger> wrapped, QObject *parent)
     : BaseLogger(parent)
     , m_wrapped(std::move(wrapped))
 {
+    setLevel(m_wrapped->level());
+}
+
+void LoggerDecorator::setLevel(const LogLevel level)
+{
+    if (m_wrapped)
+        m_wrapped->setLevel(level);
+}
+
+void LoggerDecorator::setLevel(const QString &levelStr)
+{
+    if (m_wrapped)
+        m_wrapped->setLevel(levelStr);
 }
 
 void LoggerDecorator::flush()
@@ -32,7 +45,7 @@ void LoggerDecorator::flush()
         m_wrapped->flush();
 }
 
-void LoggerDecorator::log(const BaseLogger::LogLevel level, const QString &msg)
+void LoggerDecorator::write(const LogLevel level, const QString &msg)
 {
     if (!m_wrapped)
         return;
@@ -51,6 +64,9 @@ void LoggerDecorator::log(const BaseLogger::LogLevel level, const QString &msg)
     case LogLevel::Critical:
         m_wrapped->critical(msg);
         break;
+    case LogLevel::Fatal:
+        m_wrapped->fatal(msg);
+        break;
     }
 }
 
@@ -58,4 +74,3 @@ std::shared_ptr<BaseLogger> LoggerDecorator::wrapped() const
 {
     return m_wrapped;
 }
-

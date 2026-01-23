@@ -21,37 +21,37 @@
 #ifndef NGFRAMEWORK_SENTRYLOGGER_H
 #define NGFRAMEWORK_SENTRYLOGGER_H
 
-#include "logger/loggerdecorator.h"
+#include "framework/logger/loggerdecorator.h"
 
 #include <QMutex>
 #include <QTimer>
+
+#include <sentry.h>
 
 class NGFRAMEWORK_EXPORT SentryLogger : public LoggerDecorator
 {
     Q_OBJECT
 
 public:
-    explicit SentryLogger(std::shared_ptr<BaseLogger> wrapped, QObject *parent = nullptr);
-    ~SentryLogger() override;
-
-    void flush() override;
+    explicit SentryLogger(
+        std::shared_ptr<BaseLogger> wrapped,
+        const QString &sentryKey,
+        const QString &softwareVersion,
+        QObject *parent = nullptr
+    );
+    virtual ~SentryLogger() override;
 
 protected:
-    void log(LogLevel level, const QString &msg) override;
+    void write(LogLevel level, const QString &msg) override;
 
 private:
-    void appendMessage(LogLevel level, const QString &formattedMessage);
-    void sendBuffered(const QString &payload, LogLevel level);
+    QString configPath(const QString &sentryKey) const;
 
-    static constexpr int kMaxBufferedLines = 1000;
-    static constexpr int kFlushIntervalMs = 10 * 1000;
+    QString m_sentryKey;
+    QString m_softwareVersion;
+    bool m_isInitialized = false;
 
-    QTimer m_flushTimer;
-    QMutex m_mutex;
-    QString m_buffer;
-    int m_lineCount = 0;
-    LogLevel m_highestBufferedLevel = LogLevel::Debug;
+    sentry_options_t *m_options = nullptr;
 };
 
 #endif // NGFRAMEWORK_SENTRYLOGGER_H
-

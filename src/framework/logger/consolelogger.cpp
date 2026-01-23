@@ -18,15 +18,20 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger/consolelogger.h"
+#include "framework/logger/consolelogger.h"
 
 #include <QTextStream>
 
-void ConsoleLogger::log(const BaseLogger::LogLevel level, const QString &msg)
+void ConsoleLogger::write(const LogLevel level, const QString &msg)
 {
+    bool use_stderr = (
+        level == LogLevel::Warning
+        || level == LogLevel::Critical
+        || level == LogLevel::Fatal
+    );
+
     QTextStream stream(
-        (level == LogLevel::Warning || level == LogLevel::Critical) ? stderr : stdout,
+        use_stderr ? stderr : stdout,
         QIODevice::WriteOnly);
     stream << formatMessage(level, msg) << Qt::endl;
 }
-

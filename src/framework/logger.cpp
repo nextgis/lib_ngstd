@@ -21,9 +21,9 @@
 #include "logger.h"
 
 #include <QByteArray>
+#include <memory>
 
-#include "logger/consolelogger.h"
-#include "logger/sentrylogger.h"
+#include "framework/logger/consolelogger.h"
 
 namespace
 {
@@ -39,16 +39,15 @@ void applyEnvironmentLogLevel(BaseLogger &logger)
 }
 }
 
-BaseLogger &getLogger()
+std::shared_ptr<BaseLogger> getLogger()
 {
     if (!g_logger)
     {
-        auto consoleLogger = std::make_shared<ConsoleLogger>();
-        g_logger = std::make_shared<SentryLogger>(consoleLogger);
+        g_logger = std::make_shared<ConsoleLogger>();
         applyEnvironmentLogLevel(*g_logger);
     }
 
-    return *g_logger;
+    return g_logger;
 }
 
 void setLogger(const std::shared_ptr<BaseLogger> &logger)
@@ -58,4 +57,3 @@ void setLogger(const std::shared_ptr<BaseLogger> &logger)
     if (g_logger)
         applyEnvironmentLogLevel(*g_logger);
 }
-
