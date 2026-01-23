@@ -21,7 +21,7 @@
 #include "access.h"
 
 #include <QByteArray>
-#include "framework/logger/sentrylogger.h"
+#include "framework/logger//sentrylogger.h"
 
 #if QT_VERSION >= 0x050000
     #include <QtConcurrent/QtConcurrent>
@@ -269,7 +269,6 @@ void NGAccess::setClientId(const QString &clientId)
             QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
 
             if(!NGRequest::addAuth(urls, options)) {
-                qDebug() << "Add tokens to NGRequest failed";
                 logMessage("Add tokens to NGRequest failed", LogLevel::Critical);
             }
         }
@@ -535,14 +534,11 @@ bool NGAccess::checkSupported()
     QByteArray baMessage = sMessage.toUtf8();
     QByteArray baSignature = QByteArray::fromBase64(sign.toUtf8());
 
-    QString errorMsg;
     bool verify = verifyRSASignature(reinterpret_cast<unsigned char*>(baMessage.data()),
                               static_cast<unsigned int>(baMessage.size()),
                               reinterpret_cast<unsigned char*>(baSignature.data()),
-                              static_cast<unsigned int>(baSignature.size()),
-                              errorMsg);
+                              static_cast<unsigned int>(baSignature.size()));
     if(!verify) {
-        logMessage(errorMsg, LogLevel::Critical);
         logMessage("Account is supported. Verify failed", LogLevel::Critical);
         return false;
     }
@@ -572,18 +568,16 @@ QString NGAccess::getPublicKey() const
 bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
                                   unsigned int messageLength,
                                   unsigned char *signature,
-                                  unsigned int sigLength,
-                                  QString &errorMsg) const
+                                  unsigned int sigLength
+                                  ) const
 {
     if(nullptr == originalMessage) {
-        qWarning() << "Message is empty";
-        errorMsg = "Message is empty";
+        getLogger()->warning("Message is empty");
         return false;
     }
 
     if(nullptr == signature) {
-        qWarning() << "Signature is empty";
-        errorMsg = "Signature is empty";
+        getLogger()->warning("Signature is empty");
         return false;
     }
 
@@ -592,52 +586,47 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
     QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
     QFile keyFile(keyFilePath);
     if(!keyFile.open(QIODevice::ReadOnly)) {
-        qWarning() << tr("Failed open file %1").arg(keyFilePath);
-        errorMsg = QString("Failed open file %1").arg(keyFilePath);
+        getLogger()->warning(QString("Failed open file %1").arg(keyFilePath));
         return false;
     }
 
     FILE *file = fdopen(keyFile.handle(), "r"); // fopen(keyFilePath.toLatin1().data(), "r");
     if (!file) {
-        qWarning() << tr("Failed open file %1").arg(keyFilePath);
-        errorMsg = QString("Failed open file %1").arg(keyFilePath);
+        getLogger()->warning(QString("Failed open file %1").arg(keyFilePath));
         return false;
     }
 
     EVP_PKEY *evp_pubkey = PEM_read_PUBKEY(file, nullptr, nullptr, nullptr);
     if (!evp_pubkey) {
-        qWarning() << "Failed PEM_read_PUBKEY";
-        errorMsg = "Failed PEM_read_PUBKEY";
+        getLogger()->warning("Failed PEM_read_PUBKEY");
         return false;
     }
 
     EVP_MD_CTX *ctx = EVP_MD_CTX_create();
     if (!ctx) {
-        qWarning() << "Failed EVP_MD_CTX_create";
-        errorMsg = "Failed PEM_read_PUBKEY";
         EVP_PKEY_free(evp_pubkey);
+        getLogger()->warning("Failed EVP_MD_CTX_create");
         return false;
     }
 
     if(!EVP_VerifyInit(ctx, EVP_sha256())) {
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
-        qWarning() << "Failed EVP_VerifyInit";
-        errorMsg = "Failed EVP_VerifyInit";
+        getLogger()->warning("Failed EVP_VerifyInit");
     }
 
     if(!EVP_VerifyUpdate(ctx, originalMessage, messageLength)) {
         EVP_MD_CTX_destroy(ctx);
         EVP_PKEY_free(evp_pubkey);
-        qWarning() << "Failed EVP_VerifyUpdate";
-        errorMsg = "Failed EVP_VerifyUpdate";
+
+        getLogger()->warning("Failed EVP_VerifyUpdate");
     }
     int result = EVP_VerifyFinal(ctx, signature, sigLength, evp_pubkey);
 
     EVP_MD_CTX_destroy(ctx);
     EVP_PKEY_free(evp_pubkey);
 
-    qDebug() << "Signature is " << (result == 1 ? "valid" : "invalid");
+    getLogger()->debug(QString("Signature is %1").arg(result == 1 ? "valid" : "invalid"));
 
     return result == 1;
 }
@@ -649,7 +638,8 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri,
         return;
     }
 
-    qDebug() << "code: " << code << "\nuri: " << redirectUri << "\nverifier: " << verifier;
+    getLogger()->debug(QString("code: %1 \nuri: %2 \nverifier: %3")
+                      .arg(code).arg(redirectUri).arg(verifier));
 
     QMap<QString, QString> options;
     options["type"] = "bearer";

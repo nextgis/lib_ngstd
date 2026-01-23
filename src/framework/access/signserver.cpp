@@ -289,7 +289,7 @@ int NGSignServer::exec()
     }
     if(!m_verifier.isEmpty()) {
         auto cc = sha256(m_verifier);
-        qDebug() << "code_challenge: " << cc;
+        getLogger()->debug(QString("code_challenge: %1").arg(cc));
         parameters.append(qMakePair(QString("code_challenge"), cc));
         parameters.append(qMakePair(QString("code_challenge_method"), QString("S256")));
     }
