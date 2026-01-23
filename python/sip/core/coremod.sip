@@ -3,6 +3,12 @@
 
 %Import QtCore/QtCoremod.sip
 
+%ModuleHeaderCode
+#include <core/core.h>
+%End
+
+QString getVersionString();
+
 class NGRequest
 {
 %TypeHeaderCode

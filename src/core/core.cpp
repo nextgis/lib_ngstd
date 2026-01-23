@@ -30,6 +30,11 @@ const char* getVersion()
     return NGLIB_VERSION_STRING;
 }
 
+QString getVersionString()
+{
+    return QString::fromLatin1(NGLIB_VERSION_STRING);
+}
+
 QMap<QString, QVariant> memJsonToMap(const QString &str) {
     CPLJSONDocument in;
     if(in.LoadMemory(str.toStdString())) {

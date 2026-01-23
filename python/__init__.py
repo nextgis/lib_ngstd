@@ -6,3 +6,5 @@ __copyright__ = '(C) 2018, NextGIS'
 
 from ngstd.core import *
 from ngstd.framework import *
+
+__version__ = getVersionString()
