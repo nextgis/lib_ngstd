@@ -21,7 +21,7 @@
 #define NGFRAMEWORK_ACCESS_H
 
 #include "framework/framework.h"
-#include "framework/logger/baselogger.h"
+#include "framework/logger//baselogger.h"
 
 #include <QDateTime>
 #include <QFile>
@@ -109,8 +109,8 @@ protected:
 
     bool checkSupported();
     bool verifyRSASignature(unsigned char *originalMessage, unsigned int messageLength,
-                            unsigned char *signature, unsigned int sigLength,
-                            QString &errorMsg) const;
+                            unsigned char *signature, unsigned int sigLength
+                            ) const;
     void getTokens(const QString &code, const QString &redirectUri, const QString &verifier);
     void updateUserInfo() const;
     void updateSupportInfo() const;

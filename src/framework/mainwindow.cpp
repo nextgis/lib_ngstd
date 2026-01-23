@@ -20,6 +20,7 @@
 #include "mainwindow.h"
 
 #include "core/application.h"
+#include "framework/logger.h"
 
 #include <QStatusBar>
 #include <QSettings>
@@ -99,7 +100,7 @@ void NGMainWindow::writeSettings()
         settings.setValue("frame.pos", pos());
     }
     settings.setValue("frame.state", saveState());
-    qDebug("Write to settings status bar is visible: %s", isStatusBarVisible ? "true" : "false");
+    getLogger()->debug(QString("Write to settings status bar is visible: %1").arg(isStatusBarVisible ? "true" : "false"));
     settings.setValue("frame.statusbar.shown", isStatusBarVisible);
     settings.endGroup();
 }
@@ -116,7 +117,7 @@ void NGMainWindow::readSettings()
         move(settings.value("frame.pos", QPoint(200, 200)).toPoint());
     }
     restoreState(settings.value("frame_state").toByteArray());
-    qDebug("Status bar is shown: %s", settings.value("frame.statusbar.shown", true).toBool() ? "true" : "false");
+    getLogger()->debug(QString("Status bar is shown: %1").arg(settings.value("frame.statusbar.shown", true).toBool() ? "true" : "false"));
     statusBar()->setVisible(settings.value("frame.statusbar.shown", true).toBool());
     settings.endGroup();
 }
