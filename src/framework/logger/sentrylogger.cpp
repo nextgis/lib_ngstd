@@ -18,121 +18,109 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger/sentrylogger.h"
+#include <QCryptographicHash>
+#include <QDir>
+#include <sentry.h>
 
-#include <QMutexLocker>
+#include "core/version.h"
 
-#include "logger/baselogger.h"
-#include "logger/loggerdecorator.h"
-#include "sentryreporter.h"
+#include "framework/logger/baselogger.h"
+#include "framework/logger/loggerdecorator.h"
+#include "framework/logger/sentrylogger.h"
 
 namespace
 {
-SentryReporter::Level toSentryLevel(const BaseLogger::LogLevel level)
+sentry_level_e toSentryLevel(LogLevel level)
 {
     switch (level)
     {
-    case BaseLogger::LogLevel::Critical:
-        return SentryReporter::Level::Fatal;
-    case BaseLogger::LogLevel::Warning:
-        return SentryReporter::Level::Warning;
-    case BaseLogger::LogLevel::Info:
-        return SentryReporter::Level::Info;
-    case BaseLogger::LogLevel::Debug:
+    case LogLevel::Info:
+        return SENTRY_LEVEL_INFO;
+    case LogLevel::Warning:
+        return SENTRY_LEVEL_WARNING;
+    case LogLevel::Critical:
+        return SENTRY_LEVEL_ERROR;
+    case LogLevel::Fatal:
+        return SENTRY_LEVEL_FATAL;
+    case LogLevel::Debug:
     default:
-        return SentryReporter::Level::Debug;
+        return SENTRY_LEVEL_DEBUG;
     }
 }
+
 }
 
-SentryLogger::SentryLogger(std::shared_ptr<BaseLogger> wrapped, QObject *parent)
-    : LoggerDecorator(std::move(wrapped), parent)
-    , m_flushTimer(this)
+SentryLogger::SentryLogger(
+    std::shared_ptr<BaseLogger> wrapped,
+    const QString &sentryKey,
+    const QString &softwareVersion,
+    QObject *parent
+) :
+    LoggerDecorator(std::move(wrapped), parent),
+    m_sentryKey(sentryKey),
+    m_softwareVersion(softwareVersion)
 {
-    m_flushTimer.setInterval(kFlushIntervalMs);
-    m_flushTimer.setTimerType(Qt::CoarseTimer);
+    if (m_sentryKey.isEmpty())
+    {
+        return;
+    }
 
-    QObject::connect(&m_flushTimer, &QTimer::timeout, this, [this]() {
-        if (m_lineCount == 0)
-            return;
+    m_options = sentry_options_new();
+    sentry_options_set_dsn(m_options, m_sentryKey.toUtf8().constData());
+    sentry_options_set_release(m_options, m_softwareVersion.toUtf8().constData());
+    sentry_options_set_database_path(
+        m_options,
+        configPath(m_sentryKey).toUtf8().constData()
+    );
 
-        flush();
-    });
-
-    m_flushTimer.start();
+    if (sentry_init(m_options) == 0)
+    {
+        m_isInitialized = true;
+    }
 }
 
 SentryLogger::~SentryLogger()
 {
-    m_flushTimer.stop();
-    flush();
-}
-
-void SentryLogger::flush()
-{
-    QString payload;
-    auto payloadLevel = LogLevel::Debug;
-
-    {
-        QMutexLocker locker(&m_mutex);
-        if (m_buffer.isEmpty())
-        {
-            LoggerDecorator::flush();
-            return;
-        }
-
-        payload = m_buffer;
-        payloadLevel = m_highestBufferedLevel;
-        m_buffer.clear();
-        m_lineCount = 0;
-        m_highestBufferedLevel = LogLevel::Debug;
-    }
-
-    sendBuffered(payload, payloadLevel);
-    LoggerDecorator::flush();
-}
-
-void SentryLogger::log(const BaseLogger::LogLevel level, const QString &msg)
-{
-    LoggerDecorator::log(level, msg);
-    appendMessage(level, BaseLogger::formatMessage(level, msg));
-}
-
-void SentryLogger::appendMessage(const BaseLogger::LogLevel level, const QString &formattedMessage)
-{
-    QString payload;
-    auto payloadLevel = LogLevel::Debug;
-
-    {
-        QMutexLocker locker(&m_mutex);
-        if (m_lineCount >= kMaxBufferedLines && !m_buffer.isEmpty())
-        {
-            payload = m_buffer;
-            payloadLevel = m_highestBufferedLevel;
-            m_buffer.clear();
-            m_lineCount = 0;
-            m_highestBufferedLevel = LogLevel::Debug;
-        }
-
-        if (!m_buffer.isEmpty())
-            m_buffer.append(QLatin1Char('\n'));
-
-        m_buffer.append(formattedMessage);
-        ++m_lineCount;
-
-        if (m_lineCount == 1 || level >= m_highestBufferedLevel)
-            m_highestBufferedLevel = level;
-    }
-
-    if (!payload.isEmpty())
-        sendBuffered(payload, payloadLevel);
-}
-
-void SentryLogger::sendBuffered(const QString &payload, BaseLogger::LogLevel level)
-{
-    if (payload.isEmpty())
+    if (!m_isInitialized)
         return;
 
-    SentryReporter::instance().sendMessage(payload, toSentryLevel(level));
+    sentry_options_free(m_options);
+    sentry_close();
 }
 
+void SentryLogger::write(LogLevel level, const QString &msg)
+{
+    LoggerDecorator::write(level, msg);
+
+    if (!m_isInitialized)
+        return;
+
+    auto event = sentry_value_new_message_event(
+        toSentryLevel(level),
+        LIB_NAME,
+        formatMessage(level, msg).toLocal8Bit().constData()
+    );
+    sentry_capture_event(event);
+}
+
+QString SentryLogger::configPath(const QString &sentryKey) const
+{
+    QString configRoot;
+#if defined(Q_OS_MACOS) || defined(Q_OS_MAC) // In Qt 4.8 Q_OS_MAC
+    configRoot = QLatin1String("Library/Application Support");
+#else
+    configRoot = QLatin1String(".config");
+#endif
+
+    const QByteArray keyHash = QCryptographicHash::hash(
+        sentryKey.toLatin1(),
+        QCryptographicHash::Md5
+    );
+
+    QDir path(QDir::homePath());
+    path = QDir(path.filePath(configRoot));
+    path = QDir(path.filePath(QLatin1String(VENDOR)));
+    path = QDir(path.filePath(QLatin1String("sentry-native")));
+
+    return path.filePath(QString::fromLatin1(keyHash.toHex()));
+}

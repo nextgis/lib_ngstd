@@ -18,26 +18,28 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "logger/baselogger.h"
+#include "framework/logger/baselogger.h"
 
 #include <QDateTime>
 
 namespace
 {
-BaseLogger::LogLevel parseLevel(const QString &value, bool *ok)
+LogLevel parseLevel(const QString &value, bool *ok)
 {
     const auto normalized = value.trimmed().toLower();
-    auto level = BaseLogger::LogLevel::Warning;
+    auto level = LogLevel::Warning;
     auto parsed = true;
 
     if (normalized == QLatin1String("debug"))
-        level = BaseLogger::LogLevel::Debug;
+        level = LogLevel::Debug;
     else if (normalized == QLatin1String("info"))
-        level = BaseLogger::LogLevel::Info;
+        level = LogLevel::Info;
     else if (normalized == QLatin1String("warning"))
-        level = BaseLogger::LogLevel::Warning;
+        level = LogLevel::Warning;
     else if (normalized == QLatin1String("critical"))
-        level = BaseLogger::LogLevel::Critical;
+        level = LogLevel::Critical;
+    else if (normalized == QLatin1String("fatal"))
+        level = LogLevel::Critical;
     else
         parsed = false;
 
@@ -47,51 +49,61 @@ BaseLogger::LogLevel parseLevel(const QString &value, bool *ok)
     return level;
 }
 
-QString levelToString(const BaseLogger::LogLevel level)
+QString levelToString(const LogLevel level)
 {
     switch (level)
     {
-    case BaseLogger::LogLevel::Debug:
-        return QStringLiteral("DEBUG");
-    case BaseLogger::LogLevel::Info:
+    case LogLevel::Info:
         return QStringLiteral("INFO");
-    case BaseLogger::LogLevel::Warning:
+    case LogLevel::Warning:
         return QStringLiteral("WARNING");
-    case BaseLogger::LogLevel::Critical:
+    case LogLevel::Critical:
         return QStringLiteral("CRITICAL");
+    case LogLevel::Fatal:
+        return QStringLiteral("FATAL");
+    default:
+        return QStringLiteral("DEBUG");
     }
-
-    return QStringLiteral("INFO");
 }
 }
 
 BaseLogger::BaseLogger(QObject *parent)
     : QObject(parent)
-    , m_level(LogLevel::Warning)
+    , m_level(LogLevel::Critical)
 {
+}
+
+BaseLogger::~BaseLogger()
+{
+    flush();
 }
 
 void BaseLogger::debug(const QString &msg)
 {
-    write(LogLevel::Debug, msg);
+    log(LogLevel::Debug, msg);
 }
 
 void BaseLogger::info(const QString &msg)
 {
-    write(LogLevel::Info, msg);
+    log(LogLevel::Info, msg);
 }
 
 void BaseLogger::warning(const QString &msg)
 {
-    write(LogLevel::Warning, msg);
+    log(LogLevel::Warning, msg);
 }
 
 void BaseLogger::critical(const QString &msg)
 {
-    write(LogLevel::Critical, msg);
+    log(LogLevel::Critical, msg);
 }
 
-void BaseLogger::setLevel(const BaseLogger::LogLevel level)
+void BaseLogger::fatal(const QString &msg)
+{
+    log(LogLevel::Fatal, msg);
+}
+
+void BaseLogger::setLevel(const LogLevel level)
 {
     m_level = level;
 }
@@ -108,14 +120,14 @@ void BaseLogger::setLevel(const QString &levelStr)
 
     if (!levelStr.trimmed().isEmpty())
     {
-        write(LogLevel::Warning,
+        log(LogLevel::Warning,
               QStringLiteral("Unknown log level \"%1\". Keeping \"%2\".")
                   .arg(levelStr, levelToString(m_level)),
               true);
     }
 }
 
-BaseLogger::LogLevel BaseLogger::level() const
+LogLevel BaseLogger::level() const
 {
     return m_level;
 }
@@ -125,22 +137,20 @@ void BaseLogger::flush()
     // no implementation
 }
 
-QString BaseLogger::formatMessage(const BaseLogger::LogLevel level, const QString &msg)
+QString BaseLogger::formatMessage(const LogLevel level, const QString &msg)
 {
     const auto timestamp = QDateTime::currentDateTime()
                                   .toString(QStringLiteral("yyyy-MM-ddTHH:mm:ss.zzz"));
-    return QStringLiteral("%1 ngstd [%2] %3")
-        .arg(timestamp, levelToString(level), msg);
+    return QStringLiteral("%1 ngstd [%2] %3").arg(timestamp, levelToString(level), msg);
 }
 
-void BaseLogger::write(const BaseLogger::LogLevel level, const QString &msg, const bool force)
+void BaseLogger::log(const LogLevel level, const QString &msg, const bool force)
 {
     if (force || shouldLog(level))
-        log(level, msg);
+        write(level, msg);
 }
 
-bool BaseLogger::shouldLog(const BaseLogger::LogLevel level) const
+bool BaseLogger::shouldLog(const LogLevel level) const
 {
     return level >= m_level;
 }
-

@@ -45,7 +45,6 @@ set(PRIVATE_HEADERS
 
 set(PROJECT_SOURCES
     ${PROJECT_SOURCE_DIR}/updater.cpp
-    ${PROJECT_SOURCE_DIR}/sentryreporter.cpp
     ${PROJECT_SOURCE_DIR}/logger.cpp
     ${PROJECT_SOURCE_DIR}/application.cpp
     ${PROJECT_SOURCE_DIR}/mainwindow.cpp
@@ -66,9 +65,12 @@ set(ACCESS_HHEADERS
     ${PROJECT_SOURCE_DIR}/access/signdialog.h
 )
 
+set(LOGGER_HEADERS
+    ${PROJECT_SOURCE_DIR}/logger/baselogger.h
+)
+
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     ${PROJECT_SOURCE_DIR}/access/signserver.h
-    ${PROJECT_SOURCE_DIR}/sentryreporter.h
     ${PROJECT_SOURCE_DIR}/logger/baselogger.h
     ${PROJECT_SOURCE_DIR}/logger/consolelogger.h
     ${PROJECT_SOURCE_DIR}/logger/loggerdecorator.h
@@ -153,6 +155,7 @@ elseif(OSX_FRAMEWORK)
     set_property(SOURCE ${QM_FILES} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/translations")
     set_property(SOURCE ${PUBLIC_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework")
     set_property(SOURCE ${ACCESS_HHEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/access")
+    set_property(SOURCE ${LOGGER_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/framework/logger")
     set_target_properties(${LIB_NAME} PROPERTIES
         DEFINE_SYMBOL ${PROJECT_UPPER_NAME}_LIBRARY
         FRAMEWORK TRUE
@@ -193,6 +196,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
     )
     install(FILES ${PUBLIC_HEADERS} DESTINATION ${INSTALL_INC_DIR}/framework)
     install(FILES ${ACCESS_HHEADERS} DESTINATION ${INSTALL_INC_DIR}/framework/access)
+    install(FILES ${LOGGER_HEADERS} DESTINATION ${INSTALL_INC_DIR}/framework/logger)
     install(FILES ${QM_FILES} DESTINATION ${INSTALL_TRANSLATIONS_DIR})
 endif()
 

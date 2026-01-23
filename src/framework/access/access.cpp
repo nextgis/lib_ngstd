@@ -21,7 +21,7 @@
 #include "access.h"
 
 #include <QByteArray>
-#include "framework/sentryreporter.h"
+#include "framework/logger/sentrylogger.h"
 
 #if QT_VERSION >= 0x050000
     #include <QtConcurrent/QtConcurrent>
@@ -270,7 +270,7 @@ void NGAccess::setClientId(const QString &clientId)
 
             if(!NGRequest::addAuth(urls, options)) {
                 qDebug() << "Add tokens to NGRequest failed";
-                logMessage("Add tokens to NGRequest failed", LogLevel::Error);
+                logMessage("Add tokens to NGRequest failed", LogLevel::Critical);
             }
         }
 
@@ -358,9 +358,15 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
     }
 }
 
-void NGAccess::initSentry(bool enabled, const QString &sentryKey, const QString &version)
+void NGAccess::initSentry(const QString &sentryKey, const QString &version)
 {
-    SentryReporter::instance().init(enabled, sentryKey, version);
+    auto currentLogger = getLogger();
+    auto sentryLogger = std::make_shared<SentryLogger>(
+        currentLogger,
+        sentryKey,
+        version
+    );
+    setLogger(sentryLogger);
 }
 
 QString NGAccess::endPoint() const
@@ -536,8 +542,8 @@ bool NGAccess::checkSupported()
                               static_cast<unsigned int>(baSignature.size()),
                               errorMsg);
     if(!verify) {
-        logMessage(errorMsg, LogLevel::Error);
-        logMessage("Account is supported. Verify failed", LogLevel::Error);
+        logMessage(errorMsg, LogLevel::Critical);
+        logMessage("Account is supported. Verify failed", LogLevel::Critical);
         return false;
     }
 
@@ -550,7 +556,7 @@ bool NGAccess::checkSupported()
     return out;
 }
 
-QString NGAccess::getPublicKey() const 
+QString NGAccess::getPublicKey() const
 {
     QString keyFilePath = m_configDir + QDir::separator() + QLatin1String(keyFile);
     QFile keyFile(keyFilePath);
@@ -748,7 +754,7 @@ extern void updateUserInfoFunction(const QString &configDir,
     QSettings settings(settingsFilePath, QSettings::IniFormat);
 
     if(userId.isEmpty()) {
-        NGAccess::instance().logMessage(QString("Get user info map size of %1").arg(result.size()), NGAccess::LogLevel::Warning);
+        NGAccess::instance().logMessage(QString("Get user info map size of %1").arg(result.size()), LogLevel::Debug);
     }
 
     settings.setValue("user_id", userId);
@@ -855,7 +861,7 @@ void NGAccess::onUserInfoUpdated()
 void NGAccess::onSupportInfoUpdated()
 {
     m_supported = checkSupported();
-    
+
     emit supportInfoUpdated();
 
     // If token changed, save
@@ -888,27 +894,10 @@ void NGAccess::updateSupportInfo() const
 
 void NGAccess::logMessage(const QString &value, LogLevel level)
 {
-    auto &logger = getLogger();
+    auto logger = getLogger();
     const auto payload = QStringLiteral("[NGAccess] %1").arg(value);
 
-    switch (level)
-    {
-    case LogLevel::Debug:
-        logger.debug(payload);
-        break;
-    case LogLevel::Info:
-        logger.info(payload);
-        break;
-    case LogLevel::Warning:
-        logger.warning(payload);
-        break;
-    case LogLevel::Error:
-        logger.critical(payload);
-        break;
-    case LogLevel::Fatal:
-        logger.critical(QStringLiteral("[NGAccess] FATAL %1").arg(value));
-        break;
-    }
+    logger->log(level, payload);
 }
 
 SignInEvent::SignInEvent(QObject *parent) : QObject(parent)

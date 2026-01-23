@@ -21,6 +21,7 @@
 #define NGFRAMEWORK_ACCESS_H
 
 #include "framework/framework.h"
+#include "framework/logger/baselogger.h"
 
 #include <QDateTime>
 #include <QFile>
@@ -44,7 +45,6 @@ class NGFRAMEWORK_EXPORT NGAccess : public QObject
 {
     Q_OBJECT
 public:
-    enum class LogLevel { Debug, Info, Warning, Error, Fatal };
     enum class AuthSourceType { NGID, KeyCloakOpenID, Custom, Blitz };
     static NGAccess &instance();
     static QIcon lockIcon(const QIcon &origin, const QSize &originSize, const QIcon &lock = QIcon());
@@ -76,7 +76,7 @@ public:
     bool checkEndpoint(const QString &endpoint = QString());
     enum AuthSourceType authType() const;
 
-    void initSentry(bool enabled, const QString &sentryKey, const QString &version = "");
+    void initSentry(const QString &sentryKey, const QString &version = "");
     void logMessage(const QString &value, LogLevel level = LogLevel::Info);
 
     QIcon avatar() const;

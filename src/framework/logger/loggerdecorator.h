@@ -21,7 +21,7 @@
 #ifndef NGFRAMEWORK_LOGGERDECORATOR_H
 #define NGFRAMEWORK_LOGGERDECORATOR_H
 
-#include "logger/baselogger.h"
+#include "framework/logger/baselogger.h"
 
 #include <memory>
 
@@ -32,10 +32,13 @@ class NGFRAMEWORK_EXPORT LoggerDecorator : public BaseLogger
 public:
     explicit LoggerDecorator(std::shared_ptr<BaseLogger> wrapped, QObject *parent = nullptr);
 
+    void setLevel(LogLevel level) override;
+    void setLevel(const QString &levelStr) override;
+
     void flush() override;
 
 protected:
-    void log(LogLevel level, const QString &msg) override;
+    void write(LogLevel level, const QString &msg) override;
 
     std::shared_ptr<BaseLogger> wrapped() const;
 
@@ -44,4 +47,3 @@ private:
 };
 
 #endif // NGFRAMEWORK_LOGGERDECORATOR_H
-
