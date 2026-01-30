@@ -35,6 +35,8 @@
 #include <QDir>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QUrl>
+#include <QUrlQuery>
 #include <QPainter>
 #include <QSettings>
 #include <QTextStream>
@@ -46,6 +48,7 @@
 
 #include "request.h"
 #include "signserver.h"
+#include "authserverchecker.h"
 #include "logger.h"
 #include "version.h"
 
@@ -60,8 +63,8 @@ constexpr const char *settingsFile = "settings.ini";
 
 constexpr const char *defaultScope = "user_info.read";
 constexpr const char *defaultEndpoint = "https://my.nextgis.com";
+constexpr const char *defaultRedirectUri = "http://127.0.0.1:65020";
 constexpr const char *defaultAvatar = ":/icons/person-blue.svg";
-
 
 static QStringList formOriginsList(NGAccess::AuthSourceType type,
                                    const QString &url1, const QString &url2) {
@@ -136,7 +139,8 @@ NGAccess::NGAccess() :
     m_logoutEndpoint(QString()),
     m_authType(AuthSourceType::NGID),
     m_avatar(QIcon(defaultAvatar)),
-    m_codeChallenge(false)
+    m_codeChallenge(false),
+    m_authChecker(new AuthServerChecker(this))
 {
     // Setup license key file
     QFileInfo appDir(QCoreApplication::applicationDirPath());
@@ -160,11 +164,9 @@ NGAccess::NGAccess() :
     m_updateSupportInfoWatcher = new QFutureWatcher<void>(this);
     connect(m_updateSupportInfoWatcher, SIGNAL(finished()), this,
             SLOT(onSupportInfoUpdated()));
-    m_updateCheckEndpointWatcher = new QFutureWatcher<bool>(this);
-    connect(m_updateCheckEndpointWatcher, SIGNAL(finished()), this,
-            SLOT(onUpdateCheckEndpoint()));
-    connect(&m_checkTimer, SIGNAL(timeout()), this,
-            SLOT(checkEndpointAsync()));
+
+    connect(m_authChecker, &AuthServerChecker::finished,
+            this, &NGAccess::onEndpointCheckFinished);
 }
 
 QIcon NGAccess::avatar() const
@@ -309,15 +311,6 @@ void NGAccess::setUseCodeChallenge(bool val)
     m_codeChallenge = val;
 }
 
-void NGAccess::setCheckEndpointTimeout(int timeout)
-{
-    if (timeout <= 0) {
-        m_checkTimer.stop();
-    }
-
-    m_checkTimer.start(timeout);
-}
-
 void NGAccess::setScope(const QString &scope)
 {
     m_scope = scope.trimmed();
@@ -325,6 +318,9 @@ void NGAccess::setScope(const QString &scope)
 
 void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
 {
+    const auto previousEndpoint = m_endpoint;
+    const auto previousType = m_authType;
+
     if (endPoint.isEmpty()) {
         m_authType = AuthSourceType::NGID;
         m_endpoint = QLatin1String(defaultEndpoint);
@@ -354,6 +350,12 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
             m_logoutEndpoint = m_endpoint + QLatin1String("/blitz/oauth/logout");
             m_userInfoEndpoint = m_endpoint + QLatin1String("/blitz/oauth/me");
         }
+    }
+
+    if(previousEndpoint != m_endpoint || previousType != m_authType) {
+        if(m_clientId.isEmpty())
+            return;
+        checkEndpointAsync();
     }
 }
 
@@ -391,6 +393,48 @@ QString NGAccess::userInfoEndpoint() const
 bool NGAccess::useCodeChallenge() const
 {
     return m_codeChallenge;
+}
+
+QUrl NGAccess::buildAuthorizeUrl(const QString &redirectUri,
+                                 const QString &codeChallenge,
+                                 const QString &codeChallengeMethod,
+                                 const QString &authEndpointOverride) const
+{
+    auto endpoint = authEndpointOverride.trimmed();
+    if(endpoint.isEmpty()) {
+        endpoint = m_authEndpoint;
+    }
+
+    if(endpoint.isEmpty() || m_clientId.isEmpty()) {
+        return QUrl();
+    }
+
+    QUrl url(endpoint);
+    if(!url.isValid()) {
+        return QUrl();
+    }
+
+    const auto effectiveRedirectUri = redirectUri.trimmed().isEmpty()
+            ? QLatin1String(defaultRedirectUri)
+            : redirectUri.trimmed();
+
+    QUrlQuery query(url);
+    query.addQueryItem(QStringLiteral("response_type"), QStringLiteral("code"));
+    query.addQueryItem(QStringLiteral("client_id"), m_clientId);
+    query.addQueryItem(QStringLiteral("redirect_uri"), effectiveRedirectUri);
+
+    const auto trimmedScope = m_scope.trimmed();
+    if(!trimmedScope.isEmpty())
+        query.addQueryItem(QStringLiteral("scope"), trimmedScope);
+
+    if(!codeChallenge.isEmpty()) {
+        query.addQueryItem(QStringLiteral("code_challenge"), codeChallenge);
+        if(!codeChallengeMethod.isEmpty())
+            query.addQueryItem(QStringLiteral("code_challenge_method"), codeChallengeMethod);
+    }
+
+    url.setQuery(query);
+    return url;
 }
 
 enum NGAccess::AuthSourceType NGAccess::authType() const
@@ -443,31 +487,26 @@ void NGAccess::save()
     settings.sync();
 }
 
-bool NGAccess::checkEndpoint(const QString &endpoint)
+void NGAccess::checkEndpointAsync()
 {
-    QString testEndpoint = (endpoint.isNull() ? m_endpoint : endpoint);
+    const auto url = buildAuthorizeUrl(QString(), QString(), QString(), m_authEndpoint);
+    if(!url.isValid()) {
+        updateEndpointAvailability(false);
+        return;
+    }
 
-    if (authType() == AuthSourceType::NGID)
-        testEndpoint = QString("%1/api/v1/rsa_public_key/").arg(testEndpoint);
-    else if (authType() == AuthSourceType::KeyCloakOpenID)
-        testEndpoint = QString("%1/.well-known/openid-configuration").arg(testEndpoint);
-    else
-        return true;
-
-    return NGRequest::checkURL(testEndpoint);
+    emit endpointCheckStarted();
+    m_authChecker->startCheck(url);
 }
 
-void NGAccess::checkEndpointAsync(const QString &endpoint)
+void NGAccess::onEndpointCheckFinished(const bool available)
 {
-    QFuture<bool> future = QtConcurrent::run(this, &NGAccess::checkEndpoint, endpoint);
-    m_updateCheckEndpointWatcher->setFuture(future);
+    updateEndpointAvailability(available);
 }
 
-void NGAccess::onUpdateCheckEndpoint()
+void NGAccess::updateEndpointAvailability(const bool available)
 {
-    if (auto watcher = dynamic_cast<QFutureWatcher<bool>*>(sender()))
-        m_endpointAvailable = watcher->future().result();
-
+    m_endpointAvailable = available;
     emit endpointAvailableUpdated();
     emit userInfoUpdated();
 }
@@ -897,7 +936,6 @@ SignInEvent::SignInEvent(QObject *parent) : QObject(parent)
 bool SignInEvent::eventFilter(QObject *obj, QEvent *event)
 {
     NGAccess* ngAccess = qobject_cast<NGAccess*>(parent());
-//    QAbstractButton* signIn = qobject_cast<QAbstractButton*>(obj);
 
     if (ngAccess && !ngAccess->isUserAuthorized()) {
         if (event->type() == QEvent::Show) {
