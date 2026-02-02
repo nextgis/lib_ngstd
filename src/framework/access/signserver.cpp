@@ -57,9 +57,6 @@ constexpr const char *contentStr = "<html>"
 "</body>"
 "</html>";
 
-constexpr unsigned short listenPort = 65020;
-constexpr const char *redirectUriStr = "http://127.0.0.1:65020";
-
 namespace
 {
 void logAuth(const LogLevel level, const QString &clientId, const QString &message, const bool flush = false)
@@ -71,6 +68,35 @@ void logAuth(const LogLevel level, const QString &clientId, const QString &messa
 
     if (flush)
         logger->flush();
+}
+
+constexpr quint16 listenPortStart = 65020;
+constexpr quint16 listenPortAttempts = 100;
+
+QString makeRedirectUri(quint16 port)
+{
+    return QStringLiteral("http://127.0.0.1:%1").arg(port);
+}
+
+quint16 listenOnAvailablePort(QTcpServer* server)
+{
+    if (!server) {
+        return 0;
+    }
+
+    for (quint16 i = 0; i < listenPortAttempts; ++i) {
+        const quint16 port = listenPortStart + i;
+        if (server->listen(QHostAddress::LocalHost, port)) {
+            return server->serverPort();
+        }
+        server->close();
+    }
+
+    if (server->listen(QHostAddress::LocalHost, 0)) {
+        return server->serverPort();
+    }
+
+    return 0;
 }
 }
 
@@ -115,9 +141,10 @@ static QString sha256(const QString &code) {
 NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
                            QWidget *parent) :
     QProgressDialog(parent),
-    m_redirectUri(redirectUriStr),
+    m_redirectUri(makeRedirectUri(listenPortStart)),
     m_clientId(clientId),
     m_scope(scope),
+    m_listenServer(new QTcpServer(this)),
     m_timer(new QTimer(this))
 {
     setLabelText(tr("Please sign in\nvia the opened browser..."));
@@ -128,18 +155,15 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
         m_verifier = generateVerifyCode();
     }
 
-    // Start listen server
-    m_listenServer = new QTcpServer(this);
-    bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
+    const auto listeningPort = listenOnAvailablePort(m_listenServer);
+    const auto result = listeningPort != 0;
 
     auto listenMsg = QString("Listen result = %1").arg(result ? "Success" : "Failed");
-    if (!result)
-    {
+    if (result)
+        m_redirectUri = makeRedirectUri(listeningPort);
+    else
         listenMsg += QString(", error: %1").arg(m_listenServer->errorString());
-    }
-
-    logAuth(result ? LogLevel::Debug : LogLevel::Warning,
-            m_clientId, listenMsg);
+    logAuth(result ? LogLevel::Debug : LogLevel::Warning, m_clientId, listenMsg);
 
     if (result)
     {
