@@ -68,6 +68,8 @@ public:
     char **baseOptions() const;
     QString lastError() const;
     void resetError();
+    int timeout() const;
+    int retryDelay() const;
 
 protected:
     NGRequest();
