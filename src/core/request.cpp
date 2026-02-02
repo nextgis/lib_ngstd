@@ -38,6 +38,7 @@
 #include <QNetworkProxyFactory>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSslError>
 #include <QTimer>
 #include <QUrl>
 #include <QtGlobal>
@@ -128,6 +129,23 @@ RequestResult executeRequest(const QString &url, const QString &method,
     QEventLoop loop;
     QTimer timer;
     timer.setSingleShot(true);
+
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply,
+                     [reply](const QList<QSslError> &errors) {
+        bool onlySelfSigned = true;
+        for(const auto &err : errors) {
+            const auto type = err.error();
+            if(type != QSslError::SelfSignedCertificate &&
+               type != QSslError::SelfSignedCertificateInChain &&
+               type != QSslError::CertificateUntrusted) {
+                onlySelfSigned = false;
+                break;
+            }
+        }
+        if(onlySelfSigned) {
+            reply->ignoreSslErrors(errors);
+        }
+    });
 
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
