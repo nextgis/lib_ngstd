@@ -22,6 +22,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDialog>
 #include <QTcpSocket>
 #include <QThread>
 #include <QUrl>
@@ -156,16 +157,21 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
     }
 
     const auto listeningPort = listenOnAvailablePort(m_listenServer);
-    const auto result = listeningPort != 0;
+    m_listening = listeningPort != 0;
 
-    auto listenMsg = QString("Listen result = %1").arg(result ? "Success" : "Failed");
-    if (result)
+    if (m_listening) {
         m_redirectUri = makeRedirectUri(listeningPort);
-    else
-        listenMsg += QString(", error: %1").arg(m_listenServer->errorString());
-    logAuth(result ? LogLevel::Debug : LogLevel::Warning, m_clientId, listenMsg);
+        m_listenError.clear();
+    } else {
+        m_redirectUri.clear();
+        m_listenError = m_listenServer->errorString().isEmpty() ? QStringLiteral("Unknown error") : m_listenServer->errorString();
+    }
 
-    if (result)
+    auto listenMsg = QString("Listen result = %1").arg(m_listening ? "Success" : "Failed");
+    listenMsg += m_listening ? QString(", port: %1").arg(listeningPort) : QString(", error: %1").arg(m_listenError);
+    logAuth(m_listening ? LogLevel::Debug : LogLevel::Warning, m_clientId, listenMsg);
+
+    if (m_listening)
     {
         connect(m_timer, &QTimer::timeout, this, [this]()
             {
@@ -207,6 +213,16 @@ QString NGSignServer::redirectUri() const
 QString NGSignServer::verifier() const
 {
     return m_verifier;
+}
+
+bool NGSignServer::isListening() const
+{
+    return m_listening;
+}
+
+QString NGSignServer::errorString() const
+{
+    return m_listenError;
 }
 
 void NGSignServer::onIncomingConnection()
@@ -302,6 +318,11 @@ void NGSignServer::onGetReply()
 
 int NGSignServer::exec()
 {
+    if(!m_listening) {
+        logAuth(LogLevel::Critical, m_clientId,
+                QStringLiteral("Authorization aborted: listener failed to start"), true);
+        return QDialog::Rejected;
+    }
     // Prepare url
     QUrl url(NGAccess::instance().authEndpoint());
     QList<QPair<QString, QString> > parameters;
