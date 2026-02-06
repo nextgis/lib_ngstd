@@ -36,6 +36,8 @@ public:
     QString code() const;
     QString redirectUri() const;
     QString verifier() const;
+    bool isListening() const;
+    QString errorString() const;
 
 signals:
 
@@ -49,6 +51,8 @@ private:
     QString m_code;
     QString m_redirectUri;
     QString m_clientId, m_scope, m_verifier;
+    bool m_listening = false;
+    QString m_listenError;
     QTcpServer *m_listenServer;
     QTimer* m_timer = {};
 

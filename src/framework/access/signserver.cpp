@@ -22,6 +22,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDialog>
 #include <QTcpSocket>
 #include <QThread>
 #include <QUrl>
@@ -53,9 +54,6 @@ constexpr const char *contentStr = "<html>"
 "</body>"
 "</html>";
 
-constexpr unsigned short listenPort = 65020;
-constexpr const char *redirectUriStr = "http://127.0.0.1:65020";
-
 namespace
 {
 void logAuth(const LogLevel level, const QString &clientId, const QString &message, const bool flush = false)
@@ -67,6 +65,35 @@ void logAuth(const LogLevel level, const QString &clientId, const QString &messa
 
     if (flush)
         logger->flush();
+}
+
+constexpr quint16 listenPortStart = 65020;
+constexpr quint16 listenPortAttempts = 100;
+
+QString makeRedirectUri(quint16 port)
+{
+    return QStringLiteral("http://127.0.0.1:%1").arg(port);
+}
+
+quint16 listenOnAvailablePort(QTcpServer* server)
+{
+    if (!server) {
+        return 0;
+    }
+
+    for (quint16 i = 0; i < listenPortAttempts; ++i) {
+        const quint16 port = listenPortStart + i;
+        if (server->listen(QHostAddress::LocalHost, port)) {
+            return server->serverPort();
+        }
+        server->close();
+    }
+
+    if (server->listen(QHostAddress::LocalHost, 0)) {
+        return server->serverPort();
+    }
+
+    return 0;
 }
 }
 
@@ -111,9 +138,10 @@ static QString sha256(const QString &code) {
 NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
                            QWidget *parent) :
     QProgressDialog(parent),
-    m_redirectUri(redirectUriStr),
+    m_redirectUri(makeRedirectUri(listenPortStart)),
     m_clientId(clientId),
     m_scope(scope),
+    m_listenServer(new QTcpServer(this)),
     m_timer(new QTimer(this))
 {
     setLabelText(tr("Please sign in\nvia the opened browser..."));
@@ -124,20 +152,22 @@ NGSignServer::NGSignServer(const QString &clientId, const QString &scope,
         m_verifier = generateVerifyCode();
     }
 
-    // Start listen server
-    m_listenServer = new QTcpServer(this);
-    bool result = m_listenServer->listen(QHostAddress::LocalHost, listenPort);
+    const auto listeningPort = listenOnAvailablePort(m_listenServer);
+    m_listening = listeningPort != 0;
 
-    auto listenMsg = QString("Listen result = %1").arg(result ? "Success" : "Failed");
-    if (!result)
-    {
-        listenMsg += QString(", error: %1").arg(m_listenServer->errorString());
+    if (m_listening) {
+        m_redirectUri = makeRedirectUri(listeningPort);
+        m_listenError.clear();
+    } else {
+        m_redirectUri.clear();
+        m_listenError = m_listenServer->errorString().isEmpty() ? QStringLiteral("Unknown error") : m_listenServer->errorString();
     }
 
-    logAuth(result ? LogLevel::Debug : LogLevel::Warning,
-            m_clientId, listenMsg);
+    auto listenMsg = QString("Listen result = %1").arg(m_listening ? "Success" : "Failed");
+    listenMsg += m_listening ? QString(", port: %1").arg(listeningPort) : QString(", error: %1").arg(m_listenError);
+    logAuth(m_listening ? LogLevel::Debug : LogLevel::Warning, m_clientId, listenMsg);
 
-    if (result)
+    if (m_listening)
     {
         connect(m_timer, &QTimer::timeout, this, [this]()
             {
@@ -179,6 +209,16 @@ QString NGSignServer::redirectUri() const
 QString NGSignServer::verifier() const
 {
     return m_verifier;
+}
+
+bool NGSignServer::isListening() const
+{
+    return m_listening;
+}
+
+QString NGSignServer::errorString() const
+{
+    return m_listenError;
 }
 
 void NGSignServer::onIncomingConnection()
@@ -276,6 +316,7 @@ int NGSignServer::exec()
 {
     QString codeChallenge;
     QString codeChallengeMethod;
+
     if(!m_verifier.isEmpty()) {
         codeChallenge = sha256(m_verifier);
         codeChallengeMethod = QStringLiteral("S256");
