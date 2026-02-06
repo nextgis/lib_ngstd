@@ -29,6 +29,7 @@
     #include <qtconcurrentrun.h>
 #endif // QT_VERSION >= 0x050000
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
@@ -48,6 +49,7 @@
 #include "signserver.h"
 #include "logger.h"
 #include "version.h"
+#include <memory>
 
 constexpr const char *apiEndpointSubpath = "/api/v1";
 constexpr const char *tokenEndpointSubpath = "/oauth2/token/";
@@ -401,10 +403,18 @@ enum NGAccess::AuthSourceType NGAccess::authType() const
 void NGAccess::authorize()
 {
     // Show modal dialog with cancel button
-    NGSignServer listenServer(m_clientId, m_scope);
-    listenServer.exec();
+    auto listenServer = std::make_unique<NGSignServer>(m_clientId, m_scope);
 
-    getTokens(listenServer.code(), listenServer.redirectUri(), listenServer.verifier());
+    if (listenServer->exec() == QDialog::Rejected && !listenServer->isListening()) {
+        const QString errorText = listenServer->errorString();
+        listenServer.reset();
+        QMessageBox::critical(QApplication::activeWindow(),
+            tr("Authorization error"),
+            tr("Unable to start local authorization server.\n%1").arg(errorText));
+        return;
+    }
+
+    getTokens(listenServer->code(), listenServer->redirectUri(), listenServer->verifier());
 }
 
 void NGAccess::exit()
