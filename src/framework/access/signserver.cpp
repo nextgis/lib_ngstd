@@ -314,6 +314,12 @@ void NGSignServer::onGetReply()
 
 int NGSignServer::exec()
 {
+    if (!m_listening) {
+        logAuth(LogLevel::Critical, m_clientId,
+            QStringLiteral("Authorization aborted: listener failed to start"), true);
+        return QDialog::Rejected;
+    }
+
     QString codeChallenge;
     QString codeChallengeMethod;
 

@@ -1,5 +1,6 @@
 #include "authserverchecker.h"
 
+#include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -41,7 +42,7 @@ void AuthServerChecker::startCheck(const QUrl &url)
     request.setRawHeader("Accept", "*/*");
     request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("NextGISAuthCheck/1.0"));
 
-    m_reply = m_networkManager->get(request);
+    m_reply = m_networkManager->sendCustomRequest(request, QByteArrayLiteral("OPTIONS"));
     connect(m_reply, &QNetworkReply::finished, this, &AuthServerChecker::onReplyFinished);
 
     m_timeoutTimer->start();
@@ -53,13 +54,13 @@ void AuthServerChecker::onReplyFinished()
         m_timeoutTimer->stop();
 
     auto *reply = m_reply.data();
-    auto status = 0;
     auto ok = false;
 
     if(reply) {
-        status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        if(reply->error() == QNetworkReply::NoError)
+        if (reply->error() == QNetworkReply::NoError) {
+            const auto status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             ok = (status >= 200 && status < 400);
+        }
         reply->deleteLater();
         m_reply = nullptr;
     }
@@ -69,7 +70,12 @@ void AuthServerChecker::onReplyFinished()
 
 void AuthServerChecker::onTimeout()
 {
-    if(m_reply)
+    if (m_reply)
+    {
+        // abort() stops the network request and emits QNetworkReply::finished().
+        // As a result, onReplyFinished() will be invoked.
+        // In onReplyFinished() we also stop the timeout timer.
         m_reply->abort();
+    }
 }
 
