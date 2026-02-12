@@ -76,13 +76,17 @@ struct RequestResult {
     bool timedOut = false;
 };
 
+bool requestFailed(const RequestResult &result)
+{
+    return result.error != QNetworkReply::NoError ||
+           result.timedOut ||
+           result.httpStatus >= 400;
+}
+
 QNetworkAccessManager *networkManager()
 {
-    static QNetworkAccessManager *manager = nullptr;
-    if(!manager) {
-        manager = new QNetworkAccessManager();
-    }
-    return manager;
+    static QNetworkAccessManager manager;
+    return &manager;
 }
 
 void applyHeaders(QNetworkRequest &request, const QString &url, bool useAuthHeader,
@@ -90,17 +94,19 @@ void applyHeaders(QNetworkRequest &request, const QString &url, bool useAuthHead
 {
     request.setRawHeader("Accept", "*/*");
 
-    if(useAuthHeader) {
-        const QString authHeader = NGRequest::getAuthHeader(url);
-        const int sep = authHeader.indexOf(':');
-        if(sep > 0) {
-            const QByteArray name = authHeader.left(sep).trimmed().toUtf8();
-            const QByteArray value = authHeader.mid(sep + 1).trimmed().toUtf8();
-            request.setRawHeader(name, value);
+    if (useAuthHeader) {
+        const QString authHeader = NGRequest::getAuthHeader(url).trimmed();
+        if (!authHeader.isEmpty()) {
+            const int sep = authHeader.indexOf(':');
+            if (sep > 0) {
+                const QByteArray name = authHeader.left(sep).trimmed().toUtf8();
+                const QByteArray value = authHeader.mid(sep + 1).trimmed().toUtf8();
+                request.setRawHeader(name, value);
+            }
         }
     }
 
-    if(!contentType.isEmpty()) {
+    if (!contentType.isEmpty()) {
         request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
     }
 }
@@ -114,16 +120,49 @@ RequestResult executeRequest(const QString &url, const QString &method,
     QNetworkRequest request{QUrl(url)};
     applyHeaders(request, url, useAuthHeader, contentType);
 
+    const QByteArray requestMethod = method.trimmed().toUpper().toUtf8();
+    auto setProtocolError = [&result](const QString &message) {
+        result.error = QNetworkReply::ProtocolInvalidOperationError;
+        result.errorString = message;
+    };
     QNetworkReply *reply = nullptr;
-    if(method == "POST") {
-        if(multiPart) {
+    if (multiPart && requestMethod != "POST") {
+        setProtocolError(QStringLiteral("Multipart payload is only supported for POST"));
+        return result;
+    }
+
+    if (requestMethod == "POST") {
+        if (multiPart) {
             reply = networkManager()->post(request, multiPart);
+            // Ensure multipart lifetime is tied to reply lifecycle.
+            multiPart->setParent(reply);
         } else {
             reply = networkManager()->post(request, body);
         }
     }
-    else {
+    else if (requestMethod == "GET") {
         reply = networkManager()->get(request);
+    }
+    else if (requestMethod == "PUT") {
+        reply = networkManager()->put(request, body);
+    }
+    else if (requestMethod == "DELETE") {
+        if (body.isEmpty()) {
+            reply = networkManager()->deleteResource(request);
+        }
+        else {
+            reply = networkManager()->sendCustomRequest(request, "DELETE", body);
+        }
+    }
+    else if (requestMethod == "PATCH") {
+        reply = networkManager()->sendCustomRequest(request, "PATCH", body);
+    }
+    else if (requestMethod == "HEAD") {
+        reply = networkManager()->head(request);
+    }
+    else {
+        setProtocolError(QStringLiteral("Unsupported HTTP method: %1").arg(method));
+        return result;
     }
 
     QEventLoop loop;
@@ -132,17 +171,21 @@ RequestResult executeRequest(const QString &url, const QString &method,
 
     QObject::connect(reply, &QNetworkReply::sslErrors, reply,
                      [reply](const QList<QSslError> &errors) {
-        bool onlySelfSigned = true;
-        for(const auto &err : errors) {
+        bool onlySelfSignedRelated = true;
+        bool hasSelfSignedError = false;
+        for (const auto &err : errors) {
             const auto type = err.error();
-            if(type != QSslError::SelfSignedCertificate &&
-               type != QSslError::SelfSignedCertificateInChain &&
-               type != QSslError::CertificateUntrusted) {
-                onlySelfSigned = false;
+            if (type == QSslError::SelfSignedCertificate ||
+               type == QSslError::SelfSignedCertificateInChain) {
+                hasSelfSignedError = true;
+                continue;
+            }
+            if (type != QSslError::CertificateUntrusted) {
+                onlySelfSignedRelated = false;
                 break;
             }
         }
-        if(onlySelfSigned) {
+        if (onlySelfSignedRelated && hasSelfSignedError) {
             reply->ignoreSslErrors(errors);
         }
     });
@@ -153,7 +196,7 @@ RequestResult executeRequest(const QString &url, const QString &method,
     timer.start(timeoutMs);
     loop.exec();
 
-    if(timer.isActive()) {
+    if (timer.isActive()) {
         timer.stop();
     }
     else {
@@ -171,7 +214,7 @@ RequestResult executeRequest(const QString &url, const QString &method,
 
 void waitMs(int delayMs)
 {
-    if(delayMs <= 0) {
+    if (delayMs <= 0) {
         return;
     }
     QEventLoop loop;
@@ -185,13 +228,15 @@ RequestResult requestWithRetries(const QString &url, const QString &method,
                                  int timeoutMs, int maxRetry, int retryDelayMs)
 {
     RequestResult result;
-    for(int attempt = 0; attempt <= maxRetry; ++attempt) {
+    // QHttpMultiPart is consumable payload; retries would reuse invalid data.
+    const int attemptsLimit = multiPart ? 0 : maxRetry;
+    for (int attempt = 0; attempt <= attemptsLimit; ++attempt) {
         result = executeRequest(url, method, body, contentType, useAuthHeader,
                                 multiPart, timeoutMs);
-        if(result.error == QNetworkReply::NoError && !result.timedOut) {
+        if (result.error == QNetworkReply::NoError && !result.timedOut) {
             return result;
         }
-        if(attempt < maxRetry) {
+        if (attempt < attemptsLimit) {
             waitMs(retryDelayMs);
         }
     }
@@ -202,19 +247,19 @@ bool parseJsonObject(const QByteArray &data, QJsonObject *out, QString *error)
 {
     QJsonParseError parseError{};
     QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
-    if(parseError.error != QJsonParseError::NoError) {
-        if(error) {
+    if (parseError.error != QJsonParseError::NoError) {
+        if (error) {
             *error = parseError.errorString();
         }
         return false;
     }
-    if(!doc.isObject()) {
-        if(error) {
+    if (!doc.isObject()) {
+        if (error) {
             *error = QStringLiteral("JSON is not an object");
         }
         return false;
     }
-    if(out) {
+    if (out) {
         *out = doc.object();
     }
     return true;
@@ -224,6 +269,14 @@ std::pair<std::string, std::string> resolveGDALProxyCredentials(const bool useSy
                                                                 const int proxyPort, const QString& proxyUser,
                                                                 const QString& proxyPassword)
 {
+    const auto makeUserPwd = [](const QString &user, const QString &password) -> std::string
+    {
+        if (user.isEmpty() && password.isEmpty()) {
+            return std::string();
+        }
+        return user.toStdString() + ":" + password.toStdString();
+    };
+
     std::string url;
     std::string userpwd;
 
@@ -235,16 +288,15 @@ std::pair<std::string, std::string> resolveGDALProxyCredentials(const bool useSy
         if (!listOfProxies.isEmpty()) {
             url = listOfProxies[0].hostName().toStdString() + ":" +
                 std::to_string(listOfProxies[0].port());
-            userpwd = listOfProxies[0].user().toStdString() + ":" +
-                listOfProxies[0].password().toStdString();
+            userpwd = makeUserPwd(listOfProxies[0].user(),
+                                  listOfProxies[0].password());
 
         }
     }
     else
     {
         url = proxyUrl.toStdString() + ":" + std::to_string(proxyPort);
-        userpwd = proxyUser.toStdString() + ":" +
-            proxyPassword.toStdString();
+        userpwd = makeUserPwd(proxyUser, proxyPassword);
     }
 
     return std::make_pair(url, userpwd);
@@ -362,15 +414,16 @@ const QString HTTPAuthBearer::header()
     time_t now = time(nullptr);
     double seconds = difftime(now, m_lastCheck);
     seconds += 2; // Two seconds addition to expiration
-    if(seconds < m_expiresIn) {
+    if (seconds < m_expiresIn) {
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
 
     // 2. Try to update token
     const QString payload = QString("grant_type=refresh_token&client_id=%1&refresh_token=%2")
-            .arg(m_clientId, m_updateToken);
+            .arg(QString::fromUtf8(QUrl::toPercentEncoding(m_clientId)),
+                 QString::fromUtf8(QUrl::toPercentEncoding(m_updateToken)));
     const int timeoutMs = std::max(1, m_request->timeout()) * 1000;
-    const int maxRetry = std::max(0, m_request->timeout());
+    const int maxRetry = std::max(0, m_request->maxRetry());
     const int retryDelayMs = std::max(0, m_request->retryDelay()) * 1000;
 
     RequestResult result = requestWithRetries(m_tokenServer, "POST",
@@ -379,7 +432,7 @@ const QString HTTPAuthBearer::header()
                                               false, nullptr, timeoutMs,
                                               maxRetry, retryDelayMs);
 
-    if(result.error != QNetworkReply::NoError || result.timedOut) {
+    if (requestFailed(result)) {
         qDebug() << "Failed to refresh token. Return last not expired. ";
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
@@ -387,13 +440,13 @@ const QString HTTPAuthBearer::header()
     m_accessToken.clear();
     QJsonObject root;
     QString parseError;
-    if(!parseJsonObject(result.data, &root, &parseError)) {
+    if (!parseJsonObject(result.data, &root, &parseError)) {
         qDebug() << "Token is expired. " << "\nError:" << parseError;
         return "expired";
     }
 
     const QString err = root.value("error").toString();
-    if(!err.isEmpty()) {
+    if (!err.isEmpty()) {
         qDebug() << "Token is expired. " << "\nError:" << err;
         return "expired";
     }
@@ -438,11 +491,13 @@ NGRequest::~NGRequest()
 
 void NGRequest::setErrorMessage(const QString &err)
 {
+    MUTEX_LOCKER;
     m_detailedError = err;
 }
 
 char **NGRequest::baseOptions() const
 {
+    MUTEX_LOCKER;
     char **options = nullptr;
     auto connTimeout = m_connTimeout.toStdString();
     options = CSLAddNameValue(options, "CONNECTTIMEOUT", connTimeout.c_str());
@@ -463,21 +518,31 @@ char **NGRequest::baseOptions() const
 
 QString NGRequest::lastError() const
 {
+    MUTEX_LOCKER;
     return m_detailedError;
 }
 
 void NGRequest::resetError()
 {
+    MUTEX_LOCKER;
     m_detailedError.clear();
 }
 
 int NGRequest::timeout() const
 {
+    MUTEX_LOCKER;
     return m_timeout.toInt();
+}
+
+int NGRequest::maxRetry() const
+{
+    MUTEX_LOCKER;
+    return m_maxRetry.toInt();
 }
 
 int NGRequest::retryDelay() const
 {
+    MUTEX_LOCKER;
     return m_retryDelay.toInt();
 }
 
@@ -485,7 +550,7 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
 {
     MUTEX_LOCKER;
 
-    if(options["type"] == "bearer") {
+    if (options["type"] == "bearer") {
         int expiresIn = options["expiresIn"].toInt();
         QString clientId = options["clientId"];
         QString tokenServer = options["tokenServer"];
@@ -493,13 +558,13 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
         QString updateToken = options["updateToken"];
         QString verify = options["codeVerifier"];
         time_t lastCheck = 0;
-        if(expiresIn == -1) {
+        if (expiresIn == -1) {
             QString postPayload = QString("grant_type=authorization_code&code=%1&redirect_uri=%2&client_id=%3")
-                    .arg(options["code"])
-                    .arg(options["redirectUri"])
-                    .arg(clientId);
-            if(!verify.isEmpty()) {
-                postPayload += "&code_verifier=" + verify;
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["code"])))
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["redirectUri"])))
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(clientId)));
+            if (!verify.isEmpty()) {
+                postPayload += "&code_verifier=" + QString::fromUtf8(QUrl::toPercentEncoding(verify));
             }
             time_t now = time(nullptr);
             qDebug() << "Server: " << tokenServer << "\noptions:" << postPayload;
@@ -511,14 +576,14 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
                                                       "application/x-www-form-urlencoded",
                                                       false, nullptr, timeoutMs,
                                                       maxRetry, retryDelayMs);
-            if(result.error != QNetworkReply::NoError || result.timedOut) {
+            if (requestFailed(result)) {
                 qDebug() << "Failed to get tokens";
                 return false;
             }
 
             QJsonObject root;
             QString parseError;
-            if(!parseJsonObject(result.data, &root, &parseError)) {
+            if (!parseJsonObject(result.data, &root, &parseError)) {
                 qDebug() << "Failed to parse token response: " << parseError;
                 return false;
             }
@@ -572,7 +637,7 @@ QString NGRequest::getAsString(const QString &url)
     RequestResult result = requestWithRetries(url, "GET", QByteArray(),
                                               QByteArray(), true, nullptr,
                                               timeoutMs, maxRetry, retryDelayMs);
-    if(result.error != QNetworkReply::NoError || result.timedOut) {
+    if (requestFailed(result)) {
         return QString();
     }
     return QString::fromUtf8(result.data);
@@ -588,7 +653,7 @@ QString NGRequest::getJsonAsString(const QString &url)
     RequestResult result = requestWithRetries(url, "GET", QByteArray(),
                                               QByteArray(), true, nullptr,
                                               timeoutMs, maxRetry, retryDelayMs);
-    if(result.error != QNetworkReply::NoError || result.timedOut) {
+    if (requestFailed(result)) {
         return QString();
     }
     return QString::fromUtf8(result.data);
@@ -604,10 +669,10 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
     RequestResult result = requestWithRetries(url, "GET", QByteArray(),
                                               QByteArray(), true, nullptr,
                                               timeoutMs, maxRetry, retryDelayMs);
-    if(result.error == QNetworkReply::NoError && !result.timedOut) {
+    if (!requestFailed(result)) {
         QJsonParseError parseError{};
         QJsonDocument doc = QJsonDocument::fromJson(result.data, &parseError);
-        if(parseError.error == QJsonParseError::NoError && doc.isObject()) {
+        if (parseError.error == QJsonParseError::NoError && doc.isObject()) {
             return doc.object().toVariantMap();
         }
     }
@@ -617,6 +682,7 @@ QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 bool NGRequest::getFile(const QString &url, const QString &path)
 {
     MUTEX_LOCKER;
+    instance().resetError();
 
     const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
     const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
@@ -624,12 +690,15 @@ bool NGRequest::getFile(const QString &url, const QString &path)
     RequestResult result = requestWithRetries(url, "GET", QByteArray(),
                                               QByteArray(), true, nullptr,
                                               timeoutMs, maxRetry, retryDelayMs);
-    if(result.error != QNetworkReply::NoError || result.timedOut) {
+    if (requestFailed(result)) {
         return false;
     }
 
     QFile file(path);
-    if(!file.open(QIODevice::WriteOnly)) {
+    if (!file.open(QIODevice::WriteOnly)) {
+        instance().setErrorMessage(
+                    QStringLiteral("Failed to open file '%1' for writing: %2")
+                    .arg(path, file.errorString()));
         return false;
     }
     file.write(result.data);
@@ -646,6 +715,7 @@ NGRequest &NGRequest::instance()
 
 void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 {
+    MUTEX_LOCKER;
     m_auths[url] = auth;
 }
 
@@ -653,11 +723,12 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
     MUTEX_LOCKER;
 
-    if(!logoutUrl.isEmpty()) {
+    if (!logoutUrl.isEmpty()) {
         auto prop = properties(url);
-        if(!prop.empty()) {
+        if (!prop.empty()) {
             const QString payload = QString("client_id=%1&refresh_token=%2")
-                    .arg(prop["clientId"], prop["updateToken"]);
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(prop["clientId"])),
+                         QString::fromUtf8(QUrl::toPercentEncoding(prop["updateToken"])));
             const int timeoutMs = std::max(1, m_timeout.toInt()) * 1000;
             const int maxRetry = std::max(0, m_maxRetry.toInt());
             const int retryDelayMs = std::max(0, m_retryDelay.toInt()) * 1000;
@@ -666,7 +737,7 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
                                                       "application/x-www-form-urlencoded",
                                                       false, nullptr, timeoutMs,
                                                       maxRetry, retryDelayMs);
-            if(result.error != QNetworkReply::NoError || result.timedOut) {
+            if (requestFailed(result)) {
                 qDebug() << "Failed to logout.";
             }
         }
@@ -696,7 +767,7 @@ const QString NGRequest::authHeader(const QString &url)
 {
     MUTEX_LOCKER;
 
-    if(!m_auths.empty() && url == "any") {
+    if (!m_auths.empty() && url == "any") {
         auto it = m_auths.constBegin();
         return it.value()->header();
     }
@@ -707,8 +778,8 @@ const QString NGRequest::authHeader(const QString &url)
     };
 
     QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
-    for(it = m_auths.begin(); it != m_auths.end(); ++it) {
-        if(removeScheme(url).startsWith(removeScheme(it.key()))) {
+    for (it = m_auths.begin(); it != m_auths.end(); ++it) {
+        if (removeScheme(url).startsWith(removeScheme(it.key()))) {
             return it.value()->header();
         }
     }
@@ -722,8 +793,9 @@ const QString NGRequest::authHeader(const QString &url)
  */
 const QMap<QString, QString> NGRequest::properties(const QString &url) const
 {
+    MUTEX_LOCKER;
     QMap<QString, QString> out;
-    if(m_auths.contains(url)) {
+    if (m_auths.contains(url)) {
         return m_auths[url]->properties();
     }
     return out;
@@ -749,7 +821,7 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     instance().resetError();
     
     QFile *file = new QFile(path);
-    if(!file->open(QIODevice::ReadOnly)) {
+    if (!file->open(QIODevice::ReadOnly)) {
         instance().setErrorMessage(QString("Failed to open file: %1").arg(path));
         file->deleteLater();
         return "";
@@ -771,12 +843,13 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
     RequestResult result = requestWithRetries(url, "POST", QByteArray(),
                                               QByteArray(), true, multiPart,
                                               timeoutMs, maxRetry, retryDelayMs);
-    file->close();
-    delete multiPart;
 
-    if(result.error != QNetworkReply::NoError || result.timedOut) {
+    if (requestFailed(result)) {
         instance().setErrorMessage(
-                    QString("Upload failed. Error: %1").arg(result.errorString));
+                    QString("Upload failed. Error: %1. HTTP status: %2. Timed out: %3")
+                    .arg(result.errorString)
+                    .arg(result.httpStatus)
+                    .arg(result.timedOut ? "true" : "false"));
         return "";
     }
 
@@ -797,10 +870,13 @@ void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &prox
                          int proxyPort, const QString &proxyUser,
                          const QString &proxyPassword, const QString &proxyAuth)
 {
+    MUTEX_LOCKER;
 
-    if(useProxy) {
-        if(useSystemProxy) {
+    if (useProxy) {
+        if (useSystemProxy) {
             QNetworkProxyFactory::setUseSystemConfiguration(true);
+            // Drop previously forced proxy and return to default/system resolution.
+            networkManager()->setProxy(QNetworkProxy::DefaultProxy);
             networkManager()->setProxyFactory(nullptr);
         }
         else {
@@ -828,7 +904,7 @@ void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &prox
 
 bool NGRequest::checkURL(const QString &url)
 {
-//    MUTEX_LOCKER;
+    MUTEX_LOCKER;
 
     CPLStringList options(NGRequest::instance().baseOptions());
 

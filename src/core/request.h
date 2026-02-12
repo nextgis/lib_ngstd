@@ -69,6 +69,7 @@ public:
     QString lastError() const;
     void resetError();
     int timeout() const;
+    int maxRetry() const;
     int retryDelay() const;
 
 protected:
