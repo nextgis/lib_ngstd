@@ -27,10 +27,6 @@
 #include <QThread>
 #include <QUrl>
 #include <QTimer>
-#if QT_VERSION >= 0x050000
-#include <QUrlQuery>
-#endif // QT_VERSION >= 0x050000
-
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
@@ -318,40 +314,29 @@ void NGSignServer::onGetReply()
 
 int NGSignServer::exec()
 {
-    if(!m_listening) {
+    if (!m_listening) {
         logAuth(LogLevel::Critical, m_clientId,
-                QStringLiteral("Authorization aborted: listener failed to start"), true);
+            QStringLiteral("Authorization aborted: listener failed to start"), true);
         return QDialog::Rejected;
     }
-    // Prepare url
-    QUrl url(NGAccess::instance().authEndpoint());
-    QList<QPair<QString, QString> > parameters;
-    parameters.append(qMakePair(QString("response_type"), QString("code")));
-    parameters.append(qMakePair(QString("client_id"), m_clientId));
-    parameters.append(qMakePair(QString("redirect_uri"), m_redirectUri));
-    if(!m_scope.isEmpty()) {
-        parameters.append(qMakePair(QString("scope"), m_scope));
-    }
+
+    QString codeChallenge;
+    QString codeChallengeMethod;
+
     if(!m_verifier.isEmpty()) {
-        auto cc = sha256(m_verifier);
-        getLogger()->debug(QString("code_challenge: %1").arg(cc));
-        parameters.append(qMakePair(QString("code_challenge"), cc));
-        parameters.append(qMakePair(QString("code_challenge_method"), QString("S256")));
+        codeChallenge = sha256(m_verifier);
+        codeChallengeMethod = QStringLiteral("S256");
     }
 
-#if QT_VERSION < 0x050000
-    url.setQueryItems(parameters);
-#else
-    QUrlQuery query(url);
-    query.setQueryItems(parameters);
-    url.setQuery(query);
-#endif
-
-    bool result = QDesktopServices::openUrl(url);
+    const auto url = NGAccess::instance().buildAuthorizeUrl(m_redirectUri,
+                                                      codeChallenge,
+                                                      codeChallengeMethod);
+    
+    const auto result = QDesktopServices::openUrl(url);
     logAuth(result ? LogLevel::Info : LogLevel::Warning,
             m_clientId,
             QString("Open authorization URL status = %1, url = %2")
                 .arg(result ? "Success" : "Failed", url.toDisplayString()));
-
+                
     return QProgressDialog::exec();
 }

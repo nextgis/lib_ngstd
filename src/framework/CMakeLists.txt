@@ -71,6 +71,7 @@ set(LOGGER_HEADERS
 
 set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
     ${PROJECT_SOURCE_DIR}/access/signserver.h
+    ${PROJECT_SOURCE_DIR}/access/authserverchecker.h
     ${PROJECT_SOURCE_DIR}/logger/baselogger.h
     ${PROJECT_SOURCE_DIR}/logger/consolelogger.h
     ${PROJECT_SOURCE_DIR}/logger/loggerdecorator.h
@@ -80,6 +81,7 @@ set(PRIVATE_HEADERS ${PRIVATE_HEADERS}
 
 set(ACCESS_CSOURCES
     ${PROJECT_SOURCE_DIR}/access/access.cpp
+    ${PROJECT_SOURCE_DIR}/access/authserverchecker.cpp
     ${PROJECT_SOURCE_DIR}/access/signbutton.cpp
     ${PROJECT_SOURCE_DIR}/access/signdialog.cpp
     ${PROJECT_SOURCE_DIR}/access/signserver.cpp
