@@ -29,6 +29,9 @@
 #include <QIcon>
 #include <QObject>
 #include <QTimer>
+#include <QUrl>
+
+class AuthServerChecker;
 
 class SignInEvent : public QObject
 {
@@ -67,13 +70,15 @@ public:
     void setTokenEndpoint(const QString &endpoint);
     void setUserInfoEndpoint(const QString &endpoint);
     void setUseCodeChallenge(bool val);
-    void setCheckEndpointTimeout(int);
     QString endPoint() const;
     QString authEndpoint() const;
     QString tokenEndpoint() const;
     QString userInfoEndpoint() const;
     bool useCodeChallenge() const;
-    bool checkEndpoint(const QString &endpoint = QString());
+    QUrl buildAuthorizeUrl(const QString &redirectUri = QString(),
+                           const QString &codeChallenge = QString(),
+                           const QString &codeChallengeMethod = QString(),
+                           const QString &authEndpointOverride = QString()) const;
     enum AuthSourceType authType() const;
 
     void initSentry(const QString &sentryKey, const QString &version = "");
@@ -88,11 +93,10 @@ public:
     QStringList userRoles() const;
     QObject* getSignInEventFilter();
 
-public slots:
-    void checkEndpointAsync(const QString &endpoint = QString());
-    void onUpdateCheckEndpoint();
+    void checkEndpointAsync();
 
 signals:
+    void endpointCheckStarted();
     void userInfoUpdated();
     void supportInfoUpdated();
     void endpointAvailableUpdated();
@@ -100,6 +104,7 @@ signals:
 private slots:
     void onUserInfoUpdated();
     void onSupportInfoUpdated();
+    void onEndpointCheckFinished(bool available);
 
 protected:
     NGAccess();
@@ -118,22 +123,24 @@ protected:
     QString pluginSign(const QString &pluginName, const QString &pluginVersion) const;
 
 private:
+    void updateEndpointAvailability(bool available);
+
+private:
     bool m_authorized;
     bool m_supported;
     bool m_endpointAvailable;
-    QTimer m_checkTimer;
     QString m_clientId, m_scope, m_endpoint, m_authEndpoint, m_logoutEndpoint, m_tokenEndpoint, m_userInfoEndpoint;
     SignInEvent *m_signInEvent;
     AuthSourceType m_authType;
     QIcon m_avatar;
     QString m_configDir;
     QFutureWatcher<void> *m_updateUserInfoWatcher, *m_updateSupportInfoWatcher;
-    QFutureWatcher<bool> *m_updateCheckEndpointWatcher;
     QString m_firstName, m_lastName, m_userId, m_email;
     mutable QString m_updateToken;
     QString m_licenseDir;
     QStringList m_roles;
     bool m_codeChallenge;
+    AuthServerChecker *m_authChecker;
 };
 
 #endif // NGFRAMEWORK_ACCESS_H
