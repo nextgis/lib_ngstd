@@ -23,6 +23,10 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(ngstd)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # some init settings
 set(CMAKE_COLOR_MAKEFILE ON)
 # set path to additional CMake modules
