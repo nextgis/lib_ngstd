@@ -316,6 +316,7 @@ static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
     return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
 };
 
+/*
 static void InstallAuthHeaderCallback()
 {
     CPLHTTPSetAuthHeaderCallback(gAuthHeaderCallback);
@@ -325,6 +326,7 @@ static void RemoveAuthHeaderCallback()
 {
     CPLHTTPSetAuthHeaderCallback(nullptr);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -473,7 +475,7 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
-    InstallAuthHeaderCallback();
+    // InstallAuthHeaderCallback();
     networkManager();
 
 #ifdef Q_OS_WIN
@@ -486,7 +488,7 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
-    RemoveAuthHeaderCallback();
+    // RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
