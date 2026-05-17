@@ -27,17 +27,29 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QEventLoop>
 #include <QFile>
+#include <QFileInfo>
+#include <QHttpMultiPart>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkAccessManager>
 #include <QNetworkProxy>
 #include <QNetworkProxyFactory>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QSslError>
+#include <QTimer>
 #include <QUrl>
+#include <QtGlobal>
 
 #include "cpl_http.h"
-#include "cpl_json.h"
+#include "cpl_string.h"
 #include "gdal.h"
 #include "gdal_version.h"
 
 // std
+#include <algorithm>
 #include <array>
 
 #include "core/util.h"
@@ -54,17 +66,243 @@
 #endif
 
 
-static CPLStringList getOptions(const QString &url) {
-    CPLStringList options(NGRequest::instance().baseOptions());
-    QStringList headers;
+namespace {
 
-    headers.append("Accept: */*");
-    if (!NGRequest::getAuthHeader(url).isNull())
-        headers.append(NGRequest::getAuthHeader(url));
+struct RequestResult {
+    QByteArray data;
+    int httpStatus = 0;
+    QNetworkReply::NetworkError error = QNetworkReply::NoError;
+    QString errorString;
+    bool timedOut = false;
+};
 
-    options.AddNameValue("HEADERS", headers.join("\r\n").toStdString().c_str());
-    return options;
+bool requestFailed(const RequestResult &result)
+{
+    return result.error != QNetworkReply::NoError ||
+           result.timedOut ||
+           result.httpStatus >= 400;
 }
+
+QNetworkAccessManager *networkManager()
+{
+    static QNetworkAccessManager manager;
+    return &manager;
+}
+
+void applyHeaders(QNetworkRequest &request, const QString &url, bool useAuthHeader,
+                  const QByteArray &contentType)
+{
+    request.setRawHeader("Accept", "*/*");
+
+    if (useAuthHeader) {
+        const QString authHeader = NGRequest::getAuthHeader(url).trimmed();
+        if (!authHeader.isEmpty()) {
+            const int sep = authHeader.indexOf(':');
+            if (sep > 0) {
+                const QByteArray name = authHeader.left(sep).trimmed().toUtf8();
+                const QByteArray value = authHeader.mid(sep + 1).trimmed().toUtf8();
+                request.setRawHeader(name, value);
+            }
+        }
+    }
+
+    if (!contentType.isEmpty()) {
+        request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
+    }
+}
+
+RequestResult executeRequest(const QString &url, const QString &method,
+                             const QByteArray &body, const QByteArray &contentType,
+                             bool useAuthHeader, QHttpMultiPart *multiPart,
+                             int timeoutMs)
+{
+    RequestResult result;
+    QNetworkRequest request{QUrl(url)};
+    applyHeaders(request, url, useAuthHeader, contentType);
+
+    const QByteArray requestMethod = method.trimmed().toUpper().toUtf8();
+    auto setProtocolError = [&result](const QString &message) {
+        result.error = QNetworkReply::ProtocolInvalidOperationError;
+        result.errorString = message;
+    };
+    QNetworkReply *reply = nullptr;
+    if (multiPart && requestMethod != "POST") {
+        setProtocolError(QStringLiteral("Multipart payload is only supported for POST"));
+        return result;
+    }
+
+    if (requestMethod == "POST") {
+        if (multiPart) {
+            reply = networkManager()->post(request, multiPart);
+            // Ensure multipart lifetime is tied to reply lifecycle.
+            multiPart->setParent(reply);
+        } else {
+            reply = networkManager()->post(request, body);
+        }
+    }
+    else if (requestMethod == "GET") {
+        reply = networkManager()->get(request);
+    }
+    else if (requestMethod == "PUT") {
+        reply = networkManager()->put(request, body);
+    }
+    else if (requestMethod == "DELETE") {
+        if (body.isEmpty()) {
+            reply = networkManager()->deleteResource(request);
+        }
+        else {
+            reply = networkManager()->sendCustomRequest(request, "DELETE", body);
+        }
+    }
+    else if (requestMethod == "PATCH") {
+        reply = networkManager()->sendCustomRequest(request, "PATCH", body);
+    }
+    else if (requestMethod == "HEAD") {
+        reply = networkManager()->head(request);
+    }
+    else {
+        setProtocolError(QStringLiteral("Unsupported HTTP method: %1").arg(method));
+        return result;
+    }
+
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply,
+                     [reply](const QList<QSslError> &errors) {
+        bool onlySelfSignedRelated = true;
+        bool hasSelfSignedError = false;
+        for (const auto &err : errors) {
+            const auto type = err.error();
+            if (type == QSslError::SelfSignedCertificate ||
+               type == QSslError::SelfSignedCertificateInChain) {
+                hasSelfSignedError = true;
+                continue;
+            }
+            if (type != QSslError::CertificateUntrusted) {
+                onlySelfSignedRelated = false;
+                break;
+            }
+        }
+        if (onlySelfSignedRelated && hasSelfSignedError) {
+            reply->ignoreSslErrors(errors);
+        }
+    });
+
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+    timer.start(timeoutMs);
+    loop.exec();
+
+    if (timer.isActive()) {
+        timer.stop();
+    }
+    else {
+        result.timedOut = true;
+        reply->abort();
+    }
+
+    result.error = reply->error();
+    result.errorString = reply->errorString();
+    result.httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    result.data = reply->readAll();
+    reply->deleteLater();
+    return result;
+}
+
+void waitMs(int delayMs)
+{
+    if (delayMs <= 0) {
+        return;
+    }
+    QEventLoop loop;
+    QTimer::singleShot(delayMs, &loop, &QEventLoop::quit);
+    loop.exec();
+}
+
+RequestResult requestWithRetries(const QString &url, const QString &method,
+                                 const QByteArray &body, const QByteArray &contentType,
+                                 bool useAuthHeader, QHttpMultiPart *multiPart,
+                                 int timeoutMs, int maxRetry, int retryDelayMs)
+{
+    RequestResult result;
+    // QHttpMultiPart is consumable payload; retries would reuse invalid data.
+    const int attemptsLimit = multiPart ? 0 : maxRetry;
+    for (int attempt = 0; attempt <= attemptsLimit; ++attempt) {
+        result = executeRequest(url, method, body, contentType, useAuthHeader,
+                                multiPart, timeoutMs);
+        if (result.error == QNetworkReply::NoError && !result.timedOut) {
+            return result;
+        }
+        if (attempt < attemptsLimit) {
+            waitMs(retryDelayMs);
+        }
+    }
+    return result;
+}
+
+bool parseJsonObject(const QByteArray &data, QJsonObject *out, QString *error)
+{
+    QJsonParseError parseError{};
+    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        if (error) {
+            *error = parseError.errorString();
+        }
+        return false;
+    }
+    if (!doc.isObject()) {
+        if (error) {
+            *error = QStringLiteral("JSON is not an object");
+        }
+        return false;
+    }
+    if (out) {
+        *out = doc.object();
+    }
+    return true;
+}
+
+std::pair<std::string, std::string> resolveGDALProxyCredentials(const bool useSystemProxy, const QString &proxyUrl,
+                                                                const int proxyPort, const QString& proxyUser,
+                                                                const QString& proxyPassword)
+{
+    const auto makeUserPwd = [](const QString &user, const QString &password) -> std::string
+    {
+        if (user.isEmpty() && password.isEmpty()) {
+            return std::string();
+        }
+        return user.toStdString() + ":" + password.toStdString();
+    };
+
+    std::string url;
+    std::string userpwd;
+
+    if (useSystemProxy) {
+        QNetworkProxyQuery npq(QUrl("http://www.google.com"));
+        QList<QNetworkProxy> listOfProxies =
+            QNetworkProxyFactory::systemProxyForQuery(npq);
+        // Get first proxy if any.
+        if (!listOfProxies.isEmpty()) {
+            url = listOfProxies[0].hostName().toStdString() + ":" +
+                std::to_string(listOfProxies[0].port());
+            userpwd = makeUserPwd(listOfProxies[0].user(),
+                                  listOfProxies[0].password());
+
+        }
+    }
+    else
+    {
+        url = proxyUrl.toStdString() + ":" + std::to_string(proxyPort);
+        userpwd = makeUserPwd(proxyUser, proxyPassword);
+    }
+
+    return std::make_pair(url, userpwd);
+}
+
+} // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization header callback
@@ -78,6 +316,7 @@ static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
     return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
 };
 
+/*
 static void InstallAuthHeaderCallback()
 {
     CPLHTTPSetAuthHeaderCallback(gAuthHeaderCallback);
@@ -87,6 +326,7 @@ static void RemoveAuthHeaderCallback()
 {
     CPLHTTPSetAuthHeaderCallback(nullptr);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -176,56 +416,46 @@ const QString HTTPAuthBearer::header()
     time_t now = time(nullptr);
     double seconds = difftime(now, m_lastCheck);
     seconds += 2; // Two seconds addition to expiration
-    if(seconds < m_expiresIn) {
+    if (seconds < m_expiresIn) {
         return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
 
     // 2. Try to update token
-    auto updateToken = m_updateToken.toStdString();
-    const char *payload = CPLSPrintf("grant_type=refresh_token&client_id=%s&refresh_token=%s",
-                                m_clientId.toStdString().c_str(),
-                                updateToken.c_str());
-    CPLStringList options(m_request->baseOptions());
-    options.AddNameValue("CUSTOMREQUEST", "POST");
-    options.AddNameValue("POSTFIELDS", payload);
+    const QString payload = QString("grant_type=refresh_token&client_id=%1&refresh_token=%2")
+            .arg(QString::fromUtf8(QUrl::toPercentEncoding(m_clientId)),
+                 QString::fromUtf8(QUrl::toPercentEncoding(m_updateToken)));
+    const int timeoutMs = std::max(1, m_request->timeout()) * 1000;
+    const int maxRetry = std::max(0, m_request->maxRetry());
+    const int retryDelayMs = std::max(0, m_request->retryDelay()) * 1000;
 
-    RemoveAuthHeaderCallback();
+    RequestResult result = requestWithRetries(m_tokenServer, "POST",
+                                              payload.toUtf8(),
+                                              "application/x-www-form-urlencoded",
+                                              false, nullptr, timeoutMs,
+                                              maxRetry, retryDelayMs);
 
-    CPLHTTPResult *result = CPLHTTPFetch(m_tokenServer.toStdString().c_str(), options);
-
-    InstallAuthHeaderCallback();
-
-    if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
-            CPLHTTPDestroyResult( result );
-            qDebug() << "Failed to refresh token. Return last not expired. ";
-            return QString("Authorization: Bearer %1").arg(m_accessToken);
-        }
+    if (requestFailed(result)) {
+        qDebug() << "Failed to refresh token. Return last not expired. ";
+        return QString("Authorization: Bearer %1").arg(m_accessToken);
     }
 
     m_accessToken.clear();
-    CPLJSONDocument resultJson;
-    if(!resultJson.LoadMemory(result->pabyData, result->nDataLen)) {
-        CPLHTTPDestroyResult( result );
-        qDebug() << "Token is expired. ";
-        return "expired";
-    }
-    CPLHTTPDestroyResult( result );
-
-    // 4. Save new update and access tokens
-    CPLJSONObject root = resultJson.GetRoot();
-    auto err = root.GetString("error", "");
-    if(!err.empty()) {
-        qDebug() << "Token is expired. " <<
-                    "\nError:" << QString::fromStdString(err);
+    QJsonObject root;
+    QString parseError;
+    if (!parseJsonObject(result.data, &root, &parseError)) {
+        qDebug() << "Token is expired. " << "\nError:" << parseError;
         return "expired";
     }
 
-    m_accessToken = QString::fromStdString(
-                root.GetString("access_token", m_accessToken.toStdString()));
-    m_updateToken = QString::fromStdString(
-                root.GetString("refresh_token", updateToken));
-    m_expiresIn = root.GetInteger("expires_in", m_expiresIn);
+    const QString err = root.value("error").toString();
+    if (!err.isEmpty()) {
+        qDebug() << "Token is expired. " << "\nError:" << err;
+        return "expired";
+    }
+
+    m_accessToken = root.value("access_token").toString(m_accessToken);
+    m_updateToken = root.value("refresh_token").toString(m_updateToken);
+    m_expiresIn = root.value("expires_in").toInt(m_expiresIn);
     m_lastCheck = now;
 
     // 5. Return new Auth Header
@@ -245,7 +475,8 @@ NGRequest::NGRequest() :
     m_retryDelay("5"),
     m_detailedError("")
 {
-    InstallAuthHeaderCallback();
+    // InstallAuthHeaderCallback();
+    networkManager();
 
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -257,16 +488,18 @@ NGRequest::NGRequest() :
 
 NGRequest::~NGRequest()
 {
-    RemoveAuthHeaderCallback();
+    // RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
 {
+    MUTEX_LOCKER;
     m_detailedError = err;
 }
 
 char **NGRequest::baseOptions() const
 {
+    MUTEX_LOCKER;
     char **options = nullptr;
     auto connTimeout = m_connTimeout.toStdString();
     options = CSLAddNameValue(options, "CONNECTTIMEOUT", connTimeout.c_str());
@@ -287,19 +520,39 @@ char **NGRequest::baseOptions() const
 
 QString NGRequest::lastError() const
 {
+    MUTEX_LOCKER;
     return m_detailedError;
 }
 
 void NGRequest::resetError()
 {
+    MUTEX_LOCKER;
     m_detailedError.clear();
+}
+
+int NGRequest::timeout() const
+{
+    MUTEX_LOCKER;
+    return m_timeout.toInt();
+}
+
+int NGRequest::maxRetry() const
+{
+    MUTEX_LOCKER;
+    return m_maxRetry.toInt();
+}
+
+int NGRequest::retryDelay() const
+{
+    MUTEX_LOCKER;
+    return m_retryDelay.toInt();
 }
 
 bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &options)
 {
     MUTEX_LOCKER;
 
-    if(options["type"] == "bearer") {
+    if (options["type"] == "bearer") {
         int expiresIn = options["expiresIn"].toInt();
         QString clientId = options["clientId"];
         QString tokenServer = options["tokenServer"];
@@ -307,37 +560,38 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
         QString updateToken = options["updateToken"];
         QString verify = options["codeVerifier"];
         time_t lastCheck = 0;
-        if(expiresIn == -1) {
-            CPLJSONDocument fetchToken;
+        if (expiresIn == -1) {
             QString postPayload = QString("grant_type=authorization_code&code=%1&redirect_uri=%2&client_id=%3")
-                    .arg(options["code"])
-                    .arg(options["redirectUri"])
-                    .arg(clientId);
-            if(!verify.isEmpty()) {
-                postPayload += "&code_verifier=" + verify;
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["code"])))
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["redirectUri"])))
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(clientId)));
+            if (!verify.isEmpty()) {
+                postPayload += "&code_verifier=" + QString::fromUtf8(QUrl::toPercentEncoding(verify));
             }
-            CPLStringList options(instance().baseOptions());
-            auto payload = postPayload.toStdString();
-            options.AddNameValue("CUSTOMREQUEST", "POST");
-            options.AddNameValue("POSTFIELDS", payload.c_str());
-
             time_t now = time(nullptr);
-            auto tokenServerStd = tokenServer.toStdString();
-            bool result = fetchToken.LoadUrl(tokenServerStd.c_str(), options);
             qDebug() << "Server: " << tokenServer << "\noptions:" << postPayload;
-            if(!result) {
+            const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+            const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
+            const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+            RequestResult result = requestWithRetries(tokenServer, "POST",
+                                                      postPayload.toUtf8(),
+                                                      "application/x-www-form-urlencoded",
+                                                      false, nullptr, timeoutMs,
+                                                      maxRetry, retryDelayMs);
+            if (requestFailed(result)) {
                 qDebug() << "Failed to get tokens";
                 return false;
             }
 
-            CPLJSONObject root = fetchToken.GetRoot();
-            auto accessTokenStd = accessToken.toStdString();
-            accessToken = QString::fromStdString(
-                        root.GetString("access_token", accessTokenStd));
-            auto updateTokenStr = updateToken.toStdString();
-            updateToken = QString::fromStdString(
-                        root.GetString("refresh_token", updateTokenStr.c_str()));
-            expiresIn = root.GetInteger("expires_in", expiresIn);
+            QJsonObject root;
+            QString parseError;
+            if (!parseJsonObject(result.data, &root, &parseError)) {
+                qDebug() << "Failed to parse token response: " << parseError;
+                return false;
+            }
+            accessToken = root.value("access_token").toString(accessToken);
+            updateToken = root.value("refresh_token").toString(updateToken);
+            expiresIn = root.value("expires_in").toInt(expiresIn);
             lastCheck = now;
         }
 
@@ -379,62 +633,78 @@ QString NGRequest::getAsString(const QString &url)
 {
     MUTEX_LOCKER;
 
-    CPLStringList options = getOptions(url);
-    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
-    if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        CPLHTTPDestroyResult( result );
+    const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+    const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
+    const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+    RequestResult result = requestWithRetries(url, "GET", QByteArray(),
+                                              QByteArray(), true, nullptr,
+                                              timeoutMs, maxRetry, retryDelayMs);
+    if (requestFailed(result)) {
         return QString();
     }
-    QByteArray data(reinterpret_cast<const char*>(result->pabyData), result->nDataLen);
-    CPLHTTPDestroyResult(result);
-    return data;
+    return QString::fromUtf8(result.data);
 }
 
 QString NGRequest::getJsonAsString(const QString &url)
 {
     MUTEX_LOCKER;
 
-    CPLStringList options = getOptions(url);
-    QString out;
-    CPLJSONDocument in;
-    if(in.LoadUrl(url.toStdString(), options)) {
-        out = QString::fromUtf8(in.SaveAsString().c_str());
+    const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+    const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
+    const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+    RequestResult result = requestWithRetries(url, "GET", QByteArray(),
+                                              QByteArray(), true, nullptr,
+                                              timeoutMs, maxRetry, retryDelayMs);
+    if (requestFailed(result)) {
+        return QString();
     }
-    return out;
+    return QString::fromUtf8(result.data);
 }
 
 QMap<QString, QVariant> NGRequest::getJsonAsMap(const QString &url)
 {
     MUTEX_LOCKER;
 
-    CPLStringList options = getOptions(url);
-    CPLJSONDocument in;
-    if(in.LoadUrl(url.toStdString(), options)) {
-        qDebug() << QString::fromStdString(in.GetRoot().Format(CPLJSONObject::PrettyFormat::Pretty));
-        return toMap(in.GetRoot());
+    const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+    const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
+    const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+    RequestResult result = requestWithRetries(url, "GET", QByteArray(),
+                                              QByteArray(), true, nullptr,
+                                              timeoutMs, maxRetry, retryDelayMs);
+    if (!requestFailed(result)) {
+        QJsonParseError parseError{};
+        QJsonDocument doc = QJsonDocument::fromJson(result.data, &parseError);
+        if (parseError.error == QJsonParseError::NoError && doc.isObject()) {
+            return doc.object().toVariantMap();
+        }
     }
-
     return QMap<QString, QVariant>();
 }
 
 bool NGRequest::getFile(const QString &url, const QString &path)
 {
     MUTEX_LOCKER;
+    instance().resetError();
 
-    CPLStringList options = getOptions(url);
-    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
-    if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        CPLHTTPDestroyResult( result );
+    const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+    const int maxRetry = std::max(0, instance().m_maxRetry.toInt());
+    const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+    RequestResult result = requestWithRetries(url, "GET", QByteArray(),
+                                              QByteArray(), true, nullptr,
+                                              timeoutMs, maxRetry, retryDelayMs);
+    if (requestFailed(result)) {
         return false;
     }
 
-    QByteArray data(reinterpret_cast<const char*>(result->pabyData), result->nDataLen);
     QFile file(path);
-    file.open(QIODevice::WriteOnly);
-    file.write(data);
+    if (!file.open(QIODevice::WriteOnly)) {
+        instance().setErrorMessage(
+                    QStringLiteral("Failed to open file '%1' for writing: %2")
+                    .arg(path, file.errorString()));
+        return false;
+    }
+    file.write(result.data);
     file.close();
-
-    CPLHTTPDestroyResult(result);
 
     return true;
 }
@@ -447,6 +717,7 @@ NGRequest &NGRequest::instance()
 
 void NGRequest::addAuth(const QString &url, QSharedPointer<IHTTPAuth> auth)
 {
+    MUTEX_LOCKER;
     m_auths[url] = auth;
 }
 
@@ -454,27 +725,23 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
 {
     MUTEX_LOCKER;
 
-    if(!logoutUrl.isEmpty()) {
+    if (!logoutUrl.isEmpty()) {
         auto prop = properties(url);
-        if(!prop.empty()) {
-            auto updateToken = prop["updateToken"].toStdString();
-            auto clientId = prop["clientId"].toStdString();
-            const char *payload = CPLSPrintf("client_id=%s&refresh_token=%s",
-                                    clientId.c_str(),
-                                    updateToken.c_str());
-            CPLStringList options(baseOptions());
-            options.AddNameValue("CUSTOMREQUEST", "POST");
-            options.AddNameValue("POSTFIELDS", payload);
-            options.AddNameValue("HEADERS", "Content-Type: application/x-www-form-urlencoded");
-
-            CPLHTTPResult *result = CPLHTTPFetch(logoutUrl.toStdString().c_str(), options);
-
-            if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-                if(EQUALN("HTTP error code :", result->pszErrBuf, 17) == FALSE) { // If server error refresh token - logout
-                    qDebug() << "Failed to logout.";
-                }
+        if (!prop.empty()) {
+            const QString payload = QString("client_id=%1&refresh_token=%2")
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(prop["clientId"])),
+                         QString::fromUtf8(QUrl::toPercentEncoding(prop["updateToken"])));
+            const int timeoutMs = std::max(1, m_timeout.toInt()) * 1000;
+            const int maxRetry = std::max(0, m_maxRetry.toInt());
+            const int retryDelayMs = std::max(0, m_retryDelay.toInt()) * 1000;
+            RequestResult result = requestWithRetries(logoutUrl, "POST",
+                                                      payload.toUtf8(),
+                                                      "application/x-www-form-urlencoded",
+                                                      false, nullptr, timeoutMs,
+                                                      maxRetry, retryDelayMs);
+            if (requestFailed(result)) {
+                qDebug() << "Failed to logout.";
             }
-            CPLHTTPDestroyResult( result );
         }
     }
     m_auths.remove(url);
@@ -502,7 +769,7 @@ const QString NGRequest::authHeader(const QString &url)
 {
     MUTEX_LOCKER;
 
-    if(!m_auths.empty() && url == "any") {
+    if (!m_auths.empty() && url == "any") {
         auto it = m_auths.constBegin();
         return it.value()->header();
     }
@@ -513,8 +780,8 @@ const QString NGRequest::authHeader(const QString &url)
     };
 
     QMap<QString, QSharedPointer<IHTTPAuth>>::iterator it;
-    for(it = m_auths.begin(); it != m_auths.end(); ++it) {
-        if(removeScheme(url).startsWith(removeScheme(it.key()))) {
+    for (it = m_auths.begin(); it != m_auths.end(); ++it) {
+        if (removeScheme(url).startsWith(removeScheme(it.key()))) {
             return it.value()->header();
         }
     }
@@ -528,8 +795,9 @@ const QString NGRequest::authHeader(const QString &url)
  */
 const QMap<QString, QString> NGRequest::properties(const QString &url) const
 {
+    MUTEX_LOCKER;
     QMap<QString, QString> out;
-    if(m_auths.contains(url)) {
+    if (m_auths.contains(url)) {
         return m_auths[url]->properties();
     }
     return out;
@@ -552,32 +820,42 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
 {
     MUTEX_LOCKER;
 
-    CPLErrorReset();
     instance().resetError();
     
-    if(atoi(GDALVersionInfo("VERSION_NUM")) < GDAL_COMPUTE_VERSION(2,4,0) ) {
-        // Upload files supported only in GDAL >= 2.4
-        instance().setErrorMessage(
-                    QString("Unsupported GDAL version = %1").arg(
-                        GDALVersionInfo("VERSION_NUM")));
-        return "";
-    }
-    CPLStringList options = getOptions(url);
-    options.AddNameValue("FORM_FILE_PATH", path.toStdString().c_str());
-    options.AddNameValue("FORM_FILE_NAME", name.toStdString().c_str());
-    CPLHTTPResult *result = CPLHTTPFetch(url.toStdString().c_str(), options);
-    if(result->nStatus != 0 || result->pszErrBuf != nullptr) {
-        instance().setErrorMessage(
-                    QString("CPLHTTPFetch() failed. Info: \nnStatus = %1 \npszErrBuf = %2 \nGDAL error = %3")
-            .arg(result->nStatus).arg(result->pszErrBuf == nullptr ? "" : result->pszErrBuf).arg(CPLGetLastErrorMsg()));
-        CPLHTTPDestroyResult( result );
+    QFile *file = new QFile(path);
+    if (!file->open(QIODevice::ReadOnly)) {
+        instance().setErrorMessage(QString("Failed to open file: %1").arg(path));
+        file->deleteLater();
         return "";
     }
 
-    QByteArray data(reinterpret_cast<const char*>(result->pabyData), result->nDataLen);
-    CPLHTTPDestroyResult(result);
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    QHttpPart filePart;
+    const QString fileName = QFileInfo(path).fileName();
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                       QVariant(QString("form-data; name=\"%1\"; filename=\"%2\"")
+                                .arg(name, fileName)));
+    filePart.setBodyDevice(file);
+    file->setParent(multiPart);
+    multiPart->append(filePart);
 
-    return data;
+    const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
+    const int maxRetry = 0;
+    const int retryDelayMs = std::max(0, instance().m_retryDelay.toInt()) * 1000;
+    RequestResult result = requestWithRetries(url, "POST", QByteArray(),
+                                              QByteArray(), true, multiPart,
+                                              timeoutMs, maxRetry, retryDelayMs);
+
+    if (requestFailed(result)) {
+        instance().setErrorMessage(
+                    QString("Upload failed. Error: %1. HTTP status: %2. Timed out: %3")
+                    .arg(result.errorString)
+                    .arg(result.httpStatus)
+                    .arg(result.timedOut ? "true" : "false"));
+        return "";
+    }
+
+    return QString::fromUtf8(result.data);
 }
 
 /**
@@ -591,35 +869,35 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
  * @param proxyAuth Proxy authentication scheme to use. Can be BASIC/NTLM/DIGEST/ANY.
  */
 void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &proxyUrl,
-                         int porxyPort, const QString &proxyUser,
+                         int proxyPort, const QString &proxyUser,
                          const QString &proxyPassword, const QString &proxyAuth)
 {
-    if(useProxy) {
-        std::string url;
-        std::string userpwd;
-        if(useSystemProxy) {
-            QNetworkProxyQuery npq(QUrl("http://www.google.com"));
-            QList<QNetworkProxy> listOfProxies =
-                    QNetworkProxyFactory::systemProxyForQuery(npq);
-            // Get first proxy if any.
-            if(!listOfProxies.isEmpty()) {
-                url = listOfProxies[0].hostName().toStdString() + ":" +
-                        std::to_string(listOfProxies[0].port());
-                userpwd = listOfProxies[0].user().toStdString() + ":" +
-                        listOfProxies[0].password().toStdString();
+    MUTEX_LOCKER;
 
-            }
+    if (useProxy) {
+        if (useSystemProxy) {
+            QNetworkProxyFactory::setUseSystemConfiguration(true);
+            // Drop previously forced proxy and return to default/system resolution.
+            networkManager()->setProxy(QNetworkProxy::DefaultProxy);
+            networkManager()->setProxyFactory(nullptr);
         }
         else {
-            url = proxyUrl.toStdString() + ":" + std::to_string(porxyPort);
-            userpwd = proxyUser.toStdString() + ":" +
-                    proxyPassword.toStdString();
+            QNetworkProxy proxy(QNetworkProxy::HttpProxy, proxyUrl, proxyPort,
+                                proxyUser, proxyPassword);
+            networkManager()->setProxyFactory(nullptr);
+            networkManager()->setProxy(proxy);
+
             CPLSetConfigOption("GDAL_PROXY_AUTH", proxyAuth.toStdString().c_str());
         }
-        CPLSetConfigOption("GDAL_HTTP_PROXY", url.c_str());
-        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", userpwd.c_str());
+
+        const auto gdalProxyCredentials = resolveGDALProxyCredentials(useSystemProxy, proxyUrl, proxyPort, proxyUser, proxyPassword);
+        CPLSetConfigOption("GDAL_HTTP_PROXY", gdalProxyCredentials.first.c_str());
+        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", gdalProxyCredentials.second.c_str());
     }
     else {
+        networkManager()->setProxyFactory(nullptr);
+        networkManager()->setProxy(QNetworkProxy::NoProxy);
+
         CPLSetConfigOption("GDAL_HTTP_PROXY", nullptr);
         CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", nullptr);
         CPLSetConfigOption("GDAL_PROXY_AUTH", nullptr);
