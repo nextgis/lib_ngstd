@@ -19,10 +19,12 @@
 ******************************************************************************/
 #include "signserver.h"
 #include "access.h"
+#include "core/core.h"
 
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QRegularExpression>
 #include <QTcpSocket>
 #include <QThread>
 #include <QUrl>
@@ -256,8 +258,8 @@ void NGSignServer::onGetReply()
     QString dataStr(data);
     QString errorMsg;
 
-    auto lines = dataStr.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    auto params = lines[0].split(QRegExp("[\\s?&]"),QString::SkipEmptyParts);
+    auto lines = dataStr.split(QRegularExpression("[\r\n]"), NGSTD_SKIP_EMPTY_PARTS);
+    auto params = lines[0].split(QRegularExpression("[\\s?&]"), NGSTD_SKIP_EMPTY_PARTS);
     for(const auto &param : params) {
         if(param.startsWith("code=")) {
             m_code = param.mid(5);

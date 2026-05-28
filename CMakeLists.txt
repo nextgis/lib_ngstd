@@ -23,7 +23,16 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(ngstd)
 
-set(CMAKE_CXX_STANDARD 14)
+option(WITH_QT6 "Build with Qt6 instead of Qt5" OFF)
+
+if(WITH_QT6)
+    set(QT_VERSION_BASE Qt6)
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(QT_VERSION_BASE Qt5)
+    set(CMAKE_CXX_STANDARD 14)
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -94,6 +103,10 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 option(WITH_BINDINGS "Build python bindings" OFF)
 
+if(WITH_BINDINGS AND WITH_QT6)
+    message(FATAL_ERROR "Python bindings with Qt6 are not supported yet. Disable WITH_BINDINGS or WITH_QT6.")
+endif()
+
 if(WITH_BINDINGS)
     find_package(Python3 COMPONENTS Interpreter Development)
 
@@ -133,13 +146,19 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_anyproject(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network Svg LinguistTools)
+find_anyproject(${QT_VERSION_BASE} REQUIRED COMPONENTS Core Widgets Gui Network Svg LinguistTools)
+if(WITH_QT6)
+    message(STATUS "Building with Qt6: ${Qt6Core_VERSION}")
+else()
+    message(STATUS "Building with Qt5: ${Qt5Core_VERSION_STRING}")
+endif()
+
 if(WITH_ZLIB_EXTERNAL)
     # ZLIB needed for uic, rcc, lrelease and lupdate
     find_anyproject(ZLIB REQUIRED)
 
     get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
-    get_target_property(RCC_PATH Qt5::lrelease IMPORTED_LOCATION)
+    get_target_property(RCC_PATH ${QT_VERSION_BASE}::lrelease IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
     if(WIN32)
         get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)

@@ -160,11 +160,15 @@ function(find_anyproject name)
                 endforeach()
             endif()
 
-            set(Qt5_LRELEASE_EXECUTABLE Qt5::lrelease PARENT_SCOPE)
-            set(Qt5_LUPDATE_EXECUTABLE Qt5::lupdate PARENT_SCOPE)
-            set(Qt5Widgets_UIC_EXECUTABLE Qt5::uic PARENT_SCOPE)
-            set(Qt5Core_RCC_EXECUTABLE Qt5::rcc PARENT_SCOPE)
-            
+            if(${name} MATCHES "^Qt[56]$")
+                set(${name}_LRELEASE_EXECUTABLE ${name}::lrelease PARENT_SCOPE)
+                set(${name}_LUPDATE_EXECUTABLE ${name}::lupdate PARENT_SCOPE)
+                set(${name}Widgets_UIC_EXECUTABLE ${name}::uic PARENT_SCOPE)
+                set(${name}Core_RCC_EXECUTABLE ${name}::rcc PARENT_SCOPE)
+                set(${name}Core_MOC_EXECUTABLE ${name}::moc PARENT_SCOPE)
+                set(QT_CMAKE_EXPORT_NAMESPACE ${name} PARENT_SCOPE)
+            endif()
+
             if(${name} STREQUAL "PyQt5")
                 string(REPLACE "\\" "/" PYQT5_SIP_DIR ${PYQT5_SIP_DIR})
                 set(PYQT5_SIP_DIR ${PYQT5_SIP_DIR} PARENT_SCOPE)
@@ -175,7 +179,7 @@ function(find_anyproject name)
                 endif()
             endif()
             
-            # AUTOMOC enabled targets need to know the Qt major and minor version they’re working with.
+            # AUTOMOC enabled targets need to know the Qt major and minor version they're working with.
             if (${name} STREQUAL "Qt5")
                 string(SUBSTRING ${QT5_VERSION} 0 1 Qt5Core_MAJOR)
                 string(REGEX MATCH ".([0-9]+)" Qt5Core_MINOR_ ${QT5_VERSION})
@@ -183,14 +187,22 @@ function(find_anyproject name)
 
                 set(Qt5Core_VERSION_MAJOR ${Qt5Core_MAJOR} PARENT_SCOPE)
                 set(Qt5Core_VERSION_MINOR ${Qt5Core_MINOR} PARENT_SCOPE)
-                
+
                 set(Qt5Sql_PRIVATE_INCLUDE_DIRS ${Qt5Sql_PRIVATE_INCLUDE_DIRS} PARENT_SCOPE)
-                
+
                 mark_as_advanced(${IS_FOUND}
                     Qt5Core_VERSION_MAJOR
                     Qt5Core_VERSION_MINOR
                     Qt5Sql_PRIVATE_INCLUDE_DIRS
-                )                
+                )
+            elseif (${name} STREQUAL "Qt6")
+                set(Qt6Core_VERSION_MAJOR ${Qt6Core_VERSION_MAJOR} PARENT_SCOPE)
+                set(Qt6Core_VERSION_MINOR ${Qt6Core_VERSION_MINOR} PARENT_SCOPE)
+
+                mark_as_advanced(${IS_FOUND}
+                    Qt6Core_VERSION_MAJOR
+                    Qt6Core_VERSION_MINOR
+                )
             endif()
 
             if(${UPPER_NAME}_LIBRARIES)
@@ -230,11 +242,14 @@ function(find_anyproject name)
         endforeach()
     endif()
 
-    set(Qt5_LRELEASE_EXECUTABLE Qt5::lrelease PARENT_SCOPE)
-    set(Qt5_LUPDATE_EXECUTABLE Qt5::lupdate PARENT_SCOPE)
-    set(Qt5Widgets_UIC_EXECUTABLE Qt5::uic PARENT_SCOPE)
-    set(Qt5Core_RCC_EXECUTABLE Qt5::rcc PARENT_SCOPE)
-    set(Qt5Core_MOC_EXECUTABLE Qt5::moc PARENT_SCOPE)    
+    if(${name} MATCHES "^Qt[56]$")
+        set(${name}_LRELEASE_EXECUTABLE ${name}::lrelease PARENT_SCOPE)
+        set(${name}_LUPDATE_EXECUTABLE ${name}::lupdate PARENT_SCOPE)
+        set(${name}Widgets_UIC_EXECUTABLE ${name}::uic PARENT_SCOPE)
+        set(${name}Core_RCC_EXECUTABLE ${name}::rcc PARENT_SCOPE)
+        set(${name}Core_MOC_EXECUTABLE ${name}::moc PARENT_SCOPE)
+        set(QT_CMAKE_EXPORT_NAMESPACE ${name} PARENT_SCOPE)
+    endif()
 
     if(${UPPER_NAME}_INCLUDE_DIRS)
         include_directories(${${UPPER_NAME}_INCLUDE_DIRS})

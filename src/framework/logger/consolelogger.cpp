@@ -20,6 +20,7 @@
 
 #include "framework/logger/consolelogger.h"
 
+#include <QIODevice>
 #include <QTextStream>
 
 void ConsoleLogger::write(const LogLevel level, const QString &msg)

@@ -52,6 +52,24 @@ static int clamp(float x)
     return val < 0 ? 0 : val;
 }
 
+static bool pixmapCacheFind(const QString &key, QPixmap &pixmap)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return QPixmapCache::find(key, &pixmap);
+#else
+    return QPixmapCache::find(key, pixmap);
+#endif
+}
+
+static int fontMetricsWidth(const QFontMetrics &fm, const QString &text)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    return fm.horizontalAdvance(text);
+#else
+    return fm.width(text);
+#endif
+}
+
 //------------------------------------------------------------------------------
 // Style
 //------------------------------------------------------------------------------
@@ -82,14 +100,18 @@ QPalette NGStyle::panelPalette(const QPalette &oldPalette, bool lightColored) co
                                                  NGTheme::PanelTextColorLight);
     pal.setBrush(QPalette::All, QPalette::WindowText, color);
     pal.setBrush(QPalette::All, QPalette::ButtonText, color);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     pal.setBrush(QPalette::All, QPalette::Foreground, color);
+#endif
     if (lightColored)
         color.setAlpha(100);
     else
         color = m_theme->color(NGTheme::IconsDisabledColor);
     pal.setBrush(QPalette::Disabled, QPalette::WindowText, color);
     pal.setBrush(QPalette::Disabled, QPalette::ButtonText, color);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     pal.setBrush(QPalette::Disabled, QPalette::Foreground, color);
+#endif
     return pal;
 }
 
@@ -425,12 +447,12 @@ void NGStyle::drawArrow(QStyle::PrimitiveElement element, QPainter *painter,
     int size = qMin(r.height(), r.width());
     QPixmap pixmap;
     QString pixmapName;
-    pixmapName.sprintf("arrow-%s-%d-%d-%d-%lld-%f",
+    pixmapName = QString::asprintf("arrow-%s-%d-%d-%d-%lld-%f",
                        "$qt_ia",
                        uint(option->state), element,
                        size, option->palette.cacheKey(),
                        devicePixelRatio);
-    if (!QPixmapCache::find(pixmapName, pixmap)) {
+    if (!pixmapCacheFind(pixmapName, pixmap)) {
         const QCommonStyle* const style =
                 qobject_cast<QCommonStyle*>(QApplication::style());
         if (!style)
@@ -668,11 +690,11 @@ void NGStyle::drawControl(ControlElement element, const QStyleOption *option,
                 bool notElideAsterisk = widget
                         && widget->property("notelideasterisk").toBool()
                         && cb->currentText.endsWith(asterisk)
-                        && option->fontMetrics.width(cb->currentText) > elideWidth;
+                        && fontMetricsWidth(option->fontMetrics, cb->currentText) > elideWidth;
 
                 QString text;
                 if (notElideAsterisk) {
-                    elideWidth -= option->fontMetrics.width(asterisk);
+                    elideWidth -= fontMetricsWidth(option->fontMetrics, QString(asterisk));
                     text = asterisk;
                 }
                 text.prepend(option->fontMetrics.elidedText(cb->currentText,
@@ -938,7 +960,7 @@ void NGStyle::drawComplexControl(ComplexControl control,
             QRect arrowRect((left + right) / 2 + (reverse ? 6 : -6), rect.center().y() - 3, 9, 9);
 
             if (!alignarrow) {
-                int labelwidth = option->fontMetrics.width(cb->currentText);
+                int labelwidth = fontMetricsWidth(option->fontMetrics, cb->currentText);
                 if (reverse)
                     arrowRect.moveLeft(qMax(rect.width() - labelwidth - menuButtonWidth - 2, 4));
                 else
@@ -1141,12 +1163,12 @@ void NGStyle::verticalGradient(QPainter *painter, const QRect &spanRect,
     if (usePixmapCache()) {
         QString key;
         QColor keyColor = baseColor(lightColored);
-        key.sprintf("mh_vertical %d %d %d %d %d",
+        key = QString::asprintf("mh_vertical %d %d %d %d %d",
             spanRect.width(), spanRect.height(), clipRect.width(),
             clipRect.height(), keyColor.rgb());
 
         QPixmap pixmap;
-        if (!QPixmapCache::find(key, pixmap)) {
+        if (!pixmapCacheFind(key, pixmap)) {
             pixmap = QPixmap(clipRect.size());
             QPainter p(&pixmap);
             QRect rect(0, 0, clipRect.width(), clipRect.height());
@@ -1200,12 +1222,12 @@ void NGStyle::horizontalGradient(QPainter *painter, const QRect &spanRect,
     if (usePixmapCache()) {
         QString key;
         QColor keyColor = baseColor(lightColored);
-        key.sprintf("mh_horizontal %d %d %d %d %d %d",
+        key = QString::asprintf("mh_horizontal %d %d %d %d %d %d",
             spanRect.width(), spanRect.height(), clipRect.width(),
             clipRect.height(), keyColor.rgb(), spanRect.x());
 
         QPixmap pixmap;
-        if (!QPixmapCache::find(key, pixmap)) {
+        if (!pixmapCacheFind(key, pixmap)) {
             pixmap = QPixmap(clipRect.size());
             QPainter p(&pixmap);
             QRect rect = QRect(0, 0, clipRect.width(), clipRect.height());
@@ -1236,12 +1258,12 @@ void NGStyle::menuGradient(QPainter *painter, const QRect &spanRect,
 {
     if (usePixmapCache()) {
         QString key;
-        key.sprintf("mh_menu %d %d %d %d %d",
+        key = QString::asprintf("mh_menu %d %d %d %d %d",
             spanRect.width(), spanRect.height(), clipRect.width(),
             clipRect.height(), baseColor().rgb());
 
         QPixmap pixmap;
-        if (!QPixmapCache::find(key, pixmap)) {
+        if (!pixmapCacheFind(key, pixmap)) {
             pixmap = QPixmap(clipRect.size());
             QPainter p(&pixmap);
             QRect rect = QRect(0, 0, clipRect.width(), clipRect.height());

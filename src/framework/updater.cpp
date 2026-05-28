@@ -99,7 +99,7 @@ void NGUpdater::maintainerFinished(int /*code*/, QProcess::ExitStatus /*status*/
             continue;
         }
         if (token == QXmlStreamReader::StartElement) {
-            if (xml.name() == "update") {
+            if (xml.name() == QLatin1String("update")) {
                 if (!ignorePackages().contains(xml.attributes().value("name").toString(),
                     Qt::CaseInsensitive)) {
                     this->checkUpdatesFinished(true);

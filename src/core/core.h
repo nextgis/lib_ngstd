@@ -24,6 +24,12 @@
 
 #include <QVariant>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#  define NGSTD_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#else
+#  define NGSTD_SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#endif
+
 #if defined(NGSTD_CORE_LIBRARY)
 #  define NGCORE_EXPORT Q_DECL_EXPORT
 #else

@@ -347,7 +347,7 @@ private:
 HTTPAuthBasic::HTTPAuthBasic(const QString &login, const QString &password)
 {
     QByteArray str;
-    str.append(login + ":" + password);
+    str.append((login + ":" + password).toUtf8());
     m_basicAuth = str.toBase64();
 }
 

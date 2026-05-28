@@ -50,7 +50,11 @@ set(TRANSLATIONS
 
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
-        qt5_add_translation(QM_FILES ${TRANSLATION})
+        if(WITH_QT6)
+            qt6_add_translation(QM_FILES ${TRANSLATION})
+        else()
+            qt5_add_translation(QM_FILES ${TRANSLATION})
+        endif()
     endif()
 endforeach()
 
@@ -105,7 +109,7 @@ else()
     )
 endif()
 
-target_link_libraries(${LIB_NAME} PRIVATE Qt5::Core Qt5::Network ${GDAL_LIBRARIES})
+target_link_libraries(${LIB_NAME} PRIVATE ${QT_VERSION_BASE}::Core ${QT_VERSION_BASE}::Network ${GDAL_LIBRARIES})
 if(JSONC_FOUND)
     target_link_libraries(${LIB_NAME} PRIVATE ${JSONC_LIBRARIES})
 endif()

@@ -43,7 +43,7 @@ NGNavigationPaneHolder::NGNavigationPaneHolder(NGNavigationWidget *parent) :
 
     NGStyledBar *toolBar = new NGStyledBar(this);
     QHBoxLayout *toolBarLayout = new QHBoxLayout;
-    toolBarLayout->setMargin(0);
+    toolBarLayout->setContentsMargins(0, 0, 0, 0);
     toolBarLayout->setSpacing(0);
     toolBar->setLayout(toolBarLayout);
     toolBarLayout->addWidget(m_navigationComboBox);
@@ -66,16 +66,13 @@ NGNavigationPaneHolder::NGNavigationPaneHolder(NGNavigationWidget *parent) :
     toolBarLayout->addWidget(closeButton);
 
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     setLayout(layout);
     layout->addWidget(toolBar);
 
-#if QT_VERSION >= 0x050900
-    connect(m_navigationComboBox,
-            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+    connect(m_navigationComboBox, &QComboBox::currentTextChanged,
             this, &NGNavigationPaneHolder::comboBoxIndexChanged);
-#endif
     connect(closeButton, &QAbstractButton::clicked, this,
             &NGNavigationPaneHolder::onClose);
 

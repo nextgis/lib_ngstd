@@ -119,7 +119,11 @@ set(TRANSLATIONS
 
 foreach(TRANSLATION ${TRANSLATIONS})
     if(EXISTS ${TRANSLATION})
-        qt5_add_translation(QM_FILES ${TRANSLATION})
+        if(WITH_QT6)
+            qt6_add_translation(QM_FILES ${TRANSLATION})
+        else()
+            qt5_add_translation(QM_FILES ${TRANSLATION})
+        endif()
     endif()
 endforeach()
 
@@ -179,7 +183,7 @@ else()
 endif()
 
 
-target_link_libraries(${LIB_NAME} PRIVATE Qt5::Widgets Qt5::Network ${OPENSSL_LIBRARIES} ${SENTRYNATIVE_LIBRARIES} ngstd_core ${GDAL_LIBRARIES})
+target_link_libraries(${LIB_NAME} PRIVATE ${QT_VERSION_BASE}::Widgets ${QT_VERSION_BASE}::Network ${OPENSSL_LIBRARIES} ${SENTRYNATIVE_LIBRARIES} ngstd_core ${GDAL_LIBRARIES})
 
 target_include_directories(${LIB_NAME} INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>

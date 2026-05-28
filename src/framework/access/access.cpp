@@ -20,6 +20,7 @@
 
 #include "access.h"
 
+#include "core/core.h"
 #include <QByteArray>
 #include "framework/logger//sentrylogger.h"
 
@@ -716,7 +717,7 @@ static QMap<QString, QVariant> userInfoFromJWT(const QString &endPoint) {
     NGRequest::getAuthHeader(endPoint);
     QMap<QString, QString> properties = NGRequest::instance().properties(endPoint);
     QString accessToken = properties["accessToken"];
-    QStringList jwtParts = accessToken.split(QLatin1Char('.'), QString::SkipEmptyParts);
+    QStringList jwtParts = accessToken.split(QLatin1Char('.'), NGSTD_SKIP_EMPTY_PARTS);
     if(jwtParts.size() != 3) {
         return result;
     }
