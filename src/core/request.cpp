@@ -41,6 +41,7 @@
 #include <QSslError>
 #include <QTimer>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QtGlobal>
 
 #include "cpl_http.h"
@@ -83,10 +84,93 @@ bool requestFailed(const RequestResult &result)
            result.httpStatus >= 400;
 }
 
+QString describeRequestResult(const QString &operation, const QString &url,
+                              const RequestResult &result)
+{
+    QStringList parts;
+    parts << QStringLiteral("%1 failed").arg(operation);
+    parts << QStringLiteral("url=%1").arg(url);
+    parts << QStringLiteral("networkError=%1").arg(static_cast<int>(result.error));
+    if (!result.errorString.isEmpty()) {
+        parts << QStringLiteral("errorString=%1").arg(result.errorString);
+    }
+    parts << QStringLiteral("httpStatus=%1").arg(result.httpStatus);
+    parts << QStringLiteral("timedOut=%1").arg(result.timedOut ? QStringLiteral("true") : QStringLiteral("false"));
+    if (!result.data.isEmpty()) {
+        QString response = QString::fromUtf8(result.data.left(512));
+        response.replace('\r', ' ');
+        response.replace('\n', ' ');
+        parts << QStringLiteral("response=%1").arg(response.trimmed());
+    }
+    return parts.join(QStringLiteral("; "));
+}
+
 QNetworkAccessManager *networkManager()
 {
     static QNetworkAccessManager manager;
     return &manager;
+}
+
+bool configureProxyFromEnvironmentValue(const QString &proxyValue, const QString &source)
+{
+    QString normalizedProxy = proxyValue.trimmed();
+    if (normalizedProxy.isEmpty()) {
+        return false;
+    }
+
+    QUrl proxyUrl(normalizedProxy);
+    if (proxyUrl.host().isEmpty()) {
+        proxyUrl = QUrl(QStringLiteral("http://") + normalizedProxy);
+    }
+    if (!proxyUrl.isValid() || proxyUrl.host().isEmpty()) {
+        qWarning() << "Ignored invalid NGRequest proxy from" << source << ":" << normalizedProxy;
+        return false;
+    }
+
+    const bool socksProxy = proxyUrl.scheme().startsWith(QStringLiteral("socks"), Qt::CaseInsensitive);
+    const int proxyPort = proxyUrl.port(socksProxy ? 1080 : 8080);
+    const QNetworkProxy::ProxyType proxyType = socksProxy ? QNetworkProxy::Socks5Proxy : QNetworkProxy::HttpProxy;
+    const QNetworkProxy proxy(proxyType, proxyUrl.host(), proxyPort,
+                              proxyUrl.userName(), proxyUrl.password());
+    networkManager()->setProxyFactory(nullptr);
+    networkManager()->setProxy(proxy);
+
+    const QString gdalProxy = QStringLiteral("%1:%2").arg(proxyUrl.host()).arg(proxyPort);
+    const QString gdalProxyCredentials = (proxyUrl.userName().isEmpty() && proxyUrl.password().isEmpty())
+        ? QString()
+        : QStringLiteral("%1:%2").arg(proxyUrl.userName(), proxyUrl.password());
+    const QByteArray gdalProxyBytes = gdalProxy.toUtf8();
+    const QByteArray gdalProxyCredentialsBytes = gdalProxyCredentials.toUtf8();
+    CPLSetConfigOption("GDAL_HTTP_PROXY", gdalProxyBytes.constData());
+    CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD",
+                       gdalProxyCredentialsBytes.isEmpty() ? nullptr : gdalProxyCredentialsBytes.constData());
+    CPLSetConfigOption("GDAL_PROXY_AUTH", "ANY");
+
+    qInfo() << "Configured NGRequest proxy from" << source
+            << proxyUrl.host() << proxyPort
+            << (proxyUrl.userName().isEmpty() ? "without credentials" : "with credentials");
+    return true;
+}
+
+void configureInitialProxy()
+{
+    const std::array<const char *, 6> proxyVariables = {
+        "HTTPS_PROXY", "https_proxy",
+        "HTTP_PROXY", "http_proxy",
+        "ALL_PROXY", "all_proxy"
+    };
+
+    for (const char *proxyVariable : proxyVariables) {
+        const QByteArray proxyValue = qgetenv(proxyVariable).trimmed();
+        if (!proxyValue.isEmpty() &&
+            configureProxyFromEnvironmentValue(QString::fromLocal8Bit(proxyValue), QString::fromLatin1(proxyVariable))) {
+            return;
+        }
+    }
+
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
+    networkManager()->setProxy(QNetworkProxy::DefaultProxy);
+    networkManager()->setProxyFactory(nullptr);
 }
 
 void applyHeaders(QNetworkRequest &request, const QString &url, bool useAuthHeader,
@@ -421,9 +505,11 @@ const QString HTTPAuthBearer::header()
     }
 
     // 2. Try to update token
-    const QString payload = QString("grant_type=refresh_token&client_id=%1&refresh_token=%2")
-            .arg(QString::fromUtf8(QUrl::toPercentEncoding(m_clientId)),
-                 QString::fromUtf8(QUrl::toPercentEncoding(m_updateToken)));
+    QUrlQuery payloadQuery;
+    payloadQuery.addQueryItem(QStringLiteral("grant_type"), QStringLiteral("refresh_token"));
+    payloadQuery.addQueryItem(QStringLiteral("client_id"), m_clientId);
+    payloadQuery.addQueryItem(QStringLiteral("refresh_token"), m_updateToken);
+    const QString payload = payloadQuery.toString(QUrl::FullyEncoded);
     const int timeoutMs = std::max(1, m_request->timeout()) * 1000;
     const int maxRetry = std::max(0, m_request->maxRetry());
     const int retryDelayMs = std::max(0, m_request->retryDelay()) * 1000;
@@ -477,6 +563,7 @@ NGRequest::NGRequest() :
 {
     // InstallAuthHeaderCallback();
     networkManager();
+    configureInitialProxy();
 
 #ifdef Q_OS_WIN
     // Add SSL cert path
@@ -561,13 +648,16 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
         QString verify = options["codeVerifier"];
         time_t lastCheck = 0;
         if (expiresIn == -1) {
-            QString postPayload = QString("grant_type=authorization_code&code=%1&redirect_uri=%2&client_id=%3")
-                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["code"])))
-                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(options["redirectUri"])))
-                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(clientId)));
+            QUrlQuery payloadQuery;
+            payloadQuery.addQueryItem(QStringLiteral("grant_type"), QStringLiteral("authorization_code"));
+            payloadQuery.addQueryItem(QStringLiteral("code"), options["code"]);
+            payloadQuery.addQueryItem(QStringLiteral("redirect_uri"), options["redirectUri"]);
+            payloadQuery.addQueryItem(QStringLiteral("client_id"), clientId);
             if (!verify.isEmpty()) {
-                postPayload += "&code_verifier=" + QString::fromUtf8(QUrl::toPercentEncoding(verify));
+                payloadQuery.addQueryItem(QStringLiteral("code_verifier"), verify);
             }
+            QString postPayload = payloadQuery.toString(QUrl::FullyEncoded);
+
             time_t now = time(nullptr);
             qDebug() << "Server: " << tokenServer << "\noptions:" << postPayload;
             const int timeoutMs = std::max(1, instance().m_timeout.toInt()) * 1000;
@@ -579,7 +669,8 @@ bool NGRequest::addAuth(const QStringList &urls, const QMap<QString, QString> &o
                                                       false, nullptr, timeoutMs,
                                                       maxRetry, retryDelayMs);
             if (requestFailed(result)) {
-                qDebug() << "Failed to get tokens";
+                instance().setErrorMessage(describeRequestResult(QStringLiteral("Token request"), tokenServer, result));
+                qDebug() << "Failed to get tokens:" << instance().lastError();
                 return false;
             }
 
@@ -728,9 +819,10 @@ void NGRequest::removeAuth(const QString &url, const QString &logoutUrl)
     if (!logoutUrl.isEmpty()) {
         auto prop = properties(url);
         if (!prop.empty()) {
-            const QString payload = QString("client_id=%1&refresh_token=%2")
-                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(prop["clientId"])),
-                         QString::fromUtf8(QUrl::toPercentEncoding(prop["updateToken"])));
+            QUrlQuery payloadQuery;
+            payloadQuery.addQueryItem(QStringLiteral("client_id"), prop["clientId"]);
+            payloadQuery.addQueryItem(QStringLiteral("refresh_token"), prop["updateToken"]);
+            const QString payload = payloadQuery.toString(QUrl::FullyEncoded);
             const int timeoutMs = std::max(1, m_timeout.toInt()) * 1000;
             const int maxRetry = std::max(0, m_maxRetry.toInt());
             const int retryDelayMs = std::max(0, m_retryDelay.toInt()) * 1000;

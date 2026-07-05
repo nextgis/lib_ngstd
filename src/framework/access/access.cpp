@@ -716,7 +716,10 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri,
 
     QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
     if(!NGRequest::addAuth(urls, options)) {
-        logMessage(QString("Token request failed. tokenEndpoint=%1").arg(m_tokenEndpoint), LogLevel::Critical);
+        const QString requestError = NGRequest::instance().lastError();
+        logMessage(QString("Token request failed. tokenEndpoint=%1 error=%2")
+                       .arg(m_tokenEndpoint,
+                            requestError.isEmpty() ? QStringLiteral("unknown") : requestError), LogLevel::Critical);
         return;
     }
 
