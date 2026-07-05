@@ -31,25 +31,39 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 import os.path
-import PyQt5.QtCore
-import sipconfig
 import sys
+import PyQt5
+import PyQt5.QtCore
 
-cfg = sipconfig.Configuration()
-sip_dir = cfg.default_sip_dir
-for p in (os.path.join(sip_dir, "PyQt5"),
-          os.path.join(sip_dir, "PyQt5-3"),
-          sip_dir,
-          os.path.join(cfg.default_mod_dir, "PyQt5", "bindings")):
-    if os.path.exists(os.path.join(p, "QtCore", "QtCoremod.sip")):
-        sip_dir = p
-        break
+try:
+    import sipconfig
+except ModuleNotFoundError:
+    sipconfig = None
+
+if sipconfig is not None:
+    cfg = sipconfig.Configuration()
+    pyqt_mod_dir = os.path.join(cfg.default_mod_dir, "PyQt5")
+    pyqt_bin_dir = cfg.default_bin_dir
+    sip_dir = cfg.default_sip_dir
+    for p in (os.path.join(sip_dir, "PyQt5"),
+              os.path.join(sip_dir, "PyQt5-3"),
+              sip_dir,
+              os.path.join(pyqt_mod_dir, "bindings")):
+        if os.path.exists(os.path.join(p, "QtCore", "QtCoremod.sip")):
+            sip_dir = p
+            break
+else:
+    pyqt_mod_dir = os.path.dirname(PyQt5.__file__)
+    pyqt_bin_dir = os.path.join(os.path.dirname(sys.executable), "Scripts")
+    if not os.path.isdir(pyqt_bin_dir):
+        pyqt_bin_dir = os.path.dirname(sys.executable)
+    sip_dir = os.path.join(pyqt_mod_dir, "bindings")
 
 print("pyqt_version_str:%s" % PyQt5.QtCore.PYQT_VERSION_STR)
-print("pyqt_mod_dir:%s" % os.path.join(cfg.default_mod_dir, "PyQt5"))
+print("pyqt_mod_dir:%s" % pyqt_mod_dir)
 print("pyqt_sip_dir:%s" % sip_dir)
-print("pyqt_sip_flags:%s" % PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags'])
-print("pyqt_bin_dir:%s" % cfg.default_bin_dir)
+print("pyqt_sip_flags:%s" % PyQt5.QtCore.PYQT_CONFIGURATION.get('sip_flags', ''))
+print("pyqt_bin_dir:%s" % pyqt_bin_dir)
 
 try:
     import PyQt5.sip

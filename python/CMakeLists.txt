@@ -34,8 +34,7 @@ endif()
 
 if (SIP_INSTALL_EXECUTABLE)
     set(TMP_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/inst")
-    set(CONFIGURE_ARGS --verbose --build-dir ${CMAKE_CURRENT_BINARY_DIR}/build_tmp --target-dir ${TMP_INSTALL_PREFIX} --no-docstrings)
-
+    set(CONFIGURE_ARGS --verbose --build-dir ${CMAKE_CURRENT_BINARY_DIR}/build_tmp --target-dir ${TMP_INSTALL_PREFIX} --no-docstrings --no-distinfo)
     if(TARGET ${QT_VERSION_BASE}::qmake)
         get_property(QT_QMAKE_EXECUTABLE TARGET ${QT_VERSION_BASE}::qmake PROPERTY IMPORTED_LOCATION)
         get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
@@ -154,7 +153,8 @@ if (SIP_INSTALL_EXECUTABLE)
             get_target_property(QT_GUI_LIB ${QT_VERSION_BASE}::Gui IMPORTED_IMPLIB_${BUILD_TYPE})
             set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${QT_GUI_LIB}")
         endif()
-
+        set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/core/ngstd_core_i.lib")
+        set(CONFIGURE_ARGS ${CONFIGURE_ARGS} --qmake-setting "LIBS+=${CMAKE_BINARY_DIR}/src/framework/ngstd_framework_i.lib")
     endif()
 
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pyproject.toml.in
