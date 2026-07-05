@@ -104,7 +104,7 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 option(WITH_BINDINGS "Build python bindings" OFF)
 
 if(WITH_BINDINGS AND WITH_QT6)
-    message(FATAL_ERROR "Python bindings with Qt6 are not supported yet. Disable WITH_BINDINGS or WITH_QT6.")
+    message(WARNING "Attempting to build Python bindings with Qt6. Proceeding, but if the build fails, try disabling WITH_QT6 or WITH_BINDINGS.")
 endif()
 
 if(WITH_BINDINGS)
