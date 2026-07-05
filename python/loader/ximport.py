@@ -6,7 +6,8 @@ __author__ = 'Dmitry Baryshnikov'
 __date__ = 'May 2019'
 __copyright__ = '(C) 2019, NextGIS'
 
-import imp
+import importlib.machinery
+import importlib.util
 import sys
 import os
 import logging
@@ -81,6 +82,22 @@ class ximporter(object):
 
         return None, []
 
+    def find_spec(self, fullname, path=None, target=None):
+        """Return an import spec for Python 3.12+ meta path imports."""
+
+        loader = self.find_module(fullname, path)
+        if loader is None:
+            return None
+
+        try:
+            ispackage = loader.is_package(fullname)
+        except XImportError:
+            return None
+
+        return importlib.util.spec_from_loader(
+            fullname, loader, is_package=ispackage
+        )
+
     # Check whether we can satisfy the import of the module named by
     # 'fullname'. Return self if we can, None if we can't.
     def find_module(self, fullname, path=None):
@@ -100,13 +117,11 @@ class ximporter(object):
         logger.debug("FINDER=================")
         logger.debug("[!] Searching %s" % fullname)
         logger.debug("[!] Path is %s" % path)
-        try:
-            loader = imp.find_module(fullname, path)
-            if loader:
+        if path is not None:
+            loader = importlib.machinery.PathFinder.find_spec(fullname, path)
+            if loader is not None:
                 logger.info("[-] Found locally!")
                 return None
-        except ImportError:
-            pass
 
         return self.find_loader(fullname, path)[0]
 
