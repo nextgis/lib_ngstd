@@ -43,6 +43,7 @@
 #include <QSettings>
 #include <QTextStream>
 
+#include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
@@ -231,7 +232,7 @@ void NGAccess::setClientId(const QString &clientId)
                                                   QCryptographicHash::Md5).toHex()));
 
     if(!QDir(m_configDir).exists()) {
-        QDir().mkdir(m_configDir);
+        QDir().mkpath(m_configDir);
     }
 
     // Get user id from config
@@ -640,15 +641,22 @@ bool NGAccess::verifyRSASignature(unsigned char *originalMessage,
         return false;
     }
 
-    FILE *file = fdopen(keyFile.handle(), "r"); // fopen(keyFilePath.toLatin1().data(), "r");
-    if (!file) {
-        getLogger()->warning(QString("Failed open file %1").arg(keyFilePath));
+    const QByteArray keyData = keyFile.readAll();
+    if (keyData.isEmpty()) {
+        getLogger()->warning(QString("Public key file is empty: %1").arg(keyFilePath));
         return false;
     }
 
-    EVP_PKEY *evp_pubkey = PEM_read_PUBKEY(file, nullptr, nullptr, nullptr);
+    BIO *keyBio = BIO_new_mem_buf(keyData.constData(), static_cast<int>(keyData.size()));
+    if (!keyBio) {
+        getLogger()->warning("Failed BIO_new_mem_buf for public key");
+        return false;
+    }
+
+    EVP_PKEY *evp_pubkey = PEM_read_bio_PUBKEY(keyBio, nullptr, nullptr, nullptr);
+    BIO_free(keyBio);
     if (!evp_pubkey) {
-        getLogger()->warning("Failed PEM_read_PUBKEY");
+        getLogger()->warning("Failed PEM_read_bio_PUBKEY");
         return false;
     }
 
@@ -685,11 +693,15 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri,
                          const QString &verifier)
 {
     if(code.isEmpty()) {
+        logMessage("Authorization callback did not contain code", LogLevel::Warning);
         return;
     }
 
-    getLogger()->debug(QString("code: %1 \nuri: %2 \nverifier: %3")
-                      .arg(code).arg(redirectUri).arg(verifier));
+    logMessage(QString("Token request started. tokenEndpoint=%1 redirectUri=%2 codeChallenge=%3")
+                   .arg(m_tokenEndpoint,
+                        redirectUri,
+                        verifier.isEmpty() ? QStringLiteral("disabled") : QStringLiteral("enabled")),
+               LogLevel::Debug);
 
     QMap<QString, QString> options;
     options["type"] = "bearer";
@@ -703,12 +715,22 @@ void NGAccess::getTokens(const QString &code, const QString &redirectUri,
     }
 
     QStringList urls = formOriginsList(m_authType, m_endpoint, m_userInfoEndpoint);
-    if(NGRequest::addAuth(urls, options)) {
-        updateUserInfo();
-        updateSupportInfo();
-
-        save();
+    if(!NGRequest::addAuth(urls, options)) {
+        logMessage(QString("Token request failed. tokenEndpoint=%1").arg(m_tokenEndpoint), LogLevel::Critical);
+        return;
     }
+
+    const auto properties = NGRequest::instance().properties(m_endpoint);
+    if(properties.value("accessToken").isEmpty()) {
+        logMessage(QString("Token request did not return access token. endpoint=%1 tokenEndpoint=%2")
+                       .arg(m_endpoint, m_tokenEndpoint), LogLevel::Critical);
+        return;
+    }
+
+    logMessage("Token request succeeded", LogLevel::Debug);
+    updateUserInfo();
+    updateSupportInfo();
+    save();
 }
 
 static QMap<QString, QVariant> userInfoFromJWT(const QString &endPoint) {

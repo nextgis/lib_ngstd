@@ -23,8 +23,42 @@
 #include <QIODevice>
 #include <QTextStream>
 
+#ifdef Q_OS_WIN
+#include <cstdio>
+#include <mutex>
+#include <windows.h>
+#endif
+
+namespace
+{
+void ensureConsoleAttached()
+{
+#ifdef Q_OS_WIN
+    static std::once_flag attachFlag;
+    std::call_once(attachFlag, []()
+    {
+        if (GetConsoleWindow() == nullptr) {
+            AttachConsole(ATTACH_PARENT_PROCESS);
+        }
+
+        if (GetConsoleWindow() == nullptr) {
+            return;
+        }
+
+        FILE *stream = nullptr;
+        freopen_s(&stream, "CONOUT$", "w", stdout);
+        freopen_s(&stream, "CONOUT$", "w", stderr);
+        setvbuf(stdout, nullptr, _IONBF, 0);
+        setvbuf(stderr, nullptr, _IONBF, 0);
+    });
+#endif
+}
+}
+
 void ConsoleLogger::write(const LogLevel level, const QString &msg)
 {
+    ensureConsoleAttached();
+
     bool use_stderr = (
         level == LogLevel::Warning
         || level == LogLevel::Critical
