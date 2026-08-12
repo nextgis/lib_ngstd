@@ -1,0 +1,85 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "BUILD_CORE": "OFF",
+        "BUILD_FRAMEWORK": "OFF",
+        "BUILD_WIDGETS": "ON",
+        "BUILD_TESTING": "ON",
+        "NGSTD_WIDGETS_BUILD_GALLERY": "OFF"
+      }
+    },
+    {
+      "name": "qt5-shared",
+      "inherits": "base",
+      "cacheVariables": {
+        "NGSTD_QT_MAJOR": "5",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "qt6-shared",
+      "inherits": "base",
+      "cacheVariables": {
+        "NGSTD_QT_MAJOR": "6",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "qt5-static",
+      "inherits": "base",
+      "cacheVariables": {
+        "NGSTD_QT_MAJOR": "5",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    },
+    {
+      "name": "qt6-static",
+      "inherits": "base",
+      "cacheVariables": {
+        "NGSTD_QT_MAJOR": "6",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    },
+    {
+      "name": "qt5-sanitizers",
+      "inherits": "qt5-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "NGSTD_WIDGETS_ENABLE_SANITIZERS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {"name": "qt5-shared", "configurePreset": "qt5-shared"},
+    {"name": "qt6-shared", "configurePreset": "qt6-shared"},
+    {"name": "qt5-static", "configurePreset": "qt5-static"},
+    {"name": "qt6-static", "configurePreset": "qt6-static"},
+    {"name": "qt5-sanitizers", "configurePreset": "qt5-sanitizers"}
+  ],
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error"},
+      "environment": {"QT_QPA_PLATFORM": "offscreen"}
+    },
+    {"name": "qt5-shared", "inherits": "base", "configurePreset": "qt5-shared"},
+    {"name": "qt6-shared", "inherits": "base", "configurePreset": "qt6-shared"},
+    {"name": "qt5-static", "inherits": "base", "configurePreset": "qt5-static"},
+    {"name": "qt6-static", "inherits": "base", "configurePreset": "qt6-static"},
+    {"name": "qt5-sanitizers", "inherits": "base", "configurePreset": "qt5-sanitizers"}
+  ]
+}

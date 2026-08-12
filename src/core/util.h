@@ -22,8 +22,8 @@
 
 #include "core/core.h"
 
-#include "cpl_json.h"
+#include <QJsonObject>
 
-QMap<QString, QVariant> toMap(const CPLJSONObject &root);
+QMap<QString, QVariant> toMap(const QJsonObject &root);
 
 #endif // NGSTD_UTIL_H

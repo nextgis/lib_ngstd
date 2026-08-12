@@ -1,0 +1,33 @@
+---
+BasedOnStyle: LLVM
+Language: Cpp
+ColumnLimit: 79
+IndentWidth: 4
+AccessModifierOffset: -4
+ContinuationIndentWidth: 4
+ConstructorInitializerIndentWidth: 4
+DerivePointerAlignment: false
+PointerAlignment: Right
+ReferenceAlignment: Pointer
+SortIncludes: CaseSensitive
+NamespaceIndentation: None
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  SplitEmptyFunction: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: WithoutElse
+IndentCaseLabels: false
+FixNamespaceComments: true
+PenaltyReturnTypeOnItsOwnLine: 1000
+WhitespaceSensitiveMacros:
+  - Q_PROPERTY
+...

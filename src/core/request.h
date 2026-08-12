@@ -28,6 +28,8 @@
 #include <QStringList>
 #include <QVariant>
 
+class QNetworkAccessManager;
+
 /**
  * @brief The IHTTPAuth class is base class for HTTP Authorization headers
  */
@@ -42,6 +44,8 @@ class NGCORE_EXPORT NGRequest
 {
 
 public:
+    using NetworkAccessManagerProvider = QNetworkAccessManager *(*)();
+
     static bool addAuth(const QStringList &urls, const QMap<QString, QString> &options);
     static bool addAuthURL(const QString &basicUrl, const QString &newUrl);
     static void removeAuthURL(const QString &url);
@@ -57,6 +61,8 @@ public:
                          int proxyPort = 0, const QString &proxyUser = "",
                          const QString &proxyPassword = "",
                          const QString &proxyAuth = "ANY");
+    static void setNetworkAccessManager(QNetworkAccessManager *manager);
+    static void setNetworkAccessManagerProvider(NetworkAccessManagerProvider provider);
     static NGRequest &instance();
 
 public:
@@ -64,7 +70,6 @@ public:
     void removeAuth(const QString &url, const QString &logoutUrl);
     const QString authHeader(const QString &url);
     const QMap<QString, QString> properties(const QString &url) const;
-    char **baseOptions() const;
     QString lastError() const;
     void resetError();
     int timeout() const;
@@ -83,11 +88,9 @@ private:
     void removeAuthURLImpl(const QString &url);
 
     QMap<QString, QSharedPointer<IHTTPAuth>> m_auths;
-    QString m_connTimeout;
     QString m_timeout;
     QString m_maxRetry;
     QString m_retryDelay;
-    QString m_certPem;
     QString m_detailedError;
 };
 

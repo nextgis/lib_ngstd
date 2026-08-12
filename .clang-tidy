@@ -1,0 +1,13 @@
+---
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  portability-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  -performance-enum-size
+WarningsAsErrors: ''
+HeaderFilterRegex: 'widgets/(include|src)/.*'
+FormatStyle: file
+...

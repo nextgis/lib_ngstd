@@ -21,7 +21,6 @@
 #include "updater.h"
 
 #include <QApplication>
-#include <QWidget>
 #include <QXmlStreamReader>
 
 #if defined Q_OS_WIN
@@ -32,12 +31,16 @@ constexpr const char *updater = "nextgisupdater.app/Contents/MacOS/nextgisupdate
 constexpr const char *updater = "";
 #endif //
 
-NGUpdater::NGUpdater( QWidget *parent ) : QObject( parent )
+NGUpdater::NGUpdater( QObject *parent ) : QObject( parent )
 {
     m_maintainerProcess = new QProcess(this);
 
     connect(m_maintainerProcess, SIGNAL(started()), this, SLOT(maintainerStrated()) );
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(m_maintainerProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(maintainerErrored(QProcess::ProcessError)));
+#else
     connect(m_maintainerProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(maintainerErrored(QProcess::ProcessError)));
+#endif
     connect(m_maintainerProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(maintainerStateChanged(QProcess::ProcessState)));
     connect(m_maintainerProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(maintainerFinished(int, QProcess::ExitStatus)));
     connect(m_maintainerProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(maintainerReadyReadStandardOutput()));

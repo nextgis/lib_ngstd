@@ -28,6 +28,10 @@
 
 #include "core/version.h"
 
+#ifndef NGSTD_PLUGIN_LIB_DIR
+#define NGSTD_PLUGIN_LIB_DIR "lib"
+#endif
+
 static NGCoreApplication *gCoreApplication = nullptr;
 
 NGCoreApplication::NGCoreApplication(const QString &applicationName,
@@ -66,7 +70,7 @@ void NGCoreApplication::init(int &argc, char **argv)
 #else
     QDir defaultPrefixDir("/usr");
     QCoreApplication::addLibraryPath(defaultPrefixDir.absolutePath() +
-        QString("/%1/qt%2/plugins").arg(INSTALL_LIB_DIR).arg(qtVer));
+        QString("/%1/qt%2/plugins").arg(NGSTD_PLUGIN_LIB_DIR).arg(qtVer));
 #endif
     m_prefixPath = defaultPrefixDir.absolutePath();
 

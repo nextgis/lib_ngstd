@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
+"""ngstd framework bindings."""
 
-__author__ = 'Dmitry Baryshnikov'
-__date__ = 'May 2018'
-__copyright__ = '(C) 2018, NextGIS'
-
-from ngstd._framework import *
+from ngstd._framework import *  # noqa: F401,F403

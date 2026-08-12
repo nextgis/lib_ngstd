@@ -22,7 +22,10 @@
 
 #include "core/core.h"
 #include <QByteArray>
-#include "framework/logger//sentrylogger.h"
+
+#ifdef NGSTD_WITH_SENTRY
+#include "framework/logger/sentrylogger.h"
+#endif
 
 #if QT_VERSION >= 0x050000
     #include <QtConcurrent/QtConcurrent>
@@ -35,6 +38,10 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QUrl>
@@ -46,8 +53,6 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
-
-#include "cpl_json.h"
 
 #include "request.h"
 #include "signserver.h"
@@ -365,6 +370,7 @@ void NGAccess::setEndPoint(const QString &endPoint, AuthSourceType type)
 
 void NGAccess::initSentry(const QString &sentryKey, const QString &version)
 {
+#ifdef NGSTD_WITH_SENTRY
     auto currentLogger = getLogger();
     auto sentryLogger = std::make_shared<SentryLogger>(
         currentLogger,
@@ -372,6 +378,11 @@ void NGAccess::initSentry(const QString &sentryKey, const QString &version)
         version
     );
     setLogger(sentryLogger);
+#else
+    Q_UNUSED(sentryKey)
+    Q_UNUSED(version)
+    logMessage(QStringLiteral("Sentry support is disabled"), LogLevel::Warning);
+#endif
 }
 
 QString NGAccess::endPoint() const
@@ -801,16 +812,32 @@ extern void updateUserInfoFunction(const QString &configDir,
             avatarUrl = QString("https://gravatar.com/avatar/%1?s=64&r=pg&d=robohash")
                     .arg(emailHash);
         }
-        // Get roles
-        std::string ra = result["resource_access"].toString().toStdString();
-        if(!ra.empty()) {
-            CPLJSONDocument doc;
-            if(doc.LoadMemory(ra)) {
-                auto root = doc.GetRoot();
-                auto rolesArray = root.GetArray(clientId.toStdString() + "/roles");
-                for(int i = 0; i < rolesArray.Size(); ++i) {
-                    rolesList.append(rolesArray[i].ToString().c_str());
-                }
+        const QVariant resourceAccess = result["resource_access"];
+        QJsonObject resourceAccessObject;
+        if (resourceAccess.canConvert<QVariantMap>()) {
+            resourceAccessObject = QJsonObject::fromVariantMap(
+                resourceAccess.toMap()
+            );
+        }
+        else {
+            const auto resourceAccessJson = resourceAccess.toString().toUtf8();
+            const QJsonDocument document = QJsonDocument::fromJson(
+                resourceAccessJson
+            );
+            if (document.isObject()) {
+                resourceAccessObject = document.object();
+            }
+        }
+
+        const QJsonArray rolesArray = resourceAccessObject
+            .value(clientId)
+            .toObject()
+            .value(QLatin1String("roles"))
+            .toArray();
+        for (const QJsonValue &role : rolesArray) {
+            const QString roleName = role.toString();
+            if (!roleName.isEmpty()) {
+                rolesList.append(roleName);
             }
         }
     }

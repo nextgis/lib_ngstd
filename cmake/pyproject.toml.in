@@ -1,5 +1,5 @@
 [build-system]
-requires = ["sip >=6, <7"]
+requires = ["PyQt-builder >=1.15, <2", "sip >=6, <7"]
 build-backend = "sipbuild.api"
 
 [tool.sip.metadata]
@@ -8,4 +8,4 @@ version = "@VERSION@"
 author = "NextGIS"
 
 [tool.sip.project]
-sip-include-dirs = ["@PYQT5_SIP_DIR@"]
+sip-include-dirs = ["@PYQT_SIP_DIR@"]

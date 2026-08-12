@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if("@NGSTD_QT_MAJOR@" STREQUAL "6")
+    find_dependency(Qt6 6.2 COMPONENTS Core Gui Svg Widgets)
+else()
+    find_dependency(Qt5 5.15 COMPONENTS Core Gui Svg Widgets)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/ngstd_widgets_targets.cmake")

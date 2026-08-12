@@ -43,6 +43,7 @@
 build/
 Build/
 build-*/
+/out/
 
 # CMake generated files
 CMakeFiles/
@@ -51,12 +52,22 @@ cmake_install.cmake
 Makefile
 install_manifest.txt 
 compile_commands.json
+CMakeUserPresets.json
+conan_toolchain.cmake
+conanbuild.*
+conanrun.*
+deactivate_conanbuild.*
+deactivate_conanrun.*
 
 # Temporary files
 *.tmp 
 *.log 
 *.bak 
 *.swp 
+
+# Python generated files
+__pycache__/
+*.py[cod]
 
 # vcpkg
 vcpkg_installed/
@@ -67,6 +78,8 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+.ruff_cache/
+.clang-tidy-cache/
 # C++ objects and libs
 *.slo
 *.lo

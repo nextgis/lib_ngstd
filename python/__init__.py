@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
+"""Python bindings for ngstd."""
 
-__author__ = 'Dmitry Baryshnikov'
-__date__ = 'May 2018'
-__copyright__ = '(C) 2018, NextGIS'
+from ngstd.core import *  # noqa: F401,F403
+from ngstd.framework import *  # noqa: F401,F403
 
-from ngstd.core import *
-from ngstd.framework import *
-
-__version__ = getVersionString()
+__version__ = getVersionString()  # noqa: F405

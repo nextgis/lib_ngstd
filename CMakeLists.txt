@@ -1,210 +1,146 @@
-#***************************************************************************
-# Project:  NextGIS common desctop libraries
-# Purpose:  cmake script
-# Author:   Dmitry Baryshnikov, bishop.dev@gmail.com
-#***************************************************************************
-#   Copyright (C) 2015-2018 NextGIS, info@nextgis.ru
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#***************************************************************************
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
+project(ngstd LANGUAGES CXX)
 
-project(ngstd)
+set(NGSTD_QT_MAJOR "5" CACHE STRING "Qt major version used to build ngstd")
+set_property(CACHE NGSTD_QT_MAJOR PROPERTY STRINGS 5 6)
+option(WITH_BINDINGS "Build Python bindings" OFF)
+option(WITH_SENTRY "Build Sentry logger support" OFF)
+option(BUILD_CORE "Build ngstd core library" ON)
+option(BUILD_FRAMEWORK "Build ngstd framework library" ON)
+option(BUILD_WIDGETS "Build ngstd Qt Widgets library" ON)
+option(NGSTD_WIDGETS_BUILD_GALLERY "Build ngstd widgets gallery" OFF)
+option(BUILD_TESTING "Build ngstd tests" OFF)
+option(NGSTD_WIDGETS_WARNINGS_AS_ERRORS "Treat widget warnings as errors" OFF)
+option(NGSTD_WIDGETS_ENABLE_SANITIZERS "Enable widget ASan and UBSan" OFF)
+option(NGSTD_WIDGETS_ENABLE_COVERAGE "Enable widget coverage" OFF)
+option(NGSTD_ENABLE_PACKAGING_TESTS "Test the generated source package" OFF)
 
-option(WITH_QT6 "Build with Qt6 instead of Qt5" OFF)
+set(CMAKE_COLOR_MAKEFILE ON)
 
-if(WITH_QT6)
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(util)
+
+ngstd_read_version(
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/version.h"
+    VERSION
+    NGLIB_MAJOR_VERSION
+    NGLIB_MINOR_VERSION
+    NGLIB_PATCH_NUMBER
+)
+message(STATUS "ngstd version ${VERSION}")
+
+set(NGSTD_PLUGIN_LIB_DIR "lib" CACHE STRING "Relative Qt plugin library directory")
+
+if(NOT NGSTD_QT_MAJOR MATCHES "^(5|6)$")
+    message(FATAL_ERROR "NGSTD_QT_MAJOR must be 5 or 6")
+endif()
+
+if(NGSTD_QT_MAJOR STREQUAL "6")
     set(QT_VERSION_BASE Qt6)
-    set(CMAKE_CXX_STANDARD 17)
 else()
     set(QT_VERSION_BASE Qt5)
-    set(CMAKE_CXX_STANDARD 14)
+endif()
+set(NGSTD_WIDGETS_QT_PACKAGE ${QT_VERSION_BASE})
+
+if(BUILD_FRAMEWORK AND NOT BUILD_CORE)
+    message(FATAL_ERROR "BUILD_FRAMEWORK requires BUILD_CORE")
 endif()
 
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# some init settings
-set(CMAKE_COLOR_MAKEFILE ON)
-# set path to additional CMake modules
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-
-if(NOT DEFINED PACKAGE_VENDOR)
-    set(PACKAGE_VENDOR NextGIS)
+if(WITH_BINDINGS AND (NOT BUILD_CORE OR NOT BUILD_FRAMEWORK))
+    message(FATAL_ERROR "WITH_BINDINGS requires BUILD_CORE and BUILD_FRAMEWORK")
 endif()
 
-if(NOT DEFINED PACKAGE_BUGREPORT)
-    set(PACKAGE_BUGREPORT info@nextgis.com)
+if(WITH_SENTRY AND NOT BUILD_FRAMEWORK)
+    message(FATAL_ERROR "WITH_SENTRY requires BUILD_FRAMEWORK")
 endif()
 
-add_definitions(-DPACKAGE_VENDOR=${PACKAGE_VENDOR})
-
-if(OSX_FRAMEWORK AND (BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS))
-  message(FATAL_ERROR "Only OSX_FRAMEWORK key or any or both BUILD_SHARED_LIBS
-                       and BUILD_STATIC_LIBS keys are permitted")
-endif()
-
-if(OSX_FRAMEWORK)
-    set(INSTALL_LIB_DIR "Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
-    set(INSTALL_CMAKECONF_DIR CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
-    set(SKIP_INSTALL_HEADERS ON)
-    set(SKIP_INSTALL_FILES ON)
-
-    set(CMAKE_MACOSX_RPATH ON)
-else()
-    include(GNUInstallDirs)
-
-    set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
-    set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
-    set(INSTALL_INC_DIR "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}" CACHE INTERNAL "Installation directory for headers" FORCE)
-    set(INSTALL_TRANSLATIONS_DIR "${CMAKE_INSTALL_DATADIR}/translations" CACHE INTERNAL "Installation directory for translations" FORCE)
-    set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
+if(NGSTD_WIDGETS_BUILD_GALLERY AND NOT BUILD_WIDGETS)
+    message(FATAL_ERROR "NGSTD_WIDGETS_BUILD_GALLERY requires BUILD_WIDGETS")
 endif()
 
 if(POLICY CMP0071)
     cmake_policy(SET CMP0071 NEW)
 endif()
 
-# Tell CMake to run moc when necessary:
-# FIXME: Not working on Qt <= 5.5 and Ubuntu [trusty, xenial]
-# set(CMAKE_AUTOMOC ON)
-
-# As moc files are generated in the binary dir, tell CMake
-# to always look for includes there:
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include(util)
-check_version(NGLIB_MAJOR_VERSION NGLIB_MINOR_VERSION NGLIB_PATCH_NUMBER)
-set(VERSION ${NGLIB_MAJOR_VERSION}.${NGLIB_MINOR_VERSION}.${NGLIB_PATCH_NUMBER})
-
-if(OSX_FRAMEWORK)
-    set(FRAMEWORK_VERSION ${NGLIB_MAJOR_VERSION})
-endif()
-
-report_version(${PROJECT_NAME} ${VERSION})
-
-configure_file(cmake/cmake_uninstall.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
-
-set(PACKAGE_NAME ${PROJECT_NAME})
-string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
-
-option(WITH_BINDINGS "Build python bindings" OFF)
-
-if(WITH_BINDINGS AND WITH_QT6)
-    message(WARNING "Attempting to build Python bindings with Qt6. Proceeding, but if the build fails, try disabling WITH_QT6 or WITH_BINDINGS.")
-endif()
-
 if(WITH_BINDINGS)
-    find_package(Python3 COMPONENTS Interpreter Development)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
-    if(${Python3_FOUND})
-        set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
-        set(PYTHON_LIBRARY ${Python3_LIBRARIES})
-        set(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
-    endif()
-
-    if(OSX_FRAMEWORK)
-        set(NGSTD_PYTHON_DIR "Library/Python/${PYTHON_VERSION_MAJOR}/site-packages/${PROJECT_NAME}")
-    elseif(WIN32)
-        set(NGSTD_PYTHON_DIR "${INSTALL_LIB_DIR}/Python${PYTHON_VERSION_MAJOR}/site-packages/${PROJECT_NAME}")
-    else()
-        set(NGSTD_PYTHON_DIR "lib/python${PYTHON_VERSION_MAJOR}/dist-packages/${PROJECT_NAME}")
-    endif()
+    set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
 endif()
 
-include(FindAnyProject)
+set(NGSTD_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(NGLIBS)
+if(BUILD_CORE)
+    list(APPEND NGLIBS core)
+endif()
+if(BUILD_FRAMEWORK)
+    list(APPEND NGLIBS framework)
+endif()
+if(BUILD_WIDGETS)
+    list(APPEND NGLIBS widgets)
 endif()
 
-set(NGSTD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(NGSTD_QT_COMPONENTS Core)
+if(BUILD_CORE OR BUILD_FRAMEWORK OR WITH_BINDINGS)
+    list(APPEND NGSTD_QT_COMPONENTS Network)
+endif()
+if(BUILD_FRAMEWORK OR BUILD_WIDGETS OR WITH_BINDINGS)
+    list(APPEND NGSTD_QT_COMPONENTS Gui Widgets)
+endif()
+if(BUILD_WIDGETS)
+    list(APPEND NGSTD_QT_COMPONENTS Svg)
+endif()
+if(BUILD_CORE OR BUILD_FRAMEWORK)
+    list(APPEND NGSTD_QT_COMPONENTS LinguistTools)
+endif()
+if(BUILD_FRAMEWORK)
+    list(APPEND NGSTD_QT_COMPONENTS Concurrent)
+endif()
+if(BUILD_TESTING AND BUILD_WIDGETS)
+    list(APPEND NGSTD_QT_COMPONENTS Test)
+endif()
+list(REMOVE_DUPLICATES NGSTD_QT_COMPONENTS)
 
-# Used in src and translations
-set(NGLIBS
-    core
-    framework
-)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
-find_anyproject(${QT_VERSION_BASE} REQUIRED COMPONENTS Core Widgets Gui Network Svg LinguistTools)
-if(WITH_QT6)
+if(NGSTD_QT_MAJOR STREQUAL "6")
+    find_package(Qt6 6.2 REQUIRED COMPONENTS ${NGSTD_QT_COMPONENTS})
     message(STATUS "Building with Qt6: ${Qt6Core_VERSION}")
 else()
+    find_package(Qt5 5.15 REQUIRED COMPONENTS ${NGSTD_QT_COMPONENTS})
     message(STATUS "Building with Qt5: ${Qt5Core_VERSION_STRING}")
 endif()
 
-if(WITH_ZLIB_EXTERNAL)
-    # ZLIB needed for uic, rcc, lrelease and lupdate
-    find_anyproject(ZLIB REQUIRED)
-
-    get_target_property(ZLIB_IMPORTED_LOCATION ${ZLIB_LIBRARIES} IMPORTED_LOCATION_RELEASE)
-    get_target_property(RCC_PATH ${QT_VERSION_BASE}::lrelease IMPORTED_LOCATION)
-    get_filename_component(QT_BIN_DIR ${RCC_PATH} PATH)
-    if(WIN32)
-        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
-        set(ENV{PATH} "$ENV{PATH};${PATH_DIR}")
-        if(EXISTS ${ZLIB_IMPORTED_LOCATION})
-            file(COPY ${ZLIB_IMPORTED_LOCATION} DESTINATION ${QT_BIN_DIR})
-        endif()
-    elseif(OSX_FRAMEWORK)
-        get_filename_component(PATH_DIR ${ZLIB_IMPORTED_LOCATION} PATH)
-        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
-        get_filename_component(PATH_DIR ${PATH_DIR} PATH)
-        if(EXISTS ${PATH_DIR})
-            file(COPY ${PATH_DIR} DESTINATION ${QT_BIN_DIR}/Frameworks)
-        endif()
-    endif()
+if(BUILD_TESTING)
+    enable_testing()
 endif()
 
 add_subdirectory(src)
+
+if(NGSTD_WIDGETS_BUILD_GALLERY)
+    add_subdirectory(examples/widgets_gallery)
+endif()
+
 if(WITH_BINDINGS)
     add_subdirectory(python)
 endif()
 
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-# Export package ===============================================================
-
-if(REGISTER_PACKAGE)
-    # Export the package for use from the build-tree
-    # (this registers the build-tree with a global CMake-registry)
-    export(PACKAGE ${PACKAGE_UPPER_NAME})
+if(BUILD_TESTING AND BUILD_WIDGETS)
+    add_subdirectory(tests)
 endif()
 
-# Archiving ====================================================================
-
-set(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
-set(CPACK_PACKAGE_VENDOR "${PACKAGE_VENDOR}")
-set(CPACK_PACKAGE_VERSION "${VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_NAME} Installation")
-set(CPACK_PACKAGE_RELOCATABLE TRUE)
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-set(CPACK_GENERATOR "ZIP")
-set(CPACK_MONOLITHIC_INSTALL ON)
-set(CPACK_STRIP_FILES TRUE)
-
-# Get cpack zip archive name
-get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
-
-include(CPack)
+if(NGSTD_ENABLE_PACKAGING_TESTS)
+    set(CPACK_SOURCE_GENERATOR "TGZ")
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "ngstd-${VERSION}")
+    set(CPACK_SOURCE_IGNORE_FILES
+        "/\\.agents/"
+        "/\\.codex/"
+        "/\\.git/"
+        "/\\.ruff_cache/"
+        "/\\.venv/"
+        "/\\.vscode/"
+        "/build[^/]*/"
+        "/out/"
+    )
+    include(CPack)
+endif()

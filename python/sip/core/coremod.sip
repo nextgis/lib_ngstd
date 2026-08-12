@@ -25,7 +25,7 @@ public:
     static bool getFile(const QString &url, const QString &path);
     static QString getAuthHeader(const QString &url);
     static QString uploadFile(const QString &url, const QString &path, const QString &name);
-    static void setProxy(bool useProxy, bool useSystemProxy, const QString &proxyUrl, int porxyPort, const QString &proxyUser, const QString &proxyPassword, const QString &proxyAuth);
+    static void setProxy(bool useProxy, bool useSystemProxy, const QString &proxyUrl, int proxyPort, const QString &proxyUser, const QString &proxyPassword, const QString &proxyAuth);
 private:
     NGRequest();
     ~NGRequest();

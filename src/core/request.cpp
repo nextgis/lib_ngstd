@@ -20,11 +20,6 @@
 
 #include "request.h"
 
-#ifdef Q_OS_WIN
-#include <QCoreApplication>
-#include <QDir>
-#endif
-
 #include <QByteArray>
 #include <QDebug>
 #include <QEventLoop>
@@ -38,16 +33,12 @@
 #include <QNetworkProxyFactory>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPointer>
 #include <QSslError>
 #include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QtGlobal>
-
-#include "cpl_http.h"
-#include "cpl_string.h"
-#include "gdal.h"
-#include "gdal_version.h"
 
 // std
 #include <algorithm>
@@ -68,6 +59,9 @@
 
 
 namespace {
+
+QPointer<QNetworkAccessManager> gNetworkAccessManager;
+NGRequest::NetworkAccessManagerProvider gNetworkAccessManagerProvider = nullptr;
 
 struct RequestResult {
     QByteArray data;
@@ -107,8 +101,25 @@ QString describeRequestResult(const QString &operation, const QString &url,
 
 QNetworkAccessManager *networkManager()
 {
+    if (gNetworkAccessManagerProvider) {
+        if (QNetworkAccessManager *manager = gNetworkAccessManagerProvider()) {
+            return manager;
+        }
+    }
+    if (gNetworkAccessManager) {
+        return gNetworkAccessManager.data();
+    }
+
     static QNetworkAccessManager manager;
     return &manager;
+}
+
+bool hasExternalNetworkManager()
+{
+    if (gNetworkAccessManagerProvider && gNetworkAccessManagerProvider()) {
+        return true;
+    }
+    return !gNetworkAccessManager.isNull();
 }
 
 bool configureProxyFromEnvironmentValue(const QString &proxyValue, const QString &source)
@@ -134,17 +145,6 @@ bool configureProxyFromEnvironmentValue(const QString &proxyValue, const QString
                               proxyUrl.userName(), proxyUrl.password());
     networkManager()->setProxyFactory(nullptr);
     networkManager()->setProxy(proxy);
-
-    const QString gdalProxy = QStringLiteral("%1:%2").arg(proxyUrl.host()).arg(proxyPort);
-    const QString gdalProxyCredentials = (proxyUrl.userName().isEmpty() && proxyUrl.password().isEmpty())
-        ? QString()
-        : QStringLiteral("%1:%2").arg(proxyUrl.userName(), proxyUrl.password());
-    const QByteArray gdalProxyBytes = gdalProxy.toUtf8();
-    const QByteArray gdalProxyCredentialsBytes = gdalProxyCredentials.toUtf8();
-    CPLSetConfigOption("GDAL_HTTP_PROXY", gdalProxyBytes.constData());
-    CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD",
-                       gdalProxyCredentialsBytes.isEmpty() ? nullptr : gdalProxyCredentialsBytes.constData());
-    CPLSetConfigOption("GDAL_PROXY_AUTH", "ANY");
 
     qInfo() << "Configured NGRequest proxy from" << source
             << proxyUrl.host() << proxyPort
@@ -349,68 +349,7 @@ bool parseJsonObject(const QByteArray &data, QJsonObject *out, QString *error)
     return true;
 }
 
-std::pair<std::string, std::string> resolveGDALProxyCredentials(const bool useSystemProxy, const QString &proxyUrl,
-                                                                const int proxyPort, const QString& proxyUser,
-                                                                const QString& proxyPassword)
-{
-    const auto makeUserPwd = [](const QString &user, const QString &password) -> std::string
-    {
-        if (user.isEmpty() && password.isEmpty()) {
-            return std::string();
-        }
-        return user.toStdString() + ":" + password.toStdString();
-    };
-
-    std::string url;
-    std::string userpwd;
-
-    if (useSystemProxy) {
-        QNetworkProxyQuery npq(QUrl("http://www.google.com"));
-        QList<QNetworkProxy> listOfProxies =
-            QNetworkProxyFactory::systemProxyForQuery(npq);
-        // Get first proxy if any.
-        if (!listOfProxies.isEmpty()) {
-            url = listOfProxies[0].hostName().toStdString() + ":" +
-                std::to_string(listOfProxies[0].port());
-            userpwd = makeUserPwd(listOfProxies[0].user(),
-                                  listOfProxies[0].password());
-
-        }
-    }
-    else
-    {
-        url = proxyUrl.toStdString() + ":" + std::to_string(proxyPort);
-        userpwd = makeUserPwd(proxyUser, proxyPassword);
-    }
-
-    return std::make_pair(url, userpwd);
-}
-
 } // namespace
-
-////////////////////////////////////////////////////////////////////////////////
-// Authorization header callback
-////////////////////////////////////////////////////////////////////////////////
-
-static auto gAuthHeaderCallback = [](const char *pszURL) -> std::string
-{
-    if (!pszURL)
-        return "";
-
-    return NGRequest::instance().authHeader(QString(pszURL)).toStdString();
-};
-
-/*
-static void InstallAuthHeaderCallback()
-{
-    CPLHTTPSetAuthHeaderCallback(gAuthHeaderCallback);
-}
-
-static void RemoveAuthHeaderCallback()
-{
-    CPLHTTPSetAuthHeaderCallback(nullptr);
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // The HTTPAuthBasic class
@@ -555,54 +494,23 @@ const QString HTTPAuthBearer::header()
 ////////////////////////////////////////////////////////////////////////////////
 
 NGRequest::NGRequest() :
-    m_connTimeout("15"),
     m_timeout("20"),
     m_maxRetry("3"),
     m_retryDelay("5"),
     m_detailedError("")
 {
-    // InstallAuthHeaderCallback();
     networkManager();
     configureInitialProxy();
-
-#ifdef Q_OS_WIN
-    // Add SSL cert path
-    const QString &certPemPath = QCoreApplication::applicationDirPath() + QDir::separator() + QLatin1String("..\\share\\ssl\\certs");
-    QDir certPemDir(certPemPath);
-    m_certPem = certPemDir.absoluteFilePath("cert.pem");
-#endif
 }
 
 NGRequest::~NGRequest()
 {
-    // RemoveAuthHeaderCallback();
 }
 
 void NGRequest::setErrorMessage(const QString &err)
 {
     MUTEX_LOCKER;
     m_detailedError = err;
-}
-
-char **NGRequest::baseOptions() const
-{
-    MUTEX_LOCKER;
-    char **options = nullptr;
-    auto connTimeout = m_connTimeout.toStdString();
-    options = CSLAddNameValue(options, "CONNECTTIMEOUT", connTimeout.c_str());
-    auto timeout = m_timeout.toStdString();
-    options = CSLAddNameValue(options, "TIMEOUT", timeout.c_str());
-    auto maxRetry = m_maxRetry.toStdString();
-    options = CSLAddNameValue(options, "MAX_RETRY", maxRetry.c_str());
-    auto retryDelay = m_retryDelay.toStdString();
-    options = CSLAddNameValue(options, "RETRY_DELAY", retryDelay.c_str());
-
-#ifdef Q_OS_WIN
-    auto certPem = m_certPem.toStdString();
-    options = CSLAddNameValue(options, "CAINFO", certPem.c_str());
-#endif
-
-    return options;
 }
 
 QString NGRequest::lastError() const
@@ -800,6 +708,26 @@ bool NGRequest::getFile(const QString &url, const QString &path)
     return true;
 }
 
+void NGRequest::setNetworkAccessManager(QNetworkAccessManager *manager)
+{
+    MUTEX_LOCKER;
+    gNetworkAccessManagerProvider = nullptr;
+    gNetworkAccessManager = manager;
+    if (!manager) {
+        configureInitialProxy();
+    }
+}
+
+void NGRequest::setNetworkAccessManagerProvider(NetworkAccessManagerProvider provider)
+{
+    MUTEX_LOCKER;
+    gNetworkAccessManager.clear();
+    gNetworkAccessManagerProvider = provider;
+    if (!provider) {
+        configureInitialProxy();
+    }
+}
+
 NGRequest &NGRequest::instance()
 {
     static NGRequest n;
@@ -958,16 +886,21 @@ QString NGRequest::uploadFile(const QString &url, const QString &path,
  * @param porxyPort Proxy port.
  * @param proxyUser User to authenticate in proxy.
  * @param proxyPassword Password to authenticate in proxy.
- * @param proxyAuth Proxy authentication scheme to use. Can be BASIC/NTLM/DIGEST/ANY.
+ * @param proxyAuth Reserved parameter.
  */
 void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &proxyUrl,
                          int proxyPort, const QString &proxyUser,
                          const QString &proxyPassword, const QString &proxyAuth)
 {
     MUTEX_LOCKER;
+    Q_UNUSED(proxyAuth)
 
     if (useProxy) {
-        if (useSystemProxy) {
+        if (hasExternalNetworkManager()) {
+            // The owner of an injected network manager is responsible for proxy,
+            // SSL exceptions, authentication prompts and cookies.
+        }
+        else if (useSystemProxy) {
             QNetworkProxyFactory::setUseSystemConfiguration(true);
             // Drop previously forced proxy and return to default/system resolution.
             networkManager()->setProxy(QNetworkProxy::DefaultProxy);
@@ -978,20 +911,12 @@ void NGRequest::setProxy(bool useProxy, bool useSystemProxy, const QString &prox
                                 proxyUser, proxyPassword);
             networkManager()->setProxyFactory(nullptr);
             networkManager()->setProxy(proxy);
-
-            CPLSetConfigOption("GDAL_PROXY_AUTH", proxyAuth.toStdString().c_str());
         }
-
-        const auto gdalProxyCredentials = resolveGDALProxyCredentials(useSystemProxy, proxyUrl, proxyPort, proxyUser, proxyPassword);
-        CPLSetConfigOption("GDAL_HTTP_PROXY", gdalProxyCredentials.first.c_str());
-        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", gdalProxyCredentials.second.c_str());
     }
     else {
-        networkManager()->setProxyFactory(nullptr);
-        networkManager()->setProxy(QNetworkProxy::NoProxy);
-
-        CPLSetConfigOption("GDAL_HTTP_PROXY", nullptr);
-        CPLSetConfigOption("GDAL_HTTP_PROXYUSERPWD", nullptr);
-        CPLSetConfigOption("GDAL_PROXY_AUTH", nullptr);
+        if (!hasExternalNetworkManager()) {
+            networkManager()->setProxyFactory(nullptr);
+            networkManager()->setProxy(QNetworkProxy::NoProxy);
+        }
     }
 }

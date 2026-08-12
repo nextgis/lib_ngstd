@@ -22,8 +22,23 @@
 #include "core/version.h"
 #include "core/util.h"
 
-#include "cpl_json.h"
-#include "cpl_string.h"
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QUrl>
+
+namespace {
+
+QMap<QString, QVariant> documentToMap(const QJsonDocument &document)
+{
+    if (!document.isObject()) {
+        return QMap<QString, QVariant>();
+    }
+
+    return toMap(document.object());
+}
+
+} // namespace
 
 const char* getVersion()
 {
@@ -35,50 +50,58 @@ QString getVersionString()
     return QString::fromLatin1(NGLIB_VERSION_STRING);
 }
 
-QMap<QString, QVariant> memJsonToMap(const QString &str) {
-    CPLJSONDocument in;
-    if(in.LoadMemory(str.toStdString())) {
-        return toMap(in.GetRoot());
+QMap<QString, QVariant> memJsonToMap(const QString &str)
+{
+    QJsonParseError error;
+    const QJsonDocument document = QJsonDocument::fromJson(str.toUtf8(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        return QMap<QString, QVariant>();
     }
-    return QMap<QString, QVariant>();
+
+    return documentToMap(document);
 }
 
 QMap<QString, QVariant> jsonToMap(const QString &path)
 {
-    CPLJSONDocument in;
-    if(in.Load(path.toStdString())) {
-        return toMap(in.GetRoot());
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return QMap<QString, QVariant>();
     }
-    return QMap<QString, QVariant>();
+
+    QJsonParseError error;
+    const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        return QMap<QString, QVariant>();
+    }
+
+    return documentToMap(document);
 }
 
-QString fromBase64(const QString &str) {
-//    Replaces “+” by “-” (minus)
-//    Replaces “/” by “_” (underline)
-//    Does not require a padding character
-//    Forbids line separators
+QString fromBase64(const QString &str)
+{
+    QByteArray encoded = str.toUtf8();
+    encoded.replace('-', '+');
+    encoded.replace('_', '/');
+    while (encoded.size() % 4 != 0) {
+        encoded.append('=');
+    }
 
-    QString cpy(str);
-    cpy = cpy.replace("-", "+").replace("_", "/");
-    GByte *base64 = reinterpret_cast<GByte*>(CPLStrdup(cpy.toStdString().c_str()));
-    int length = CPLBase64DecodeInPlace(base64);
-    std::string out(reinterpret_cast<const char*>(base64), length);
-    CPLFree(base64);
-    return QString::fromStdString(out);
+    return QString::fromUtf8(QByteArray::fromBase64(encoded));
 }
 
-QString toBase64(unsigned char *data, int size) {
-    char* base64new = CPLBase64Encode(size, data);
-    QString out(base64new);
-    CPLFree(base64new);
-    out = out.replace("+", "-").replace("/", "_").replace("=", "");
-    return out;
+QString toBase64(unsigned char *data, int size)
+{
+    if (!data || size <= 0) {
+        return QString();
+    }
+
+    const QByteArray raw(reinterpret_cast<const char *>(data), size);
+    return QString::fromLatin1(
+        raw.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals)
+    );
 }
 
 QString unescapeUrl(const QString &str)
 {
-    char* unescaped = CPLUnescapeString(str.toStdString().c_str(), nullptr, CPLES_URL);
-    QString out(unescaped);
-    CPLFree(unescaped);
-    return out;
+    return QUrl::fromPercentEncoding(str.toUtf8());
 }
