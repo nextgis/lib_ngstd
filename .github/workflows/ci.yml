@@ -1,0 +1,307 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop-matrix:
+    name: ${{ matrix.os }} / Qt ${{ matrix.qt }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-13]
+        qt: [5.15.2, 6.2.4]
+        include:
+          - qt: 5.15.2
+            major: 5
+          - qt: 6.2.4
+            major: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt }}
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - name: Configure
+        run: >-
+          cmake -S . -B build -G Ninja
+          -DNGSTD_QT_MAJOR=${{ matrix.major }}
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DBUILD_TESTING=ON
+          -DNGSTD_WIDGETS_WARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build --parallel 2
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  static-builds:
+    name: Static / Qt ${{ matrix.qt }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qt: 5.15.2
+            major: 5
+          - qt: 6.2.4
+            major: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt }}
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - run: >-
+          cmake -S . -B build -G Ninja
+          -DNGSTD_QT_MAJOR=${{ matrix.major }}
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=OFF
+          -DBUILD_TESTING=ON
+          -DNGSTD_WIDGETS_WARNINGS_AS_ERRORS=ON
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
+
+  quality:
+    name: Format, lint, codegen, resources
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 5.15.2
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - run: python -m pip install ruff==0.16.2
+      - name: Python quality
+        run: |
+          ruff check tools/widgets conanfile.py
+          ruff format --check tools/widgets conanfile.py
+      - name: C++ format
+        run: >-
+          find src/widgets/include src/widgets/src tests/widgets examples/widgets_gallery
+          -type f \( -name '*.h' -o -name '*.cpp' \)
+          ! -path '*/generated/*' -print0 |
+          xargs -0 clang-format --dry-run --Werror
+      - name: Configure clang-tidy
+        run: >-
+          cmake -S . -B build -G Ninja
+          -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DBUILD_TESTING=OFF
+          -DNGSTD_WIDGETS_WARNINGS_AS_ERRORS=ON
+          -DCMAKE_CXX_CLANG_TIDY='clang-tidy;-warnings-as-errors=*'
+      - name: Run clang-tidy
+        run: cmake --build build --parallel 2
+      - name: Generated data and licenses
+        run: |
+          python tools/widgets/validate_tokens.py src/widgets/resources/tokens/nextgis-tokens.json
+          python tools/widgets/check_generated_tokens.py src/widgets/resources/tokens/nextgis-tokens.json src/widgets/src/generated/token_data_p.h
+          python tools/widgets/build_style_resources.py --check
+          python tools/widgets/build_asset_manifest.py --check
+          python tools/widgets/check_licenses.py
+
+  sanitizers:
+    name: ASan and UBSan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 5.15.2
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - run: >-
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DBUILD_TESTING=ON
+          -DNGSTD_WIDGETS_ENABLE_SANITIZERS=ON
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
+        env:
+          ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 5.15.2
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - run: sudo apt-get update && sudo apt-get install -y lcov
+      - run: >-
+          cmake -S . -B build -G Ninja
+          -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DBUILD_TESTING=ON
+          -DNGSTD_WIDGETS_ENABLE_COVERAGE=ON
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
+      - run: lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.info
+
+  visual-smoke:
+    name: Fusion snapshots / Qt ${{ matrix.qt }}
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - qt: 5.15.2
+            major: 5
+          - qt: 6.2.4
+            major: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt }}
+          modules: qtsvg
+          cache: true
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - run: >-
+          cmake -S . -B build -G Ninja
+          -DNGSTD_QT_MAJOR=${{ matrix.major }}
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DNGSTD_WIDGETS_BUILD_GALLERY=ON
+          -DBUILD_TESTING=ON
+      - run: cmake --build build --parallel 2
+      - name: Capture matrix
+        shell: bash
+        run: |
+          mkdir -p snapshots
+          for theme in light dark; do
+            for direction in ltr rtl; do
+              for dpr in 1 2; do
+                QT_QPA_PLATFORM=offscreen QT_SCALE_FACTOR=$dpr \
+                  build/examples/widgets_gallery/ngstd_widgets_gallery \
+                  --theme "$theme" --direction "$direction" \
+                  --section components \
+                  --viewport 1268x1000 \
+                  --screenshot "snapshots/${theme}-${direction}-${dpr}x.png"
+                test -s "snapshots/${theme}-${direction}-${dpr}x.png"
+                QT_QPA_PLATFORM=offscreen QT_SCALE_FACTOR=$dpr \
+                  build/examples/widgets_gallery/ngstd_widgets_gallery \
+                  --theme "$theme" --direction "$direction" \
+                  --section components \
+                  --viewport 1268x1000 \
+                  --screenshot "${RUNNER_TEMP}/ngstd-repeat.png"
+                cmp "snapshots/${theme}-${direction}-${dpr}x.png" \
+                  "${RUNNER_TEMP}/ngstd-repeat.png"
+              done
+            done
+          done
+      - name: Compare canonical visual baseline
+        run: ctest --test-dir build -L visual --output-on-failure
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fusion-qt${{ matrix.major }}
+          path: snapshots
+
+  source-package:
+    name: Conan source export
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - run: python -m pip install conan==2.28.2
+      - run: conan export .
+
+  abi:
+    name: ABI and export surface
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 5.15.2
+          modules: qtsvg
+      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - run: sudo apt-get update && sudo apt-get install -y abi-dumper abi-compliance-checker
+      - run: >-
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF
+          -DBUILD_FRAMEWORK=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DBUILD_TESTING=ON
+      - run: cmake --build build --parallel 2
+      - run: python tools/widgets/check_public_exports.py build/src/widgets/libngstd_widgets.so
+      - run: >-
+          abi-dumper build/src/widgets/libngstd_widgets.so
+          -public-headers src/widgets/include
+          -lver 1.0.0
+          -o candidate.dump
+      - name: Compare stable ABI when baseline exists
+        run: |
+          if test -f abi/ngstd_widgets-1.0.0.dump; then
+            abi-compliance-checker -l ngstd_widgets \
+              -old abi/ngstd_widgets-1.0.0.dump \
+              -new candidate.dump
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qt5-abi-dump
+          path: candidate.dump
+
+  qgis-host-smoke:
+    if: ${{ vars.NGSTD_WIDGETS_QGIS_IMAGE != '' }}
+    runs-on: ubuntu-24.04
+    container: ${{ vars.NGSTD_WIDGETS_QGIS_IMAGE }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: >-
+          cmake -S . -B build -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF -DBUILD_FRAMEWORK=OFF -DBUILD_TESTING=ON
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
+
+  qtifw-host-smoke:
+    if: ${{ vars.NGSTD_WIDGETS_QTIFW_IMAGE != '' }}
+    runs-on: ubuntu-24.04
+    container: ${{ vars.NGSTD_WIDGETS_QTIFW_IMAGE }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: >-
+          cmake -S . -B build -DNGSTD_QT_MAJOR=5
+          -DBUILD_CORE=OFF -DBUILD_FRAMEWORK=OFF -DBUILD_TESTING=ON
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
