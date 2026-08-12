@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/ngstd/widgets">
+        <file alias="assets/cards/base_card.webp">resources/cards/base_card.webp</file>
+        <file alias="assets/cards/overture_card.webp">resources/cards/overture_card.webp</file>
+        <file alias="assets/cards/sat_card.webp">resources/cards/sat_card.webp</file>
+        <file alias="assets/pictograms/data.png">resources/pictograms/data.png</file>
+    </qresource>
+    <qresource prefix="/ngstd/widgets-gallery">
+        <file alias="assets/fonts/roboto-cyrillic-400.woff2">resources/fonts/roboto-cyrillic-400.woff2</file>
+        <file alias="assets/fonts/roboto-cyrillic-500.woff2">resources/fonts/roboto-cyrillic-500.woff2</file>
+        <file alias="assets/fonts/roboto-cyrillic-700.woff2">resources/fonts/roboto-cyrillic-700.woff2</file>
+        <file alias="assets/fonts/roboto-latin-400.woff2">resources/fonts/roboto-latin-400.woff2</file>
+        <file alias="assets/fonts/roboto-latin-500.woff2">resources/fonts/roboto-latin-500.woff2</file>
+        <file alias="assets/fonts/roboto-latin-700.woff2">resources/fonts/roboto-latin-700.woff2</file>
+        <file alias="assets/fonts/ubuntu-cyrillic-400.woff2">resources/fonts/ubuntu-cyrillic-400.woff2</file>
+        <file alias="assets/fonts/ubuntu-cyrillic-500.woff2">resources/fonts/ubuntu-cyrillic-500.woff2</file>
+        <file alias="assets/fonts/ubuntu-cyrillic-700.woff2">resources/fonts/ubuntu-cyrillic-700.woff2</file>
+        <file alias="assets/fonts/ubuntu-latin-400.woff2">resources/fonts/ubuntu-latin-400.woff2</file>
+        <file alias="assets/fonts/ubuntu-latin-500.woff2">resources/fonts/ubuntu-latin-500.woff2</file>
+        <file alias="assets/fonts/ubuntu-latin-700.woff2">resources/fonts/ubuntu-latin-700.woff2</file>
+        <file alias="nextgis-tokens.json">../../src/widgets/resources/tokens/nextgis-tokens.json</file>
+        <file alias="nextgis-gallery-dark.qss">resources/themes/nextgis-gallery-dark.qss</file>
+        <file alias="nextgis-gallery-light.qss">resources/themes/nextgis-gallery-light.qss</file>
+    </qresource>
+</RCC>

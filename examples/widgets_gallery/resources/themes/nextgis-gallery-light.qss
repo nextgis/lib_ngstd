@@ -1,0 +1,487 @@
+/****** Generated from the canonical NextGIS QSS. ******/
+
+QWidget[_ngstdRole="page"] {
+background: #F1F5F9;
+}
+
+QFrame[_ngstdRole="galleryHeader"] {
+background: rgba(255, 255, 255, 0.92);
+    border: 0;
+    border-bottom: 1px solid #D7DEE5;
+}
+
+QLabel[_ngstdRole="separator"] {
+background: #D7DEE5;
+}
+
+QFrame[_ngstdRole="quickNavigation"] {
+background: #FFFFFF;
+    border: 1px solid #D7DEE5;
+    border-radius: 12px;
+}
+
+QFrame[_ngstdRole="quickLink"] {
+background: transparent;
+    border: 0;
+    border-radius: 7px;
+}
+
+QFrame[_ngstdRole="quickLink"]:hover {
+background: #F2F8FC;
+}
+
+QFrame[_ngstdRole="quickLink"][pressed="true"] {
+background: #DCECF7;
+}
+
+QFrame[_ngstdRole="quickLink"]:disabled {
+background: transparent;
+}
+
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationNumber"],
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationText"],
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationArrow"] {
+color: #9CA3AF;
+}
+
+QFrame[_ngstdRole="quickLink"][pressed="true"]
+QLabel[_ngstdRole="navigationText"],
+QFrame[_ngstdRole="quickLink"][pressed="true"]
+QLabel[_ngstdRole="navigationArrow"] {
+color: #063F80;
+}
+
+QFrame[_ngstdRole="cardIcon"],
+QLabel[_ngstdRole="cardIcon"] {
+border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+QLabel[_ngstdRole="secondary"] {
+background: transparent;
+    color: #374151;
+}
+
+QLabel[_ngstdRole="toggleState"] {
+min-width: 74px;
+    max-width: 74px;
+    min-height: 28px;
+    max-height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 999px;
+    background: #F2F4F5;
+    color: #6C7280;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="toggleState"][active="true"] {
+background: #DCECF7;
+    color: #0C65AF;
+}
+
+QLabel[_ngstdRole="eyebrow"] {
+background: transparent;
+    color: #0C65AF;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="heroTitle"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 54px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="heroLead"] {
+background: transparent;
+    color: #374151;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="navigationLabel"] {
+background: transparent;
+    color: #6C7280;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="navigationNumber"] {
+background: transparent;
+    color: #0C65AF;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="navigationText"] {
+background: transparent;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="navigationArrow"] {
+background: transparent;
+    color: #6C7280;
+    font-size: 15px;
+}
+
+QLabel[_ngstdRole="panelHeading"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+QFrame[_ngstdRole="componentPanel"] {
+background: #F8FAFC;
+    border: 1px solid #D7DEE5;
+    border-radius: 10px;
+}
+
+QFrame[_ngstdRole="semanticState"] {
+border: 1px solid #0C65AF;
+    border-radius: 10px;
+    background: #F2F8FC;
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="success"] {
+border-color: #137A50;
+    background: #E1F3EA;
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="warning"] {
+border-color: #8A5A00;
+    background: #FFF2D6;
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="danger"] {
+border-color: #B8324A;
+    background: #FBE6EA;
+}
+
+QToolButton[_ngstdRole="semanticCopy"] {
+min-height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #374151;
+}
+
+QToolButton[_ngstdRole="semanticCopy"]:hover {
+background: rgba(127, 127, 127, 0.12);
+}
+
+QToolButton[_ngstdRole="semanticCopy"]:pressed {
+background: rgba(127, 127, 127, 0.18);
+}
+
+QLabel[_ngstdRole="semanticToken"] {
+color: #1D1D1B;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+}
+
+QLabel[_ngstdRole="semanticValue"] {
+font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+}
+
+QLabel[_ngstdRole="semanticTitle"] {
+color: #0C65AF;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="success"] {
+color: #137A50;
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="warning"] {
+color: #8A5A00;
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="danger"] {
+color: #B8324A;
+}
+
+QFrame[_ngstdRole="sampleStage"] {
+background: #F2F8FC;
+    border: 1px solid #D7DEE5;
+    border-radius: 10px;
+}
+
+QLabel[_ngstdRole="typeStageDisplay"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+}
+
+QFrame[_ngstdRole="typeScale"] {
+background: #FFFFFF;
+    border: 1px solid #D7DEE5;
+    border-radius: 10px;
+}
+
+QFrame[_ngstdRole="typeSpecimen"] {
+background: #FFFFFF;
+    border: 0;
+    border-bottom: 1px solid #D7DEE5;
+}
+
+QFrame[_ngstdRole="typeSpecimen"][last="true"] {
+border-bottom: 0;
+}
+
+QFrame[_ngstdRole="nestedPanel"] {
+background: #F8FAFC;
+    border: 1px solid #D7DEE5;
+    border-radius: 10px;
+}
+
+QFrame[_ngstdRole="privateShowcase"] {
+background: #FFFFFF;
+    border: 1px solid #D7DEE5;
+    border-radius: 8px;
+}
+
+QFrame[_ngstdRole="backgroundCaption"] {
+background: #FFFFFF;
+    border: 0;
+    border-top: 1px solid #D7DEE5;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+QFrame[_ngstdRole="panel"],
+QWidget[_ngstdRole="panel"] {
+background: #FFFFFF;
+    border: 1px solid #D7DEE5;
+    border-radius: 12px;
+}
+
+QLabel[_ngstdRole="sourceCardLabel"] {
+background: transparent;
+    color: #6C7280;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="dataCardTitle"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="dataCardDescription"] {
+background: transparent;
+    color: #1D1D1B;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="toolboxTag"] {
+padding: 1px 7px;
+    border: 1px solid #0070C5;
+    border-radius: 4px;
+    background: #F5F5F5;
+    color: #0070C5;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="toolboxTag"][featured="true"] {
+border-color: #FFBB96;
+    background: #FFF2E8;
+    color: #D4380D;
+}
+
+QLabel[_ngstdRole="toolboxCardTitle"] {
+background: transparent;
+    color: #212121;
+    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="toolboxCardBody"] {
+background: transparent;
+    color: #212121;
+    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="onImageTitle"] {
+background: transparent;
+    color: #FFFFFF;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="onImageBody"] {
+background: transparent;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="heading1"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="heading2"] {
+background: transparent;
+    color: #1D1D1B;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="muted"] {
+background: transparent;
+    color: #6C7280;
+}
+
+QLabel[_ngstdRole="success"] {
+background: transparent;
+    color: #137A50;
+}
+
+QLabel[_ngstdRole="warning"] {
+background: transparent;
+    color: #8A5A00;
+}
+
+QLabel[_ngstdRole="danger"] {
+background: transparent;
+    color: #B8324A;
+}
+
+QToolButton[_ngstdRole="iconButton"],
+QPushButton[ngstdButtonVariant="icon"] {
+min-width: 40px;
+    max-width: 40px;
+    min-height: 38px;
+    max-height: 40px;
+    padding: 0;
+    border-radius: 8px;
+}
+
+QToolButton[_ngstdRole="iconButton"]:checked {
+background: #0C65AF;
+    border-color: #0C65AF;
+    color: #FFFFFF;
+}
+
+QToolButton[_ngstdRole="iconButton"]:checked:hover {
+background: #0952A5;
+    border-color: #0952A5;
+    color: #FFFFFF;
+}
+
+QToolButton[_ngstdRole="iconButton"]:pressed,
+QToolButton[_ngstdRole="iconButton"]:checked:pressed {
+background: #063F80;
+    border-color: #063F80;
+    color: #FFFFFF;
+}
+
+QWizard QWidget[_ngstdRole="wizardPage"],
+QWizard QWidget[_ngstdRole="wizardPageStack"] {
+background-color: #F1F5F9;
+    color: #1D1D1B;
+}
+
+QWidget[_ngstdRole="wizardHeader"] {
+background-color: #FFFFFF;
+    border: 0;
+    border-bottom: 1px solid #D7DEE5;
+}
+
+QWidget[_ngstdRole="wizardNavigation"] {
+background-color: #FFFFFF;
+    border: 0;
+    border-top: 1px solid #D7DEE5;
+}
+
+QFrame[_ngstdRole="wizardRuler"] {
+min-height: 1px;
+    max-height: 1px;
+    border: 0;
+    background: #D7DEE5;
+}
+
+QFrame[_ngstdRole="assetCard"] {
+border: 1px solid #D7DEE5;
+    border-radius: 10px;
+    background: #FFFFFF;
+}
+
+QFrame[_ngstdRole="assetPreview"] {
+border: 0;
+    border-bottom: 1px solid #D7DEE5;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #F6F8FA;
+}
+
+QFrame[_ngstdRole="assetPreview"][dark="true"] {
+background: #1B2A38;
+}
+
+QFrame[_ngstdRole="assetPreview"][adaptive="true"] {
+background: #F8FAFC;
+}
+
+QLabel[_ngstdRole="assetTitle"] {
+color: #374151;
+    font-weight: 500;
+}
+
+QFrame[_ngstdRole="tokenRow"] {
+border: 0;
+    border-bottom: 1px solid #D7DEE5;
+    background: transparent;
+}
+
+QLabel[_ngstdRole="tokenRowName"] {
+color: #6C7280;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="tokenRowValue"] {
+color: #0C65AF;
+}
+
+QPlainTextEdit[_ngstdRole="codeBlock"] {
+padding: 18px;
+    border: 1px solid #2A3A49;
+    border-radius: 10px;
+    background: #0F1822;
+    color: #D8E2EA;
+    font-family: "NextGIS Roboto Mono", monospace;
+    font-size: 13px;
+}
