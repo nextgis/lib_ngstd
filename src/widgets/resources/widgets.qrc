@@ -1,0 +1,85 @@
+<RCC>
+    <qresource prefix="/ngstd/widgets">
+        <file alias="qt/nextgis-dark.qss">themes/nextgis-dark.qss</file>
+        <file alias="qt/nextgis-light.qss">themes/nextgis-light.qss</file>
+
+        <file alias="assets/backgrounds/data-route.svg">assets/backgrounds/data-route.svg</file>
+        <file alias="assets/backgrounds/field-data.webp">assets/backgrounds/field-data.webp</file>
+        <file alias="assets/backgrounds/for-mainpage-isolines.svg">assets/backgrounds/for-mainpage-isolines.svg</file>
+        <file alias="assets/backgrounds/for-mainpage-roads-qt-4x.png">assets/backgrounds/for-mainpage-roads-qt-4x.png</file>
+        <file alias="assets/backgrounds/gradientiso3.png">assets/backgrounds/gradientiso3.png</file>
+        <file alias="assets/backgrounds/main-right-pic.webp">assets/backgrounds/main-right-pic.webp</file>
+        <file alias="assets/backgrounds/topo-bg.svg">assets/backgrounds/topo-bg.svg</file>
+
+        <file alias="assets/fonts/qt/roboto-400.ttf">assets/fonts/qt/roboto-400.ttf</file>
+        <file alias="assets/fonts/qt/roboto-500.ttf">assets/fonts/qt/roboto-500.ttf</file>
+        <file alias="assets/fonts/qt/roboto-700.ttf">assets/fonts/qt/roboto-700.ttf</file>
+        <file alias="assets/fonts/qt/ubuntu-400.ttf">assets/fonts/qt/ubuntu-400.ttf</file>
+        <file alias="assets/fonts/qt/ubuntu-500.ttf">assets/fonts/qt/ubuntu-500.ttf</file>
+        <file alias="assets/fonts/qt/ubuntu-700.ttf">assets/fonts/qt/ubuntu-700.ttf</file>
+
+        <file alias="assets/icons/generated/checkbox-checked-dark.svg">assets/icons/generated/checkbox-checked-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-checked-light.svg">assets/icons/generated/checkbox-checked-light.svg</file>
+        <file alias="assets/icons/generated/checkbox-disabled-checked-dark.svg">assets/icons/generated/checkbox-disabled-checked-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-disabled-checked-light.svg">assets/icons/generated/checkbox-disabled-checked-light.svg</file>
+        <file alias="assets/icons/generated/checkbox-disabled-dark.svg">assets/icons/generated/checkbox-disabled-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-disabled-light.svg">assets/icons/generated/checkbox-disabled-light.svg</file>
+        <file alias="assets/icons/generated/checkbox-hover-dark.svg">assets/icons/generated/checkbox-hover-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-hover-light.svg">assets/icons/generated/checkbox-hover-light.svg</file>
+        <file alias="assets/icons/generated/checkbox-off-dark.svg">assets/icons/generated/checkbox-off-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-off-light.svg">assets/icons/generated/checkbox-off-light.svg</file>
+        <file alias="assets/icons/generated/checkbox-pressed-dark.svg">assets/icons/generated/checkbox-pressed-dark.svg</file>
+        <file alias="assets/icons/generated/checkbox-pressed-light.svg">assets/icons/generated/checkbox-pressed-light.svg</file>
+        <file alias="assets/icons/generated/combobox-chevron-dark-open.svg">assets/icons/generated/combobox-chevron-dark-open.svg</file>
+        <file alias="assets/icons/generated/combobox-chevron-dark.svg">assets/icons/generated/combobox-chevron-dark.svg</file>
+        <file alias="assets/icons/generated/combobox-chevron-light-open.svg">assets/icons/generated/combobox-chevron-light-open.svg</file>
+        <file alias="assets/icons/generated/combobox-chevron-light.svg">assets/icons/generated/combobox-chevron-light.svg</file>
+        <file alias="assets/icons/generated/radio-checked-dark.svg">assets/icons/generated/radio-checked-dark.svg</file>
+        <file alias="assets/icons/generated/radio-checked-light.svg">assets/icons/generated/radio-checked-light.svg</file>
+        <file alias="assets/icons/generated/radio-disabled-checked-dark.svg">assets/icons/generated/radio-disabled-checked-dark.svg</file>
+        <file alias="assets/icons/generated/radio-disabled-checked-light.svg">assets/icons/generated/radio-disabled-checked-light.svg</file>
+        <file alias="assets/icons/generated/radio-disabled-dark.svg">assets/icons/generated/radio-disabled-dark.svg</file>
+        <file alias="assets/icons/generated/radio-disabled-light.svg">assets/icons/generated/radio-disabled-light.svg</file>
+        <file alias="assets/icons/generated/radio-hover-dark.svg">assets/icons/generated/radio-hover-dark.svg</file>
+        <file alias="assets/icons/generated/radio-hover-light.svg">assets/icons/generated/radio-hover-light.svg</file>
+        <file alias="assets/icons/generated/radio-off-dark.svg">assets/icons/generated/radio-off-dark.svg</file>
+        <file alias="assets/icons/generated/radio-off-light.svg">assets/icons/generated/radio-off-light.svg</file>
+        <file alias="assets/icons/generated/radio-pressed-dark.svg">assets/icons/generated/radio-pressed-dark.svg</file>
+        <file alias="assets/icons/generated/radio-pressed-light.svg">assets/icons/generated/radio-pressed-light.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-down-dark-disabled.svg">assets/icons/generated/spinbox-chevron-down-dark-disabled.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-down-dark.svg">assets/icons/generated/spinbox-chevron-down-dark.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-down-light-disabled.svg">assets/icons/generated/spinbox-chevron-down-light-disabled.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-down-light.svg">assets/icons/generated/spinbox-chevron-down-light.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-up-dark-disabled.svg">assets/icons/generated/spinbox-chevron-up-dark-disabled.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-up-dark.svg">assets/icons/generated/spinbox-chevron-up-dark.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-up-light-disabled.svg">assets/icons/generated/spinbox-chevron-up-light-disabled.svg</file>
+        <file alias="assets/icons/generated/spinbox-chevron-up-light.svg">assets/icons/generated/spinbox-chevron-up-light.svg</file>
+
+        <file alias="assets/icons/ant/ellipsis.svg">assets/icons/ant/ellipsis.svg</file>
+        <file alias="assets/icons/ant/search.svg">assets/icons/ant/search.svg</file>
+        <file alias="assets/icons/lucide/alert-triangle.svg">assets/icons/lucide/alert-triangle.svg</file>
+        <file alias="assets/icons/lucide/check-circle.svg">assets/icons/lucide/check-circle.svg</file>
+        <file alias="assets/icons/lucide/check.svg">assets/icons/lucide/check.svg</file>
+        <file alias="assets/icons/lucide/chevron-down.svg">assets/icons/lucide/chevron-down.svg</file>
+        <file alias="assets/icons/lucide/copy.svg">assets/icons/lucide/copy.svg</file>
+        <file alias="assets/icons/lucide/download.svg">assets/icons/lucide/download.svg</file>
+        <file alias="assets/icons/lucide/flame.svg">assets/icons/lucide/flame.svg</file>
+        <file alias="assets/icons/lucide/gradient.svg">assets/icons/lucide/gradient.svg</file>
+        <file alias="assets/icons/lucide/info.svg">assets/icons/lucide/info.svg</file>
+        <file alias="assets/icons/lucide/layers.svg">assets/icons/lucide/layers.svg</file>
+        <file alias="assets/icons/lucide/monitor.svg">assets/icons/lucide/monitor.svg</file>
+        <file alias="assets/icons/lucide/moon.svg">assets/icons/lucide/moon.svg</file>
+        <file alias="assets/icons/lucide/sun.svg">assets/icons/lucide/sun.svg</file>
+        <file alias="assets/icons/lucide/x-circle.svg">assets/icons/lucide/x-circle.svg</file>
+        <file alias="assets/icons/mdi/dots-grid.svg">assets/icons/mdi/dots-grid.svg</file>
+        <file alias="assets/icons/mdi/menu.svg">assets/icons/mdi/menu.svg</file>
+
+        <file alias="assets/logos/nextgis-horizontal-on-dark.svg">assets/logos/nextgis-horizontal-on-dark.svg</file>
+        <file alias="assets/logos/nextgis-horizontal.svg">assets/logos/nextgis-horizontal.svg</file>
+        <file alias="assets/logos/nextgis-mono-brand.svg">assets/logos/nextgis-mono-brand.svg</file>
+        <file alias="assets/logos/nextgis-mono-dark.svg">assets/logos/nextgis-mono-dark.svg</file>
+        <file alias="assets/logos/nextgis-mono-light.svg">assets/logos/nextgis-mono-light.svg</file>
+        <file alias="assets/logos/nextgis-symbol-on-dark.svg">assets/logos/nextgis-symbol-on-dark.svg</file>
+        <file alias="assets/logos/nextgis-symbol.svg">assets/logos/nextgis-symbol.svg</file>
+    </qresource>
+</RCC>

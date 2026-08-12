@@ -1,0 +1,461 @@
+{
+  "manifestVersion": 1,
+  "resources": [
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/data-route.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "31e0156c32e2d0901633ee0ebf02a9c76dd36fce512d835957cbefafb99e6e0a",
+      "source": "assets/backgrounds/data-route.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/field-data.webp",
+      "license": "GPL-2.0-only",
+      "sha256": "5ec486039565bda3a7bfaa948586d389e87a6a83b5ea5eabf7634d356c5219e9",
+      "source": "assets/backgrounds/field-data.webp"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/for-mainpage-isolines.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "b7f99bdf2e8c0f0b902c50af9d6a56642ab44b3503a38598d023461d3fce5cc4",
+      "source": "assets/backgrounds/for-mainpage-isolines.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/for-mainpage-roads-qt-4x.png",
+      "license": "GPL-2.0-only",
+      "sha256": "5849267dc53c51c771cd10ea209c07822eee4cce407e59ed716922e9ba07c070",
+      "source": "assets/backgrounds/for-mainpage-roads-qt-4x.png"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/gradientiso3.png",
+      "license": "GPL-2.0-only",
+      "sha256": "0115ba76b48e7a5de8da45f080096118edfc33830201eccc3fbf4d781116a3bc",
+      "source": "assets/backgrounds/gradientiso3.png"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/main-right-pic.webp",
+      "license": "GPL-2.0-only",
+      "sha256": "0417f2c1dc306bd7eeec13c0c730af1e848a3ec5f4583a0dd703886c972b92a8",
+      "source": "assets/backgrounds/main-right-pic.webp"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/backgrounds/topo-bg.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "54aaab8e80bdcae10761855ab43c2f3e514609b37774d089c001e7a522366f16",
+      "source": "assets/backgrounds/topo-bg.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/roboto-400.ttf",
+      "license": "OFL-1.1",
+      "sha256": "acdcd91bf7f78ad42cb2d8c53cfcfe03a04f59e72babaf4208ede6f4a7ec844a",
+      "source": "assets/fonts/qt/roboto-400.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/roboto-500.ttf",
+      "license": "OFL-1.1",
+      "sha256": "8748551d3b2d4a71a321bf9de3cce6347504ce2fb742d28ed22673ddc364e332",
+      "source": "assets/fonts/qt/roboto-500.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/roboto-700.ttf",
+      "license": "OFL-1.1",
+      "sha256": "70726b91b9cca0c18c815a6a84ae9f2b251daed0e6911740dd5262b9390294dd",
+      "source": "assets/fonts/qt/roboto-700.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/ubuntu-400.ttf",
+      "license": "LicenseRef-Ubuntu-Font-1.0",
+      "sha256": "27400105ee6fd82c0a81ab671ef686d82b8c12cc370154cba41a5fe7e60d898a",
+      "source": "assets/fonts/qt/ubuntu-400.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/ubuntu-500.ttf",
+      "license": "LicenseRef-Ubuntu-Font-1.0",
+      "sha256": "d5732185db1f290c75dd99d48aadec28c2aedf6464461d5fa17260dd83a36b68",
+      "source": "assets/fonts/qt/ubuntu-500.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/fonts/qt/ubuntu-700.ttf",
+      "license": "LicenseRef-Ubuntu-Font-1.0",
+      "sha256": "c3cfc3aad205f091beb5bed2b6b575cc42af512596f9950dafb91c05bca3f4ee",
+      "source": "assets/fonts/qt/ubuntu-700.ttf"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/ant/ellipsis.svg",
+      "license": "MIT",
+      "sha256": "cb4ca420c2f962b03be8fcd4bbcdabf28f3458d0bb895d561b02db19e39cc3ac",
+      "source": "assets/icons/ant/ellipsis.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/ant/search.svg",
+      "license": "MIT",
+      "sha256": "bc07655ebdd2c4571b586b641cbcf9a92627f47d087289eab12021f2010c9e68",
+      "source": "assets/icons/ant/search.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-checked-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "864e9f025b29cac18afc9c3d708baea84e99fec5ed84c62948ae1770eee9e823",
+      "source": "assets/icons/generated/checkbox-checked-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-checked-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "864e9f025b29cac18afc9c3d708baea84e99fec5ed84c62948ae1770eee9e823",
+      "source": "assets/icons/generated/checkbox-checked-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-disabled-checked-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "26f2beda7aa24f24eb1c39d7c212f8d619b63376ae5ef228b5900a79aa902fd6",
+      "source": "assets/icons/generated/checkbox-disabled-checked-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-disabled-checked-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "6c25442d8c73a39cdca44990a5b166945b9342ea052895a7417fdca012231f83",
+      "source": "assets/icons/generated/checkbox-disabled-checked-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-disabled-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "3928ca2d8efe5df479f1e9fccb8c9f20aab50740bc36f691b231c1cdb1f463cb",
+      "source": "assets/icons/generated/checkbox-disabled-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-disabled-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "c1c5e6bd62e9c9d5e03985292d1ae39a4366fbe12d3b4f6a74f83acda06efe16",
+      "source": "assets/icons/generated/checkbox-disabled-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-hover-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "1989bd48491cc8209e37de5a15a331ddb8be779e012c4ad9a2d26799344e9d57",
+      "source": "assets/icons/generated/checkbox-hover-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-hover-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "de50b933e981d682228841afdb596a72df828c46397023260fe023511244d94b",
+      "source": "assets/icons/generated/checkbox-hover-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-off-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "6edabe2b6f08bdad01d5c3e959aba1715bae2e354b79fad4f2d1424399fa08d3",
+      "source": "assets/icons/generated/checkbox-off-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-off-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "d1520479d39611eb9b8dcb04556ac90ef1e755f4a7c0ed0a7106a0ff69cca4be",
+      "source": "assets/icons/generated/checkbox-off-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-pressed-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "6320af246b6f7fda14a976a40e2d7413be03b98968b1e86cd05c0abe3b30c616",
+      "source": "assets/icons/generated/checkbox-pressed-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/checkbox-pressed-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "67ccb31b0acc26d6db21b00c2775fcd8c0d844ffab5b1a113c46d81c134b34ad",
+      "source": "assets/icons/generated/checkbox-pressed-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/combobox-chevron-dark-open.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "f7876837d8fb7f92e9b893796ca4937bb0c4d31b2b083699158c4d9e8f56b841",
+      "source": "assets/icons/generated/combobox-chevron-dark-open.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/combobox-chevron-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "def192372435556865157e5de65cf0e96612281008830b0530ff4e9b8f62ce71",
+      "source": "assets/icons/generated/combobox-chevron-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/combobox-chevron-light-open.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "43bc10f849433be9e22cd28bc5ec0c18fca6465562a07899c646e84e8443ee89",
+      "source": "assets/icons/generated/combobox-chevron-light-open.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/combobox-chevron-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "e40afebc5ebdde1d85a85506f69fea8e9db62f99aa51398c1ddfa35def4bda0a",
+      "source": "assets/icons/generated/combobox-chevron-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-checked-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "e5ac85413b43dcf7e607a5f313fe8533f05c76e289cb404f2b3da7b56f8d8872",
+      "source": "assets/icons/generated/radio-checked-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-checked-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "e5ac85413b43dcf7e607a5f313fe8533f05c76e289cb404f2b3da7b56f8d8872",
+      "source": "assets/icons/generated/radio-checked-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-disabled-checked-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "e68450fa1169a594f5eca456f7097bf51008558592f6b0e58646f12d2266371b",
+      "source": "assets/icons/generated/radio-disabled-checked-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-disabled-checked-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "ef2a36f0ab209b3d4c087e79f822ee096b1cf7c15beb1486ff90648254864a2e",
+      "source": "assets/icons/generated/radio-disabled-checked-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-disabled-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "e65ae14b289519471091b0b00b5fe133a544ebb7f6edb42e63d9cae02fac2f1c",
+      "source": "assets/icons/generated/radio-disabled-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-disabled-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "d1fa098bc85337ccb0962bebc8f19dd29f7b09941db09ac5a7e2085bf2ee4cce",
+      "source": "assets/icons/generated/radio-disabled-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-hover-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "21ba4ec03b37e07c967949af8d542d68cefed0f772216c634323cf566a194c96",
+      "source": "assets/icons/generated/radio-hover-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-hover-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "534ac754953121fa90675fa56f6b3a61faa7e25b310072e0ff8ffd7b2d104750",
+      "source": "assets/icons/generated/radio-hover-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-off-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "674e01c141494cfd3064cb381dc6d6bb1025897e09bb99d57733ad23ba33cfef",
+      "source": "assets/icons/generated/radio-off-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-off-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "0eadfd1939dc50652a8e3156654ecad54c9c0994e4988df54141a5e116d3b61f",
+      "source": "assets/icons/generated/radio-off-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-pressed-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "7dd0d5fc8d7eacffd914dec64bbd5e82051e992248069faeb8f53df163079685",
+      "source": "assets/icons/generated/radio-pressed-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/radio-pressed-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "b4161a373b9fc79ca0f12ecaca6d390a04959287b09d5fd5c00bde13e5d4efb9",
+      "source": "assets/icons/generated/radio-pressed-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-down-dark-disabled.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "0a5fc6b1ea00a82564adc46b31dad4b34a2b53ae4402674775309598ff8b0ac0",
+      "source": "assets/icons/generated/spinbox-chevron-down-dark-disabled.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-down-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "f47b421c2395603be317318c169830cd33ed8c0605d77b03fb58f4433e526aa9",
+      "source": "assets/icons/generated/spinbox-chevron-down-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-down-light-disabled.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "82ae0cbee144a49ba7c12ba5c30d7ee7168860f95489fe7a226d725db16b3ebc",
+      "source": "assets/icons/generated/spinbox-chevron-down-light-disabled.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-down-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "fa4fea413f36ef7d119ad55a6454bf64b55d88aee1d457bafcc990e46d6d32f7",
+      "source": "assets/icons/generated/spinbox-chevron-down-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-up-dark-disabled.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "4f7f2e4aa08e33cb8cfec828fc9588bea7b38975ce94156f5efaa3401f53affd",
+      "source": "assets/icons/generated/spinbox-chevron-up-dark-disabled.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-up-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "38b0a28b05b8159776b577e1cb528be2fbabfc19b42bf67dfa989a3f66ea26df",
+      "source": "assets/icons/generated/spinbox-chevron-up-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-up-light-disabled.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "8cf6b4129b3c991fa667b6a11e158f1297d2702f0af7d42fb59124a423fac828",
+      "source": "assets/icons/generated/spinbox-chevron-up-light-disabled.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/generated/spinbox-chevron-up-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "60a72a9c1a7219fa37b02855842e93e8c4e40d49fd1e0687b398ea5d44fbaa03",
+      "source": "assets/icons/generated/spinbox-chevron-up-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/alert-triangle.svg",
+      "license": "ISC AND MIT",
+      "sha256": "f9456a30013be9d12e7c6882a3dab596cfd959575ff894102243de18a4c1091f",
+      "source": "assets/icons/lucide/alert-triangle.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/check-circle.svg",
+      "license": "ISC AND MIT",
+      "sha256": "69bc3c7716f64dd40cf2366a8042176c2782973ac3f2e4b7525bbcfa0828ac7e",
+      "source": "assets/icons/lucide/check-circle.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/check.svg",
+      "license": "ISC AND MIT",
+      "sha256": "6ac0113cd390c39e57413ecf117803df990f0fe5a918d598e1bf881a0137a58a",
+      "source": "assets/icons/lucide/check.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/chevron-down.svg",
+      "license": "ISC AND MIT",
+      "sha256": "233b6f745eaaa9127419a1c5d03f748ef2905797a08ae0192365cb7a28fdd1a1",
+      "source": "assets/icons/lucide/chevron-down.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/copy.svg",
+      "license": "ISC AND MIT",
+      "sha256": "feb36698dbc7f2d7e8bc835b823b3b459285f81f2b5445e840f468edadaf0664",
+      "source": "assets/icons/lucide/copy.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/download.svg",
+      "license": "ISC AND MIT",
+      "sha256": "cfcf16a7d6fed5a470afe6ffe471c8a9a4eb936534c11f304d38e6183764e597",
+      "source": "assets/icons/lucide/download.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/flame.svg",
+      "license": "ISC AND MIT",
+      "sha256": "3b604e63d649f424b8520e9a5b07a34259cdf0233a106c951cb04c9098eee036",
+      "source": "assets/icons/lucide/flame.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/gradient.svg",
+      "license": "ISC AND MIT",
+      "sha256": "e5bfe54e22ac61ec3f97885463817274e5900c0d543cfcbb26a7fe9bd1432a7e",
+      "source": "assets/icons/lucide/gradient.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/info.svg",
+      "license": "ISC AND MIT",
+      "sha256": "0c243749de43d31896339ecb092df2ddb77a3f292b9fbb4e00e1c570dedda48c",
+      "source": "assets/icons/lucide/info.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/layers.svg",
+      "license": "ISC AND MIT",
+      "sha256": "65674c7b8afde6e577a7ee392a844dfe67ee0fc5ecb1898cc5f4d28dc01d4897",
+      "source": "assets/icons/lucide/layers.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/monitor.svg",
+      "license": "ISC AND MIT",
+      "sha256": "7c75f110df190876a3181662ed0c85ee85c7b9d4b0dd51be982200cf7ea716b2",
+      "source": "assets/icons/lucide/monitor.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/moon.svg",
+      "license": "ISC AND MIT",
+      "sha256": "598e307396f4843fad8b9d911509b01d18e9871c121a98664bcedf8927e4f1e5",
+      "source": "assets/icons/lucide/moon.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/sun.svg",
+      "license": "ISC AND MIT",
+      "sha256": "40393f2d88f5339f5e65e3c36842a2dbd9a8cb4ad84e2c5ff0fe2536cbb2b722",
+      "source": "assets/icons/lucide/sun.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/x-circle.svg",
+      "license": "ISC AND MIT",
+      "sha256": "1a8a8c8c4b1665903a3372846510a36a103fe1c1bbc62535cd7d851ffb9de0e6",
+      "source": "assets/icons/lucide/x-circle.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/mdi/dots-grid.svg",
+      "license": "Apache-2.0",
+      "sha256": "a358af943d26fb157c65fbb96e63758df10203859566a6b4ba1d0bfb5aa86a8f",
+      "source": "assets/icons/mdi/dots-grid.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/mdi/menu.svg",
+      "license": "Apache-2.0",
+      "sha256": "a0e1305ce8e40bc015e4f2a6e17011dc4f5d6cf67eb00ad22ca89e7cd734dcd4",
+      "source": "assets/icons/mdi/menu.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-horizontal-on-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "aa53ddf9a6fc3d18b64f753da8418083023a9a14a79f1fd74b19468457da0a4e",
+      "source": "assets/logos/nextgis-horizontal-on-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-horizontal.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "dbc9d7ba80d6e20a6a721a51650f2c4d0ca6af4394bd300800e3e0c890a34556",
+      "source": "assets/logos/nextgis-horizontal.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-mono-brand.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "dcd7af26e07626f516eca1cc759f20746278a214319d5090dfe2ecfd7ed322bb",
+      "source": "assets/logos/nextgis-mono-brand.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-mono-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "ed43bba2e5a210ab8971fef9dc55e70fa0ec9c4451bbbaf7f0da03b4785c5277",
+      "source": "assets/logos/nextgis-mono-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-mono-light.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "751b442ec1b1589092d3e407ed02dbe79eb5c02fe99204894caf60b56a12b4c1",
+      "source": "assets/logos/nextgis-mono-light.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-symbol-on-dark.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "c052f7670c34350cf3a070ce919865e9022ade8da82984afd4d5145c9ba8021a",
+      "source": "assets/logos/nextgis-symbol-on-dark.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-symbol.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "c401f1e94e914eff8d7daf9d6d40e8adf3c212e109fe58be858aea14499d4ee8",
+      "source": "assets/logos/nextgis-symbol.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/qt/nextgis-dark.qss",
+      "license": "GPL-2.0-only",
+      "sha256": "7e796730350e1bbd78cce1cd11bfd5c04d694134d4d80556979085daf511ecb4",
+      "source": "themes/nextgis-dark.qss"
+    },
+    {
+      "alias": ":/ngstd/widgets/qt/nextgis-light.qss",
+      "license": "GPL-2.0-only",
+      "sha256": "d0feb5b747c0f1c123f1d505e798fac5316a1867698fd45951e1941e6de5c98c",
+      "source": "themes/nextgis-light.qss"
+    }
+  ]
+}

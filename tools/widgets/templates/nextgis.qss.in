@@ -1,0 +1,1704 @@
+/* Generated NextGIS UI Style Reference for Qt 5.15, {{theme}} theme. */
+
+QWidget {
+    color: {{text}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{qtBodySize}}px;
+    font-weight: {{qtBodyWeight}};
+}
+
+QLabel {
+    background: transparent;
+}
+
+QToolButton {
+    min-height: {{controlContentHeightMedium}}px;
+    padding: 0 {{controlPaddingX}}px;
+    border: 1px solid {{borderStrong}};
+    border-radius: {{buttonRadius}}px;
+    background: {{surface}};
+    color: {{text}};
+    font-weight: 500;
+}
+
+QToolButton:hover {
+    background: {{surfaceBrand}};
+    border-color: {{brandHover}};
+    color: {{linkHover}};
+}
+
+QToolButton:pressed {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+    color: {{brandActive}};
+}
+
+QToolButton:disabled {
+    background: {{surfaceMuted}};
+    border-color: {{border}};
+    color: {{textDisabled}};
+}
+
+QLineEdit QToolButton[_ngstdRole="fieldAction"] {
+    min-width: {{controlIconSize}}px;
+    max-width: {{controlIconSize}}px;
+    min-height: {{controlIconSize}}px;
+    max-height: {{controlIconSize}}px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+QWidget[_ngstdRole="page"] {
+    background: {{pageSoft}};
+}
+
+QFrame[_ngstdRole="galleryHeader"] {
+    background: {{header}};
+    border: 0;
+    border-bottom: 1px solid {{border}};
+}
+
+QLabel[_ngstdRole="separator"] {
+    background: {{border}};
+}
+
+QFrame[_ngstdRole="themeSwitch"] {
+    background: {{surfaceMuted}};
+    border: 1px solid {{border}};
+    border-radius: 10px;
+}
+
+QToolButton[_ngstdRole="themeButton"] {
+    min-width: {{themeSwitchButtonWidth}}px;
+    max-width: {{themeSwitchButtonWidth}}px;
+    min-height: {{themeSwitchButtonHeight}}px;
+    max-height: {{themeSwitchButtonHeight}}px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: {{themeSwitchIndicatorRadius}}px;
+}
+
+QToolButton[_ngstdRole="themeButton"]:hover {
+    background: {{surfaceBrand}};
+}
+
+QToolButton[_ngstdRole="themeButton"]:checked {
+    background: transparent;
+}
+
+QToolButton[_ngstdRole="themeButton"]:pressed,
+QToolButton[_ngstdRole="themeButton"]:checked:pressed {
+    background: {{brandActive}};
+}
+
+QToolButton[_ngstdRole="themeButton"]:checked:hover {
+    background: transparent;
+}
+
+QFrame[_ngstdRole="quickNavigation"] {
+    background: {{surface}};
+    border: 1px solid {{border}};
+    border-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="quickLink"] {
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+}
+
+QFrame[_ngstdRole="quickLink"]:hover {
+    background: {{surfaceBrand}};
+}
+
+QFrame[_ngstdRole="quickLink"][pressed="true"] {
+    background: {{brandSoft}};
+}
+
+QFrame[_ngstdRole="quickLink"]:disabled {
+    background: transparent;
+}
+
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationNumber"],
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationText"],
+QFrame[_ngstdRole="quickLink"]:disabled
+QLabel[_ngstdRole="navigationArrow"] {
+    color: {{textDisabled}};
+}
+
+QFrame[_ngstdRole="quickLink"][pressed="true"]
+QLabel[_ngstdRole="navigationText"],
+QFrame[_ngstdRole="quickLink"][pressed="true"]
+QLabel[_ngstdRole="navigationArrow"] {
+    color: {{brandActive}};
+}
+
+QFrame[_ngstdRole="cardIcon"],
+QLabel[_ngstdRole="cardIcon"] {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+QLabel[_ngstdRole="secondary"] {
+    background: transparent;
+    color: {{textSecondary}};
+}
+
+QLabel[_ngstdRole="toggleState"] {
+    min-width: {{toggleStateContentWidth}}px;
+    max-width: {{toggleStateContentWidth}}px;
+    min-height: {{toggleStateContentHeight}}px;
+    max-height: {{toggleStateContentHeight}}px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: {{toggleStateRadius}}px;
+    background: {{surfaceMuted}};
+    color: {{textMuted}};
+    font-size: {{typeCaptionSize}}px;
+    font-weight: {{typeCaptionWeight}};
+}
+
+QLabel[_ngstdRole="toggleState"][active="true"] {
+    background: {{brandSoft}};
+    color: {{link}};
+}
+
+QLabel[_ngstdRole="eyebrow"] {
+    background: transparent;
+    color: {{link}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="heroTitle"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: 54px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="heroLead"] {
+    background: transparent;
+    color: {{textSecondary}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="navigationLabel"] {
+    background: transparent;
+    color: {{textMuted}};
+    font-size: 12px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="navigationNumber"] {
+    background: transparent;
+    color: {{link}};
+    font-family: "{{qtMonoFamily}}", "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="navigationText"] {
+    background: transparent;
+    color: {{textSecondary}};
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="navigationArrow"] {
+    background: transparent;
+    color: {{textMuted}};
+    font-size: 15px;
+}
+
+QLabel[_ngstdRole="panelHeading"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+QFrame[_ngstdRole="componentPanel"] {
+    background: {{surfaceNested}};
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+}
+
+QFrame[_ngstdRole="semanticState"] {
+    border: 1px solid {{link}};
+    border-radius: {{cardRadius}}px;
+    background: {{surfaceBrand}};
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="success"] {
+    border-color: {{success}};
+    background: {{successSoft}};
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="warning"] {
+    border-color: {{warning}};
+    background: {{warningSoft}};
+}
+
+QFrame[_ngstdRole="semanticState"][ngstdTone="danger"] {
+    border-color: {{danger}};
+    background: {{dangerSoft}};
+}
+
+QToolButton[_ngstdRole="semanticCopy"] {
+    min-height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+    background: transparent;
+    color: {{textSecondary}};
+}
+
+QToolButton[_ngstdRole="semanticCopy"]:hover {
+    background: {{referenceSemanticHover}};
+}
+
+QToolButton[_ngstdRole="semanticCopy"]:pressed {
+    background: {{referenceSemanticActive}};
+}
+
+QLabel[_ngstdRole="semanticToken"] {
+    color: {{text}};
+    font-family: "{{qtMonoFamily}}", "Consolas", monospace;
+    font-size: 11px;
+}
+
+QLabel[_ngstdRole="semanticValue"] {
+    font-family: "{{qtMonoFamily}}", "Consolas", monospace;
+    font-size: 11px;
+}
+
+QLabel[_ngstdRole="semanticTitle"] {
+    color: {{link}};
+    font-size: 14px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="success"] {
+    color: {{success}};
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="warning"] {
+    color: {{warning}};
+}
+
+QLabel[_ngstdRole="semanticTitle"][ngstdTone="danger"] {
+    color: {{danger}};
+}
+
+QFrame[_ngstdRole="sampleStage"] {
+    background: {{surfaceBrand}};
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+}
+
+QLabel[_ngstdRole="typeStageDisplay"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{galleryTypeStageDisplaySize}}px;
+    font-weight: 700;
+}
+
+QFrame[_ngstdRole="typeScale"] {
+    background: {{surface}};
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+}
+
+QFrame[_ngstdRole="typeSpecimen"] {
+    background: {{surface}};
+    border: 0;
+    border-bottom: 1px solid {{border}};
+}
+
+QFrame[_ngstdRole="typeSpecimen"][last="true"] {
+    border-bottom: 0;
+}
+
+QFrame[_ngstdRole="nestedPanel"] {
+    background: {{surfaceNested}};
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+}
+
+QFrame[_ngstdRole="privateShowcase"] {
+    background: {{surface}};
+    border: 1px solid {{border}};
+    border-radius: {{buttonRadius}}px;
+}
+
+QFrame[_ngstdRole="backgroundCaption"] {
+    background: {{surface}};
+    border: 0;
+    border-top: 1px solid {{border}};
+    border-bottom-left-radius: {{panelRadius}}px;
+    border-bottom-right-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="pageBackground"],
+QWidget[_ngstdRole="pageBackground"] {
+    background: {{background}};
+    color: {{text}};
+}
+
+QFrame[_ngstdRole="pageBackground"][_ngstdCornerMode="roundedTop"] {
+    border-top-left-radius: {{panelRadius}}px;
+    border-top-right-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="pageBackground"][_ngstdCornerMode="rounded"] {
+    border-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"] {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 {{pageSoft}},
+        stop: 0.95 {{background}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="none"] {
+    background: {{background}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="up"] {
+    background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 {{pageSoft}},
+        stop: 0.95 {{background}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="center"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="center"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{background}},
+        stop: 1 {{pageSoft}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="toCenter"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{pageSoft}},
+        stop: 1 {{background}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="workspace"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="workspace"] {
+    background: {{pageSoft}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] {
+    background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 {{toolboxGradientStrong}},
+        stop: 1 {{toolboxGradientClear}}
+    );
+    color: {{toolboxText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="none"] {
+    background: {{toolboxSurface}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="up"] {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 {{toolboxGradientStrong}},
+        stop: 1 {{toolboxGradientClear}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="center"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="center"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{toolboxGradientClear}},
+        stop: 1 {{toolboxGradientStrong}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="toCenter"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{toolboxGradientStrong}},
+        stop: 1 {{toolboxGradientClear}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdPaintedBackground="true"] {
+    background: {{toolboxSurface}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] {
+    background: {{dataSurface}};
+    color: {{dataText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{corporateGradientClear}},
+        stop: 1 {{corporateGradientStrong}}
+    );
+    color: {{corporateText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="none"] {
+    background: {{corporateSurface}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="down"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="down"] {
+    background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 {{corporateGradientStrong}},
+        stop: 1 {{corporateGradientClear}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="up"] {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 {{corporateGradientStrong}},
+        stop: 1 {{corporateGradientClear}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="toCenter"] {
+    background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 {{corporateGradientStrong}},
+        stop: 1 {{corporateGradientClear}}
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] {
+    background: {{fieldworkSurface}};
+    color: {{fieldworkText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] QLabel {
+    color: {{toolboxText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] QLabel {
+    color: {{dataText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] QLabel {
+    color: {{corporateText}};
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] QLabel {
+    color: {{fieldworkText}};
+}
+
+QFrame[_ngstdRole="panel"],
+QWidget[_ngstdRole="panel"] {
+    background: {{surface}};
+    border: 1px solid {{border}};
+    border-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="card"],
+QWidget[_ngstdRole="card"] {
+    background: {{surface}};
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+}
+
+QFrame[_ngstdRole="card"][_ngstdDisclosureAnimating="true"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"],
+QWidget[_ngstdRole="card"][_ngstdPaintedCard="true"] {
+    border-color: transparent;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="panel"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="panel"] {
+    border-radius: {{panelRadius}}px;
+}
+
+QFrame[_ngstdRole="card"][ngstdSelected="true"],
+QWidget[_ngstdRole="card"][ngstdSelected="true"] {
+    background: {{surfaceBrand}};
+    border-color: {{focus}};
+}
+
+QFrame[_ngstdRole="card"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][interactive="true"]:hover {
+    background: {{surfaceBrand}};
+    border-color: {{brandHover}};
+}
+
+QFrame[_ngstdRole="card"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][interactive="true"][pressed="true"] {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"] {
+    border-color: {{dataBorder}};
+    border-radius: {{fieldRadius}}px;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"]:hover {
+    background: {{dataOutlineHoverBackground}};
+    border-color: {{dataBorder}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"][pressed="true"] {
+    background: {{dataOutlinePressedBackground}};
+    border-color: {{dataBorder}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"],
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"] {
+    border: 0;
+    border-radius: {{buttonRadius}}px;
+    background: {{toolboxCardSurface}};
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][interactive="true"][pressed="true"] {
+    border-color: transparent;
+    background: {{surface}};
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolbox"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"],
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"] {
+    border-color: transparent;
+    background: {{toolboxCardSurface}};
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"] {
+    border-color: transparent;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"]:hover {
+    background: {{toolboxCardSurface}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"] {
+    border: 0;
+    background: {{toolboxCardSurface}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"] {
+    border: 2px solid {{toolboxAccent}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"] {
+    border: 2px solid {{toolboxAccent}};
+}
+
+QLabel[_ngstdRole="sourceCardLabel"] {
+    background: transparent;
+    color: {{textMuted}};
+    font-size: 12px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="dataCardTitle"] {
+    background: transparent;
+    color: {{dataText}};
+    font-family: "{{qtHeadingFamily}}", "{{qtBodyFamily}}", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="dataCardDescription"] {
+    background: transparent;
+    color: {{dataText}};
+    font-size: 14px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="toolboxTag"] {
+    padding: 1px 7px;
+    border: 1px solid {{toolboxAccent}};
+    border-radius: 4px;
+    background: {{toolboxSurface}};
+    color: {{toolboxAccent}};
+    font-size: 12px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="toolboxTag"][featured="true"] {
+    border-color: {{toolboxTagFeaturedBorder}};
+    background: {{toolboxTagFeaturedSurface}};
+    color: {{toolboxTagFeaturedText}};
+}
+
+QLabel[_ngstdRole="toolboxCardTitle"] {
+    background: transparent;
+    color: {{toolboxText}};
+    font-family: "{{qtHeadingFamily}}", "{{qtBodyFamily}}", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="toolboxCardBody"] {
+    background: transparent;
+    color: {{toolboxText}};
+    font-family: "{{qtHeadingFamily}}", "{{qtBodyFamily}}", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="onImageTitle"] {
+    background: transparent;
+    color: {{white}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+QLabel[_ngstdRole="onImageBody"] {
+    background: transparent;
+    color: {{corporateText}};
+    font-size: 14px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="heading1"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{qtHeading1Size}}px;
+    font-weight: {{qtHeading1Weight}};
+}
+
+QLabel[_ngstdRole="heading2"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{qtHeading2Size}}px;
+    font-weight: {{qtHeading2Weight}};
+}
+
+QLabel[ngstdTypographyRole="display"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeDisplaySize}}px;
+    font-weight: {{typeDisplayWeight}};
+}
+
+QLabel[ngstdTypographyRole="heading1"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeHeading1Size}}px;
+    font-weight: {{typeHeading1Weight}};
+}
+
+QLabel[ngstdTypographyRole="heading2"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeHeading2Size}}px;
+    font-weight: {{typeHeading2Weight}};
+}
+
+QLabel[ngstdTypographyRole="heading3"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeHeading3Size}}px;
+    font-weight: {{typeHeading3Weight}};
+}
+
+QLabel[ngstdTypographyRole="bodyLarge"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeBodyLargeSize}}px;
+    font-weight: {{typeBodyLargeWeight}};
+}
+
+QLabel[ngstdTypographyRole="body"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeBodySize}}px;
+    font-weight: {{typeBodyWeight}};
+}
+
+QLabel[ngstdTypographyRole="control"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeControlSize}}px;
+    font-weight: {{typeControlWeight}};
+}
+
+QLabel[ngstdTypographyRole="caption"] {
+    background: transparent;
+    color: {{textMuted}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeCaptionSize}}px;
+    font-weight: {{typeCaptionWeight}};
+}
+
+QLabel[ngstdTypographyRole="mono"],
+QWidget[ngstdTypographyRole="mono"] {
+    background: transparent;
+    color: {{textMuted}};
+    font-family: "{{qtMonoFamily}}", "Consolas", monospace;
+    font-size: {{qtMonoSize}}px;
+    font-weight: {{qtMonoWeight}};
+}
+
+QLabel[_ngstdRole="muted"] {
+    background: transparent;
+    color: {{textMuted}};
+}
+
+QLabel[_ngstdRole="success"] {
+    background: transparent;
+    color: {{success}};
+}
+
+QLabel[_ngstdRole="warning"] {
+    background: transparent;
+    color: {{warning}};
+}
+
+QLabel[_ngstdRole="danger"] {
+    background: transparent;
+    color: {{danger}};
+}
+
+QLabel[_ngstdRole="tag"] {
+    min-height: {{tagContentHeight}}px;
+    padding: 0 {{tagPaddingHorizontal}}px;
+    border: 1px solid {{border}};
+    border-radius: 14px;
+    background: {{surfaceMuted}};
+    color: {{textSecondary}};
+    font-size: 12px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="info"] {
+    border-color: transparent;
+    background: {{brandSoft}};
+    color: {{link}};
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="success"] {
+    border-color: transparent;
+    background: {{successSoft}};
+    color: {{success}};
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="warning"] {
+    border-color: transparent;
+    background: {{warningSoft}};
+    color: {{warning}};
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="danger"] {
+    border-color: transparent;
+    background: {{dangerSoft}};
+    color: {{danger}};
+}
+
+QPushButton {
+    min-height: {{controlContentHeightMedium}}px;
+    max-height: {{controlHeightMedium}}px;
+    padding: 0 {{controlPaddingX}}px;
+    border: 1px solid {{borderStrong}};
+    border-radius: {{buttonRadius}}px;
+    background: {{surface}};
+    color: {{text}};
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background: {{surfaceBrand}};
+    border-color: {{brandHover}};
+    color: {{linkHover}};
+}
+
+QPushButton:pressed {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+    color: {{brandActive}};
+}
+
+QPushButton:disabled {
+    background: {{surfaceMuted}};
+    border-color: {{border}};
+    color: {{textDisabled}};
+}
+
+QPushButton[ngstdButtonVariant="primary"] {
+    background: {{brand}};
+    border-color: {{brand}};
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="primary"]:hover {
+    background: {{brandHover}};
+    border-color: {{brandHover}};
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="primary"]:pressed {
+    background: {{brandActive}};
+    border-color: {{brandActive}};
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="secondary"] {
+    background: {{surface}};
+    border-color: {{borderStrong}};
+    color: {{text}};
+}
+
+QPushButton[ngstdButtonVariant="secondary"]:hover {
+    background: {{surfaceBrand}};
+    border-color: {{brandHover}};
+    color: {{linkHover}};
+}
+
+QPushButton[ngstdButtonVariant="secondary"]:pressed {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+    color: {{brandActive}};
+}
+
+QPushButton[ngstdButtonVariant="text"] {
+    border-color: transparent;
+    background: transparent;
+    color: {{text}};
+}
+
+QPushButton[ngstdButtonVariant="text"]:hover {
+    border-color: {{borderStrong}};
+    background: transparent;
+    color: {{linkHover}};
+}
+
+QPushButton[ngstdButtonVariant="text"]:pressed {
+    border-color: {{brandActive}};
+    background: {{brandSoft}};
+    color: {{brandActive}};
+}
+
+QPushButton[ngstdButtonVariant="ghost"] {
+    background: transparent;
+    border-color: transparent;
+    color: {{link}};
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:hover {
+    background: {{surfaceBrand}};
+    border-color: transparent;
+    color: {{linkHover}};
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:pressed {
+    background: {{brandSoft}};
+    border-color: transparent;
+    color: {{brandActive}};
+}
+
+QPushButton[ngstdButtonVariant="danger"] {
+    background: {{surface}};
+    border-color: {{danger}};
+    color: {{danger}};
+}
+
+QPushButton[ngstdButtonVariant="danger"]:hover {
+    background: {{dangerSoft}};
+    border-color: {{danger}};
+    color: {{danger}};
+}
+
+QPushButton[ngstdButtonVariant="danger"]:pressed {
+    background: {{dangerAction}};
+    border-color: {{dangerAction}};
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="hero"] {
+    min-height: {{controlHeightMedium}}px;
+    max-height: {{controlHeightMedium}}px;
+    border: 0;
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 {{heroGradientStart}},
+        stop: 1 {{heroGradientEnd}}
+    );
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="hero"]:hover {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 {{heroGradientHoverStart}},
+        stop: 1 {{heroGradientHoverEnd}}
+    );
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="hero"]:pressed {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 {{heroGradientActiveStart}},
+        stop: 1 {{heroGradientActiveEnd}}
+    );
+    color: {{white}};
+}
+
+QPushButton[ngstdButtonVariant="trial"] {
+    min-height: 44px;
+    max-height: 44px;
+    padding: 0 30px;
+    border: 0;
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 {{trialGradientStart}},
+        stop: 1 {{trialGradientEnd}}
+    );
+    color: {{trialText}};
+    font-weight: 700;
+}
+
+QPushButton[ngstdButtonVariant="trial"]:hover,
+QPushButton[ngstdButtonVariant="trial"]:pressed {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 {{trialGradientHoverStart}},
+        stop: 1 {{trialGradientHoverEnd}}
+    );
+    color: {{trialText}};
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"] {
+    min-height: {{controlContentHeightLarge}}px;
+    max-height: {{controlHeightLarge}}px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+    background: {{dataActionBackground}};
+    color: {{dataActionText}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"]:hover {
+    background: {{dataActionHoverBackground}};
+    color: {{dataActionText}};
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"]:pressed {
+    background: {{dataActionPressedBackground}};
+    color: {{dataActionText}};
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"] {
+    min-height: {{controlContentHeightLarge}}px;
+    max-height: {{controlHeightLarge}}px;
+    padding: 0 22px;
+    border: 1px solid {{dataActionBackground}};
+    border-radius: {{fieldRadius}}px;
+    background: transparent;
+    color: {{dataActionBackground}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"]:hover {
+    background: {{dataOutlineHoverBackground}};
+    border-color: {{dataActionBackground}};
+    color: {{dataActionBackground}};
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"]:pressed {
+    background: {{dataOutlinePressedBackground}};
+    border-color: {{dataActionBackground}};
+    color: {{dataActionBackground}};
+}
+
+QPushButton[ngstdButtonVariant="onBrand"] {
+    background: {{corporateText}};
+    border-color: {{corporateText}};
+    color: {{corporateActionText}};
+}
+
+QPushButton[ngstdButtonVariant="onBrand"]:hover {
+    background: transparent;
+    border-color: {{corporateText}};
+    color: {{corporateText}};
+}
+
+QPushButton[ngstdButtonVariant="onBrand"]:pressed {
+    background: {{corporateSurfaceHover}};
+    border-color: {{corporateText}};
+    color: {{corporateText}};
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"] {
+    background: transparent;
+    border-color: {{corporateBorderSecondary}};
+    color: {{corporateText}};
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:hover {
+    background: {{corporateSurfaceHover}};
+    border-color: {{corporateText}};
+    color: {{corporateText}};
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:pressed {
+    background: {{corporateSurfaceActive}};
+    border-color: {{corporateText}};
+    color: {{corporateText}};
+}
+
+QPushButton[ngstdButtonVariant="photo"] {
+    background: transparent;
+    border-color: {{fieldworkText}};
+    color: {{fieldworkText}};
+}
+
+QPushButton[ngstdButtonVariant="photo"]:hover {
+    background: {{fieldworkSurfaceHover}};
+    border-color: transparent;
+    color: {{fieldworkText}};
+}
+
+QPushButton[ngstdButtonVariant="photo"]:pressed {
+    background: {{fieldworkSurfaceActive}};
+    border-color: transparent;
+    color: {{fieldworkText}};
+}
+
+QPushButton[ngstdButtonVariant="photoText"] {
+    background: transparent;
+    border-color: transparent;
+    color: {{fieldworkText}};
+}
+
+QPushButton[ngstdButtonVariant="photoText"]:hover {
+    background: {{fieldworkTextSurfaceHover}};
+    border-color: transparent;
+    color: {{fieldworkText}};
+}
+
+QPushButton[ngstdButtonVariant="photoText"]:pressed {
+    background: {{fieldworkSurfaceHover}};
+    border-color: transparent;
+    color: {{fieldworkText}};
+}
+
+QPushButton:checked {
+    background: {{brand}};
+    border-color: {{brand}};
+    color: {{white}};
+}
+
+QPushButton:checked:hover {
+    background: {{brandHover}};
+    border-color: {{brandHover}};
+    color: {{white}};
+}
+
+QPushButton:checked:pressed {
+    background: {{brandActive}};
+    border-color: {{brandActive}};
+    color: {{white}};
+}
+
+QToolButton[_ngstdRole="iconButton"],
+QPushButton[ngstdButtonVariant="icon"] {
+    min-width: {{controlHeightMedium}}px;
+    max-width: {{controlHeightMedium}}px;
+    min-height: {{controlContentHeightMedium}}px;
+    max-height: {{controlHeightMedium}}px;
+    padding: 0;
+    border-radius: {{buttonRadius}}px;
+}
+
+QPushButton[ngstdButtonVariant="icon"]:pressed {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+    color: {{brandActive}};
+}
+
+QToolButton[_ngstdRole="iconButton"]:checked {
+    background: {{brand}};
+    border-color: {{brand}};
+    color: {{white}};
+}
+
+QToolButton[_ngstdRole="iconButton"]:checked:hover {
+    background: {{brandHover}};
+    border-color: {{brandHover}};
+    color: {{white}};
+}
+
+QToolButton[_ngstdRole="iconButton"]:pressed,
+QToolButton[_ngstdRole="iconButton"]:checked:pressed {
+    background: {{brandActive}};
+    border-color: {{brandActive}};
+    color: {{white}};
+}
+
+QPushButton:disabled,
+QPushButton[ngstdButtonVariant="primary"]:disabled,
+QPushButton[ngstdButtonVariant="secondary"]:disabled,
+QPushButton[ngstdButtonVariant="ghost"]:disabled,
+QPushButton[ngstdButtonVariant="danger"]:disabled,
+QPushButton[ngstdButtonVariant="hero"]:disabled,
+QPushButton[ngstdButtonVariant="trial"]:disabled,
+QPushButton[ngstdButtonVariant="dataFilled"]:disabled,
+QPushButton[ngstdButtonVariant="dataOutline"]:disabled,
+QPushButton[ngstdButtonVariant="onBrand"]:disabled,
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:disabled,
+QPushButton[ngstdButtonVariant="photo"]:disabled,
+QPushButton[ngstdButtonVariant="photoText"]:disabled {
+    background: {{surfaceMuted}};
+    border-color: {{border}};
+    color: {{textDisabled}};
+}
+
+QFrame[_ngstdRole="disclosure"] {
+    border: 0;
+    background: transparent;
+}
+
+QToolButton[_ngstdRole="disclosure"] {
+    min-height: {{disclosureHeaderHeight}}px;
+    padding: 0;
+    border: 0;
+    border-radius: {{buttonRadius}}px;
+    background: transparent;
+    color: {{textSecondary}};
+    font-weight: 500;
+    text-align: left;
+}
+
+QToolButton[_ngstdRole="disclosure"]:hover {
+    background: {{surfaceNested}};
+    color: {{text}};
+}
+
+QToolButton[_ngstdRole="disclosure"]:pressed {
+    background: {{brandSoft}};
+    border-color: {{brandActive}};
+    color: {{brandActive}};
+}
+
+QToolButton[_ngstdRole="disclosure"]:checked {
+    background: {{surfaceNested}};
+    color: {{text}};
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+QLabel[_ngstdRole="disclosureTitle"] {
+    background: transparent;
+    color: {{textSecondary}};
+    font-weight: 500;
+}
+
+QToolButton[_ngstdRole="disclosure"]:hover
+QLabel[_ngstdRole="disclosureTitle"],
+QToolButton[_ngstdRole="disclosure"]:checked
+QLabel[_ngstdRole="disclosureTitle"] {
+    color: {{text}};
+}
+
+QWidget[_ngstdRole="disclosureContent"] {
+    border: 0;
+    background: transparent;
+    color: {{textSecondary}};
+}
+
+QTextEdit,
+QPlainTextEdit {
+    min-height: {{controlContentHeightMedium}}px;
+    padding: 0 {{space3}}px;
+    border: 1px solid {{borderStrong}};
+    border-radius: {{fieldRadius}}px;
+    background: {{surface}};
+    color: {{text}};
+    selection-background-color: {{brand}};
+    selection-color: {{white}};
+}
+
+QTextEdit:hover,
+QPlainTextEdit:hover {
+    border-color: {{brandHover}};
+}
+
+QTextEdit[ngstdError="true"],
+QPlainTextEdit[ngstdError="true"] {
+    border-color: {{danger}};
+    background: {{dangerSoft}};
+}
+
+QTextEdit:disabled,
+QPlainTextEdit:disabled {
+    border-color: {{border}};
+    background: {{surfaceMuted}};
+    color: {{textDisabled}};
+}
+
+QComboBox QAbstractItemView {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: {{textSecondary}};
+    outline: 0;
+    selection-background-color: transparent;
+    selection-color: {{text}};
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: {{comboBoxPopupItemHeight}}px;
+    padding: 0 {{comboBoxPopupItemPaddingHorizontal}}px;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+    color: {{textSecondary}};
+}
+
+QComboBox QAbstractItemView::item:disabled {
+    color: {{textDisabled}};
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background: {{surfaceBrand}};
+    color: {{link}};
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background: {{surfaceBrand}};
+    color: {{link}};
+    font-weight: 500;
+}
+
+QComboBox QAbstractItemView::item:selected:hover {
+    background: {{surfaceBrand}};
+    color: {{link}};
+}
+
+QComboBoxPrivateContainer {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+QTabWidget::pane {
+    border: 0;
+    border-top: 1px solid {{border}};
+}
+
+QAbstractItemView {
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+    background: {{surface}};
+    alternate-background-color: {{surfaceMuted}};
+    color: {{text}};
+    outline: 0;
+    selection-background-color: {{brandSoft}};
+    selection-color: {{link}};
+}
+
+QListView {
+    padding: 5px;
+}
+
+QTreeView {
+    padding: 5px;
+}
+
+QListView::item {
+    min-height: {{itemViewRowHeight}}px;
+    padding: 0 {{itemViewCellPaddingHorizontal}}px;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+}
+
+QListView::item:hover {
+    background: {{surfaceBrand}};
+}
+
+QListView::item:selected {
+    background: {{brandSoft}};
+    color: {{link}};
+}
+
+QHeaderView::section {
+    min-height: {{tableHeaderHeight}}px;
+    padding: 0 {{tableCellPaddingHorizontal}}px;
+    border: 0;
+    border-bottom: 1px solid {{border}};
+    background: {{surfaceMuted}};
+    color: {{textSecondary}};
+    font-weight: 500;
+}
+
+QTableView,
+QTableWidget {
+    gridline-color: {{border}};
+}
+
+QTableWidget[_ngstdPaintedTable="true"] {
+    border: 0;
+}
+
+QTableWidget[_ngstdPaintedTable="true"]::item {
+    padding: 0;
+}
+
+QTableView::item,
+QTableWidget::item {
+    min-height: {{tableRowHeight}}px;
+    padding: {{tableCellPaddingVertical}}px {{tableCellPaddingHorizontal}}px;
+    border: 0;
+    border-bottom: 1px solid {{border}};
+}
+
+QTableView QWidget[_ngstdRole="tableViewport"],
+QTableWidget QWidget[_ngstdRole="tableViewport"] {
+    background: {{surface}};
+    border: 0;
+}
+
+QScrollBar:vertical {
+    width: {{scrollBarExtent}}px;
+    margin: {{scrollBarMargin}}px;
+    border: 0;
+    background: {{pageSoft}};
+}
+
+QScrollBar:horizontal {
+    height: {{scrollBarExtent}}px;
+    margin: {{scrollBarMargin}}px;
+    border: 0;
+    background: {{pageSoft}};
+}
+
+QScrollBar::groove:vertical,
+QScrollBar::groove:horizontal {
+    border: 0;
+    background: {{pageSoft}};
+}
+
+QAbstractItemView QScrollBar:vertical,
+QAbstractItemView QScrollBar:horizontal,
+QAbstractItemView QScrollBar::groove:vertical,
+QAbstractItemView QScrollBar::groove:horizontal {
+    background: {{surface}};
+}
+
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal {
+    min-width: {{scrollBarMinimumThumb}}px;
+    min-height: {{scrollBarMinimumThumb}}px;
+    border: 0;
+    border-radius: {{scrollBarRadius}}px;
+    background: {{borderStrong}};
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+    background: {{textMuted}};
+}
+
+QScrollBar::handle:vertical:pressed,
+QScrollBar::handle:horizontal:pressed {
+    background: {{scrollBarPressed}};
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line,
+QScrollBar::add-page,
+QScrollBar::sub-page {
+    width: 0;
+    height: 0;
+    border: 0;
+    background: transparent;
+}
+
+QAbstractScrollArea::corner {
+    border: 0;
+    background: transparent;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"] {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: {{textSecondary}};
+    outline: 0;
+    selection-background-color: transparent;
+    selection-color: {{text}};
+    padding: 0;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item {
+    min-height: {{comboBoxPopupItemHeight}}px;
+    padding: 0 {{comboBoxPopupItemPaddingHorizontal}}px;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+    color: {{textSecondary}};
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:disabled {
+    color: {{textDisabled}};
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:hover {
+    background: {{surfaceBrand}};
+    color: {{link}};
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected {
+    background: {{surfaceBrand}};
+    color: {{link}};
+    font-weight: 500;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected:hover {
+    background: {{surfaceBrand}};
+    color: {{link}};
+}
+
+QFrame[_ngstdRole="notice"] {
+    padding: {{noticePaddingVertical}}px {{noticePaddingHorizontal}}px;
+    border: 1px solid {{border}};
+    border-left: {{noticeAccentWidth}}px solid {{link}};
+    border-radius: {{buttonRadius}}px;
+    background: {{surfaceBrand}};
+    color: {{textSecondary}};
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="success"] {
+    border-left-color: {{success}};
+    background: {{successSoft}};
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="warning"] {
+    border-left-color: {{warning}};
+    background: {{warningSoft}};
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="danger"] {
+    border-left-color: {{danger}};
+    background: {{dangerSoft}};
+}
+
+QProgressBar {
+    min-height: {{progressHeight}}px;
+    max-height: {{progressHeight}}px;
+    border: 0;
+    border-radius: {{progressRadius}}px;
+    background: {{brandSoft}};
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    border-radius: {{progressRadius}}px;
+    background: {{brand}};
+}
+
+QWizard[_ngstdRole="wizard"] {
+    background-color: {{surface}};
+    border-color: {{border}};
+}
+
+QWizard QWidget[_ngstdRole="wizardPage"],
+QWizard QWidget[_ngstdRole="wizardPageStack"] {
+    background-color: {{pageSoft}};
+    color: {{text}};
+}
+
+QWizard QFrame {
+    border-color: {{border}};
+}
+
+QWizardPage {
+    background-color: {{pageSoft}};
+    color: {{text}};
+}
+
+QWizardPage QLabel {
+    color: {{text}};
+}
+
+QWizard QPushButton,
+QDialogButtonBox QPushButton {
+    min-width: {{wizardButtonMinimumWidth}}px;
+}
+
+QWizard QLabel,
+QDialogButtonBox QLabel {
+    background: transparent;
+}
+
+QWidget[_ngstdRole="wizardHeader"] {
+    background-color: {{surface}};
+    border: 0;
+    border-bottom: 1px solid {{border}};
+}
+
+QWidget[_ngstdRole="wizardNavigation"] {
+    background-color: {{surface}};
+    border: 0;
+    border-top: 1px solid {{border}};
+}
+
+QFrame[_ngstdRole="wizardRuler"] {
+    min-height: 1px;
+    max-height: 1px;
+    border: 0;
+    background: {{border}};
+}
+
+QFrame[_ngstdRole="assetCard"] {
+    border: 1px solid {{border}};
+    border-radius: {{cardRadius}}px;
+    background: {{surface}};
+}
+
+QFrame[_ngstdRole="assetPreview"] {
+    border: 0;
+    border-bottom: 1px solid {{border}};
+    border-top-left-radius: {{cardRadius}}px;
+    border-top-right-radius: {{cardRadius}}px;
+    background: #F6F8FA;
+}
+
+QFrame[_ngstdRole="assetPreview"][dark="true"] {
+    background: #1B2A38;
+}
+
+QFrame[_ngstdRole="assetPreview"][adaptive="true"] {
+    background: {{surfaceNested}};
+}
+
+QLabel[_ngstdRole="assetTitle"] {
+    color: {{textSecondary}};
+    font-weight: 500;
+}
+
+QFrame[_ngstdRole="tokenRow"] {
+    border: 0;
+    border-bottom: 1px solid {{border}};
+    background: transparent;
+}
+
+QLabel[_ngstdRole="tokenRowName"] {
+    color: {{textMuted}};
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="tokenRowValue"] {
+    color: {{link}};
+}
+
+QPlainTextEdit[_ngstdRole="codeBlock"] {
+    padding: 18px;
+    border: 1px solid #2A3A49;
+    border-radius: {{cardRadius}}px;
+    background: #0F1822;
+    color: #D8E2EA;
+    font-family: "NextGIS Roboto Mono", monospace;
+    font-size: 13px;
+}
+
+QDialogButtonBox {
+    min-height: {{controlContentHeightMedium}}px;
+    background: transparent;
+}
+
+QFrame[_ngstdRole="toast"] {
+    min-width: {{toastMinimumWidth}}px;
+    padding: 0;
+    border: 0;
+    border-radius: {{buttonRadius}}px;
+    background: {{referenceToastSurface}};
+    color: {{referenceToastText}};
+}
+
+QFrame[_ngstdRole="toast"] QLabel {
+    background: transparent;
+    color: {{referenceToastText}};
+    font-size: 13px;
+}
+
+QToolTip {
+    padding: 5px 8px;
+    border: 0;
+    border-radius: {{fieldRadius}}px;
+    background: {{text}};
+    color: {{background}};
+}

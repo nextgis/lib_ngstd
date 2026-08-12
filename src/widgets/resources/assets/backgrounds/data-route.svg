@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 240 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 100C34 54 62 77 82 48C101 20 129 22 151 44C171 64 194 59 224 12" stroke="#0C65FF" stroke-width="3"/>
+  <path d="m35 70 7-12 7 12H35Zm39 1 7-12 7 12H74Zm38-42 7-12 7 12h-14Zm34 24 7-12 7 12h-14Zm66-25 7-12 7 12h-14Z" fill="#fff" stroke="#0C65FF" stroke-width="2"/>
+  <path d="m61 78 7-12 7 12H61Zm91-31 7-12 7 12h-14Z" fill="#0C65FF"/>
+</svg>

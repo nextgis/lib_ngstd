@@ -1,0 +1,44 @@
+ngstd::widgets third-party notices
+==================================
+
+This distribution embeds only the resources listed in
+src/widgets/resources/assets-manifest.json.
+
+Roboto font
+-----------
+Copyright 2011 The Roboto Project Authors.
+License: SIL Open Font License 1.1.
+Release copy: licenses/Roboto-OFL-1.1.txt
+
+Ubuntu font
+-----------
+Copyright Canonical Ltd. and the Ubuntu Font Family contributors.
+License: Ubuntu Font Licence 1.0.
+Release copy: licenses/Ubuntu-Font-1.0.txt
+
+Material Design Icons (Pictogrammers)
+-------------------------------------
+License: Apache License 2.0.
+Source: https://github.com/Templarian/MaterialDesign
+Full text: licenses/Apache-2.0.txt
+
+Ant Design Icons
+----------------
+Copyright (c) 2018-present Ant UED.
+License: MIT.
+Source: https://github.com/ant-design/ant-design-icons
+Full text: licenses/Ant-Design-Icons-MIT.txt
+
+Lucide Icons
+------------
+Copyright (c) Lucide Icons and Contributors.
+License: ISC; Feather-derived icons are additionally under MIT.
+Source: https://github.com/lucide-icons/lucide
+Full text: licenses/Lucide-ISC-Feather-MIT.txt
+
+NextGIS artwork
+---------------
+The NextGIS logos, backgrounds, generated control indicators, gallery cards,
+and pictograms are NextGIS project artwork and are distributed under the main
+project license unless a source asset states otherwise. NextGIS names and
+logos may additionally be protected by trademark law.

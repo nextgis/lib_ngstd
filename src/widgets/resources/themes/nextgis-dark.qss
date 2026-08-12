@@ -1,0 +1,1220 @@
+/****** Generated from the canonical NextGIS QSS. ******/
+
+/* Generated NextGIS UI Style Reference for Qt 5.15, dark theme. */
+
+QWidget {
+color: #F2F6F9;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+QLabel {
+background: transparent;
+}
+
+QToolButton {
+min-height: 38px;
+    padding: 0 16px;
+    border: 1px solid #3B5062;
+    border-radius: 8px;
+    background: #121D27;
+    color: #F2F6F9;
+    font-weight: 500;
+}
+
+QToolButton:hover {
+background: #10263A;
+    border-color: #1478C9;
+    color: #9BD3F5;
+}
+
+QToolButton:pressed {
+background: #173A56;
+    border-color: #0952A5;
+    color: #0952A5;
+}
+
+QToolButton:disabled {
+background: #172431;
+    border-color: #2A3A49;
+    color: #6E7F8D;
+}
+
+QLineEdit QToolButton[_ngstdRole="fieldAction"] {
+min-width: 18px;
+    max-width: 18px;
+    min-height: 18px;
+    max-height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+QFrame[_ngstdRole="themeSwitch"] {
+background: #172431;
+    border: 1px solid #2A3A49;
+    border-radius: 10px;
+}
+
+QToolButton[_ngstdRole="themeButton"] {
+min-width: 36px;
+    max-width: 36px;
+    min-height: 32px;
+    max-height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+}
+
+QToolButton[_ngstdRole="themeButton"]:hover {
+background: #10263A;
+}
+
+QToolButton[_ngstdRole="themeButton"]:checked {
+background: transparent;
+}
+
+QToolButton[_ngstdRole="themeButton"]:pressed,
+QToolButton[_ngstdRole="themeButton"]:checked:pressed {
+background: #0952A5;
+}
+
+QToolButton[_ngstdRole="themeButton"]:checked:hover {
+background: transparent;
+}
+
+QFrame[_ngstdRole="pageBackground"],
+QWidget[_ngstdRole="pageBackground"] {
+background: #0B1118;
+    color: #F2F6F9;
+}
+
+QFrame[_ngstdRole="pageBackground"][_ngstdCornerMode="roundedTop"] {
+border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+QFrame[_ngstdRole="pageBackground"][_ngstdCornerMode="rounded"] {
+border-radius: 12px;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"] {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 #0F1822,
+        stop: 0.95 #0B1118
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="none"] {
+background: #0B1118;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="up"] {
+background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 #0F1822,
+        stop: 0.95 #0B1118
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="center"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="center"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 #0B1118,
+        stop: 1 #0F1822
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="main"][_ngstdGradient="toCenter"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 #0F1822,
+        stop: 1 #0B1118
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="workspace"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="workspace"] {
+background: #0F1822;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] {
+background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 rgba(23, 58, 86, 0.94),
+        stop: 1 rgba(18, 29, 39, 0.10)
+    );
+    color: #F2F6F9;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="none"] {
+background: #121D27;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="up"] {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 rgba(23, 58, 86, 0.94),
+        stop: 1 rgba(18, 29, 39, 0.10)
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="center"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="center"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 rgba(18, 29, 39, 0.10),
+        stop: 1 rgba(23, 58, 86, 0.94)
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdGradient="toCenter"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 rgba(23, 58, 86, 0.94),
+        stop: 1 rgba(18, 29, 39, 0.10)
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"][_ngstdPaintedBackground="true"] {
+background: #121D27;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] {
+background: #121D27;
+    color: #F2F6F9;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 #0C65AF,
+        stop: 1 #084C83
+    );
+    color: #FFFFFF;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="none"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="none"] {
+background: #0C65AF;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="down"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="down"] {
+background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 #084C83,
+        stop: 1 #0C65AF
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="up"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="up"] {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 0, y2: 0,
+        stop: 0 #084C83,
+        stop: 1 #0C65AF
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="toCenter"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"][_ngstdGradient="toCenter"] {
+background: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.8,
+        fx: 0.5, fy: 0.5,
+        stop: 0 #084C83,
+        stop: 1 #0C65AF
+    );
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"],
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] {
+background: #173426;
+    color: #FFFFFF;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="toolbox"] QLabel {
+color: #F2F6F9;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="data"] QLabel {
+color: #F2F6F9;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="corporate"] QLabel {
+color: #FFFFFF;
+}
+
+QFrame[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] QLabel,
+QWidget[_ngstdRole="pageBackground"][ngstdPageBackgroundVariant="fieldwork"] QLabel {
+color: #FFFFFF;
+}
+
+QFrame[_ngstdRole="card"],
+QWidget[_ngstdRole="card"] {
+background: #121D27;
+    border: 1px solid #2A3A49;
+    border-radius: 10px;
+}
+
+QFrame[_ngstdRole="card"][_ngstdDisclosureAnimating="true"] {
+border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"],
+QWidget[_ngstdRole="card"][_ngstdPaintedCard="true"] {
+border-color: transparent;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="panel"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="panel"] {
+border-radius: 12px;
+}
+
+QFrame[_ngstdRole="card"][ngstdSelected="true"],
+QWidget[_ngstdRole="card"][ngstdSelected="true"] {
+background: #10263A;
+    border-color: #69B8ED;
+}
+
+QFrame[_ngstdRole="card"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][interactive="true"]:hover {
+background: #10263A;
+    border-color: #1478C9;
+}
+
+QFrame[_ngstdRole="card"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][interactive="true"][pressed="true"] {
+background: #173A56;
+    border-color: #0952A5;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"] {
+border-color: rgba(242, 246, 249, 0.18);
+    border-radius: 6px;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"]:hover {
+background: #1B262F;
+    border-color: rgba(242, 246, 249, 0.18);
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="data"][interactive="true"][pressed="true"] {
+background: #2D3740;
+    border-color: rgba(242, 246, 249, 0.18);
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"],
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"] {
+border: 0;
+    border-radius: 8px;
+    background: #172431;
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][interactive="true"][pressed="true"] {
+border-color: transparent;
+    background: #121D27;
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolbox"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"],
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"][interactive="true"]:hover,
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"] {
+border-color: transparent;
+    background: #172431;
+}
+
+QFrame[_ngstdRole="card"][_ngstdPaintedCard="true"][ngstdCardVariant="toolboxNew"] {
+border-color: transparent;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"]:hover,
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"]:hover {
+background: #172431;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolbox"][interactive="true"][pressed="true"] {
+border: 0;
+    background: #172431;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"][interactive="true"][pressed="true"] {
+border: 2px solid #69B8ED;
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="toolboxNew"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="toolboxNew"] {
+border: 2px solid #69B8ED;
+}
+
+QLabel[ngstdTypographyRole="display"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+}
+
+QLabel[ngstdTypographyRole="heading1"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+QLabel[ngstdTypographyRole="heading2"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+QLabel[ngstdTypographyRole="heading3"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+QLabel[ngstdTypographyRole="bodyLarge"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+QLabel[ngstdTypographyRole="body"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+QLabel[ngstdTypographyRole="control"] {
+background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+QLabel[ngstdTypographyRole="caption"] {
+background: transparent;
+    color: #899AA8;
+    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+QLabel[ngstdTypographyRole="mono"],
+QWidget[ngstdTypographyRole="mono"] {
+background: transparent;
+    color: #899AA8;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+QLabel[_ngstdRole="tag"] {
+min-height: 26px;
+    padding: 0 9px;
+    border: 1px solid #2A3A49;
+    border-radius: 14px;
+    background: #172431;
+    color: #BCC8D2;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="info"] {
+border-color: transparent;
+    background: #173A56;
+    color: #69B8ED;
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="success"] {
+border-color: transparent;
+    background: #143426;
+    color: #54D497;
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="warning"] {
+border-color: transparent;
+    background: #3B2C13;
+    color: #F2C66D;
+}
+
+QLabel[_ngstdRole="tag"][ngstdTone="danger"] {
+border-color: transparent;
+    background: #3D1D25;
+    color: #F08A9B;
+}
+
+QPushButton {
+min-height: 38px;
+    max-height: 40px;
+    padding: 0 16px;
+    border: 1px solid #3B5062;
+    border-radius: 8px;
+    background: #121D27;
+    color: #F2F6F9;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+background: #10263A;
+    border-color: #1478C9;
+    color: #9BD3F5;
+}
+
+QPushButton:pressed {
+background: #173A56;
+    border-color: #0952A5;
+    color: #0952A5;
+}
+
+QPushButton:disabled {
+background: #172431;
+    border-color: #2A3A49;
+    color: #6E7F8D;
+}
+
+QPushButton[ngstdButtonVariant="primary"] {
+background: #0C65AF;
+    border-color: #0C65AF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="primary"]:hover {
+background: #1478C9;
+    border-color: #1478C9;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="primary"]:pressed {
+background: #0952A5;
+    border-color: #0952A5;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="secondary"] {
+background: #121D27;
+    border-color: #3B5062;
+    color: #F2F6F9;
+}
+
+QPushButton[ngstdButtonVariant="secondary"]:hover {
+background: #10263A;
+    border-color: #1478C9;
+    color: #9BD3F5;
+}
+
+QPushButton[ngstdButtonVariant="secondary"]:pressed {
+background: #173A56;
+    border-color: #0952A5;
+    color: #0952A5;
+}
+
+QPushButton[ngstdButtonVariant="text"] {
+border-color: transparent;
+    background: transparent;
+    color: #F2F6F9;
+}
+
+QPushButton[ngstdButtonVariant="text"]:hover {
+border-color: #3B5062;
+    background: transparent;
+    color: #9BD3F5;
+}
+
+QPushButton[ngstdButtonVariant="text"]:pressed {
+border-color: #0952A5;
+    background: #173A56;
+    color: #0952A5;
+}
+
+QPushButton[ngstdButtonVariant="ghost"] {
+background: transparent;
+    border-color: transparent;
+    color: #69B8ED;
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:hover {
+background: #10263A;
+    border-color: transparent;
+    color: #9BD3F5;
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:pressed {
+background: #173A56;
+    border-color: transparent;
+    color: #0952A5;
+}
+
+QPushButton[ngstdButtonVariant="danger"] {
+background: #121D27;
+    border-color: #F08A9B;
+    color: #F08A9B;
+}
+
+QPushButton[ngstdButtonVariant="danger"]:hover {
+background: #3D1D25;
+    border-color: #F08A9B;
+    color: #F08A9B;
+}
+
+QPushButton[ngstdButtonVariant="danger"]:pressed {
+background: #B8324A;
+    border-color: #B8324A;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="hero"] {
+min-height: 40px;
+    max-height: 40px;
+    border: 0;
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 #0C65AF,
+        stop: 1 #1E88E5
+    );
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="hero"]:hover {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 #0952A5,
+        stop: 1 #1976D2
+    );
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="hero"]:pressed {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 #063F80,
+        stop: 1 #1266AD
+    );
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="trial"] {
+min-height: 44px;
+    max-height: 44px;
+    padding: 0 30px;
+    border: 0;
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 #FFD700,
+        stop: 1 #F8A726
+    );
+    color: #3D2B0E;
+    font-weight: 700;
+}
+
+QPushButton[ngstdButtonVariant="trial"]:hover,
+QPushButton[ngstdButtonVariant="trial"]:pressed {
+background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 0,
+        stop: 0 #F8A726,
+        stop: 1 #FFD700
+    );
+    color: #3D2B0E;
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"] {
+min-height: 46px;
+    max-height: 48px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 6px;
+    background: #F2F6F9;
+    color: #0B1118;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"]:hover {
+background: #E8ECEF;
+    color: #0B1118;
+}
+
+QPushButton[ngstdButtonVariant="dataFilled"]:pressed {
+background: #D6DADF;
+    color: #0B1118;
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"] {
+min-height: 46px;
+    max-height: 48px;
+    padding: 0 22px;
+    border: 1px solid #F2F6F9;
+    border-radius: 6px;
+    background: transparent;
+    color: #F2F6F9;
+    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"]:hover {
+background: #1B262F;
+    border-color: #F2F6F9;
+    color: #F2F6F9;
+}
+
+QPushButton[ngstdButtonVariant="dataOutline"]:pressed {
+background: #2D3740;
+    border-color: #F2F6F9;
+    color: #F2F6F9;
+}
+
+QPushButton[ngstdButtonVariant="onBrand"] {
+background: #FFFFFF;
+    border-color: #FFFFFF;
+    color: #1D1D1B;
+}
+
+QPushButton[ngstdButtonVariant="onBrand"]:hover {
+background: transparent;
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="onBrand"]:pressed {
+background: rgba(255, 255, 255, 0.12);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"] {
+background: transparent;
+    border-color: rgba(255, 255, 255, 0.72);
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:hover {
+background: rgba(255, 255, 255, 0.12);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:pressed {
+background: rgba(255, 255, 255, 0.24);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photo"] {
+background: transparent;
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photo"]:hover {
+background: rgba(0, 0, 0, 0.44);
+    border-color: transparent;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photo"]:pressed {
+background: rgba(0, 0, 0, 0.64);
+    border-color: transparent;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photoText"] {
+background: transparent;
+    border-color: transparent;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photoText"]:hover {
+background: rgba(0, 0, 0, 0.28);
+    border-color: transparent;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="photoText"]:pressed {
+background: rgba(0, 0, 0, 0.44);
+    border-color: transparent;
+    color: #FFFFFF;
+}
+
+QPushButton:checked {
+background: #0C65AF;
+    border-color: #0C65AF;
+    color: #FFFFFF;
+}
+
+QPushButton:checked:hover {
+background: #1478C9;
+    border-color: #1478C9;
+    color: #FFFFFF;
+}
+
+QPushButton:checked:pressed {
+background: #0952A5;
+    border-color: #0952A5;
+    color: #FFFFFF;
+}
+
+QPushButton[ngstdButtonVariant="icon"]:pressed {
+background: #173A56;
+    border-color: #0952A5;
+    color: #0952A5;
+}
+
+QPushButton:disabled,
+QPushButton[ngstdButtonVariant="primary"]:disabled,
+QPushButton[ngstdButtonVariant="secondary"]:disabled,
+QPushButton[ngstdButtonVariant="ghost"]:disabled,
+QPushButton[ngstdButtonVariant="danger"]:disabled,
+QPushButton[ngstdButtonVariant="hero"]:disabled,
+QPushButton[ngstdButtonVariant="trial"]:disabled,
+QPushButton[ngstdButtonVariant="dataFilled"]:disabled,
+QPushButton[ngstdButtonVariant="dataOutline"]:disabled,
+QPushButton[ngstdButtonVariant="onBrand"]:disabled,
+QPushButton[ngstdButtonVariant="onBrandSecondary"]:disabled,
+QPushButton[ngstdButtonVariant="photo"]:disabled,
+QPushButton[ngstdButtonVariant="photoText"]:disabled {
+background: #172431;
+    border-color: #2A3A49;
+    color: #6E7F8D;
+}
+
+QFrame[_ngstdRole="disclosure"] {
+border: 0;
+    background: transparent;
+}
+
+QToolButton[_ngstdRole="disclosure"] {
+min-height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #BCC8D2;
+    font-weight: 500;
+    text-align: left;
+}
+
+QToolButton[_ngstdRole="disclosure"]:hover {
+background: #1C2B39;
+    color: #F2F6F9;
+}
+
+QToolButton[_ngstdRole="disclosure"]:pressed {
+background: #173A56;
+    border-color: #0952A5;
+    color: #0952A5;
+}
+
+QToolButton[_ngstdRole="disclosure"]:checked {
+background: #1C2B39;
+    color: #F2F6F9;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+QLabel[_ngstdRole="disclosureTitle"] {
+background: transparent;
+    color: #BCC8D2;
+    font-weight: 500;
+}
+
+QToolButton[_ngstdRole="disclosure"]:hover
+QLabel[_ngstdRole="disclosureTitle"],
+QToolButton[_ngstdRole="disclosure"]:checked
+QLabel[_ngstdRole="disclosureTitle"] {
+color: #F2F6F9;
+}
+
+QWidget[_ngstdRole="disclosureContent"] {
+border: 0;
+    background: transparent;
+    color: #BCC8D2;
+}
+
+QTextEdit,
+QPlainTextEdit {
+min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #3B5062;
+    border-radius: 6px;
+    background: #121D27;
+    color: #F2F6F9;
+    selection-background-color: #0C65AF;
+    selection-color: #FFFFFF;
+}
+
+QTextEdit:hover,
+QPlainTextEdit:hover {
+border-color: #1478C9;
+}
+
+QTextEdit[ngstdError="true"],
+QPlainTextEdit[ngstdError="true"] {
+border-color: #F08A9B;
+    background: #3D1D25;
+}
+
+QTextEdit:disabled,
+QPlainTextEdit:disabled {
+border-color: #2A3A49;
+    background: #172431;
+    color: #6E7F8D;
+}
+
+QComboBox QAbstractItemView {
+border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #BCC8D2;
+    outline: 0;
+    selection-background-color: transparent;
+    selection-color: #F2F6F9;
+}
+
+QComboBox QAbstractItemView::item {
+min-height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    color: #BCC8D2;
+}
+
+QComboBox QAbstractItemView::item:disabled {
+color: #6E7F8D;
+}
+
+QComboBox QAbstractItemView::item:hover {
+background: #10263A;
+    color: #69B8ED;
+}
+
+QComboBox QAbstractItemView::item:selected {
+background: #10263A;
+    color: #69B8ED;
+    font-weight: 500;
+}
+
+QComboBox QAbstractItemView::item:selected:hover {
+background: #10263A;
+    color: #69B8ED;
+}
+
+QComboBoxPrivateContainer {
+border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+QTabWidget::pane {
+border: 0;
+    border-top: 1px solid #2A3A49;
+}
+
+QAbstractItemView {
+border: 1px solid #2A3A49;
+    border-radius: 10px;
+    background: #121D27;
+    alternate-background-color: #172431;
+    color: #F2F6F9;
+    outline: 0;
+    selection-background-color: #173A56;
+    selection-color: #69B8ED;
+}
+
+QListView {
+padding: 5px;
+}
+
+QTreeView {
+padding: 5px;
+}
+
+QListView::item {
+min-height: 38px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+}
+
+QListView::item:hover {
+background: #10263A;
+}
+
+QListView::item:selected {
+background: #173A56;
+    color: #69B8ED;
+}
+
+QHeaderView::section {
+min-height: 40px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 1px solid #2A3A49;
+    background: #172431;
+    color: #BCC8D2;
+    font-weight: 500;
+}
+
+QTableView,
+QTableWidget {
+gridline-color: #2A3A49;
+}
+
+QTableWidget[_ngstdPaintedTable="true"] {
+border: 0;
+}
+
+QTableWidget[_ngstdPaintedTable="true"]::item {
+padding: 0;
+}
+
+QTableView::item,
+QTableWidget::item {
+min-height: 44px;
+    padding: 4px 12px;
+    border: 0;
+    border-bottom: 1px solid #2A3A49;
+}
+
+QTableView QWidget[_ngstdRole="tableViewport"],
+QTableWidget QWidget[_ngstdRole="tableViewport"] {
+background: #121D27;
+    border: 0;
+}
+
+QScrollBar:vertical {
+width: 8px;
+    margin: 0px;
+    border: 0;
+    background: #0F1822;
+}
+
+QScrollBar:horizontal {
+height: 8px;
+    margin: 0px;
+    border: 0;
+    background: #0F1822;
+}
+
+QScrollBar::groove:vertical,
+QScrollBar::groove:horizontal {
+border: 0;
+    background: #0F1822;
+}
+
+QAbstractItemView QScrollBar:vertical,
+QAbstractItemView QScrollBar:horizontal,
+QAbstractItemView QScrollBar::groove:vertical,
+QAbstractItemView QScrollBar::groove:horizontal {
+background: #121D27;
+}
+
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal {
+min-width: 32px;
+    min-height: 32px;
+    border: 0;
+    border-radius: 4px;
+    background: #3B5062;
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+background: #899AA8;
+}
+
+QScrollBar::handle:vertical:pressed,
+QScrollBar::handle:horizontal:pressed {
+background: #0C65AF;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line,
+QScrollBar::add-page,
+QScrollBar::sub-page {
+width: 0;
+    height: 0;
+    border: 0;
+    background: transparent;
+}
+
+QAbstractScrollArea::corner {
+border: 0;
+    background: transparent;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"] {
+border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #BCC8D2;
+    outline: 0;
+    selection-background-color: transparent;
+    selection-color: #F2F6F9;
+    padding: 0;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item {
+min-height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    color: #BCC8D2;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:disabled {
+color: #6E7F8D;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:hover {
+background: #10263A;
+    color: #69B8ED;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected {
+background: #10263A;
+    color: #69B8ED;
+    font-weight: 500;
+}
+
+QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected:hover {
+background: #10263A;
+    color: #69B8ED;
+}
+
+QFrame[_ngstdRole="notice"] {
+padding: 14px 16px;
+    border: 1px solid #2A3A49;
+    border-left: 3px solid #69B8ED;
+    border-radius: 8px;
+    background: #10263A;
+    color: #BCC8D2;
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="success"] {
+border-left-color: #54D497;
+    background: #143426;
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="warning"] {
+border-left-color: #F2C66D;
+    background: #3B2C13;
+}
+
+QFrame[_ngstdRole="notice"][ngstdTone="danger"] {
+border-left-color: #F08A9B;
+    background: #3D1D25;
+}
+
+QProgressBar {
+min-height: 10px;
+    max-height: 10px;
+    border: 0;
+    border-radius: 5px;
+    background: #173A56;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+border-radius: 5px;
+    background: #0C65AF;
+}
+
+QWizard[_ngstdRole="wizard"] {
+background-color: #121D27;
+    border-color: #2A3A49;
+}
+
+QWizard QFrame {
+border-color: #2A3A49;
+}
+
+QWizardPage {
+background-color: #0F1822;
+    color: #F2F6F9;
+}
+
+QWizardPage QLabel {
+color: #F2F6F9;
+}
+
+QWizard QPushButton,
+QDialogButtonBox QPushButton {
+min-width: 96px;
+}
+
+QWizard QLabel,
+QDialogButtonBox QLabel {
+background: transparent;
+}
+
+QDialogButtonBox {
+min-height: 38px;
+    background: transparent;
+}
+
+QFrame[_ngstdRole="toast"] {
+min-width: 180px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: #101820;
+    color: #FFFFFF;
+}
+
+QFrame[_ngstdRole="toast"] QLabel {
+background: transparent;
+    color: #FFFFFF;
+    font-size: 13px;
+}
+
+QToolTip {
+padding: 5px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: #F2F6F9;
+    color: #0B1118;
+}

@@ -1,0 +1,1141 @@
+{
+  "name": "NextGIS UI Style Reference",
+  "version": "2026.09",
+  "prefix": "ng",
+  "sources": [
+    "NextGIS Data",
+    "NextGIS Toolbox",
+    "nextgis.com"
+  ],
+  "excludedSources": [
+    "NextGIS Docs / knowledge base"
+  ],
+  "css": {
+    "customPropertyPrefix": "--ng-",
+    "themeAttribute": "data-theme",
+    "componentClassPrefix": "ng-"
+  },
+  "color": {
+    "shared": {
+      "brand": "#0C65AF",
+      "white": "#FFFFFF",
+      "black": "#000000"
+    },
+    "light": {
+      "brandHover": "#0952A5",
+      "brandActive": "#063F80",
+      "brandSoft": "#DCECF7",
+      "background": "#FFFFFF",
+      "pageSoft": "#F1F5F9",
+      "surface": "#FFFFFF",
+      "surfaceMuted": "#F2F4F5",
+      "surfaceBrand": "#F2F8FC",
+      "surfaceNested": "#F8FAFC",
+      "border": "#D7DEE5",
+      "borderStrong": "#B8C4CF",
+      "text": "#1D1D1B",
+      "textSecondary": "#374151",
+      "textMuted": "#6C7280",
+      "textDisabled": "#9CA3AF",
+      "link": "#0C65AF",
+      "linkHover": "#0952A5",
+      "focus": "#0C65AF",
+      "feedbackRing": "rgba(12, 101, 175, 0.34)",
+      "success": "#137A50",
+      "successSoft": "#E1F3EA",
+      "warning": "#8A5A00",
+      "warningSoft": "#FFF2D6",
+      "danger": "#B8324A",
+      "dangerSoft": "#FBE6EA",
+      "dangerAction": "#B8324A",
+      "dangerActionHover": "#9E2940",
+      "header": "rgba(255, 255, 255, 0.92)",
+      "codeBackground": "#101820",
+      "codeText": "#E7EDF2"
+    },
+    "dark": {
+      "brandHover": "#1478C9",
+      "brandActive": "#0952A5",
+      "brandSoft": "#173A56",
+      "background": "#0B1118",
+      "pageSoft": "#0F1822",
+      "surface": "#121D27",
+      "surfaceMuted": "#172431",
+      "surfaceBrand": "#10263A",
+      "surfaceNested": "#1C2B39",
+      "border": "#2A3A49",
+      "borderStrong": "#3B5062",
+      "text": "#F2F6F9",
+      "textSecondary": "#BCC8D2",
+      "textMuted": "#899AA8",
+      "textDisabled": "#6E7F8D",
+      "link": "#69B8ED",
+      "linkHover": "#9BD3F5",
+      "focus": "#69B8ED",
+      "feedbackRing": "#173A56",
+      "success": "#54D497",
+      "successSoft": "#143426",
+      "warning": "#F2C66D",
+      "warningSoft": "#3B2C13",
+      "danger": "#F08A9B",
+      "dangerSoft": "#3D1D25",
+      "dangerAction": "#B8324A",
+      "dangerActionHover": "#D1475F",
+      "header": "rgba(11, 17, 24, 0.92)",
+      "codeBackground": "#080D12",
+      "codeText": "#E7EDF2"
+    }
+  },
+  "effect": {
+    "light": {
+      "shadowOverlay": "0 18px 48px rgba(15, 23, 42, 0.16)",
+      "focusRing": "0 0 0 3px rgba(12, 101, 175, 0.22)",
+      "decorationOpacity": 0.62,
+      "decorationFilter": "none",
+      "iconFilter": "none",
+      "shadowCard": "0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.03)",
+      "shadowCardHover": "0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09)"
+    },
+    "dark": {
+      "shadowOverlay": "0 18px 48px rgba(0, 0, 0, 0.42)",
+      "focusRing": "0 0 0 3px rgba(105, 184, 237, 0.30)",
+      "decorationOpacity": 0.16,
+      "decorationFilter": "brightness(0) invert(1)",
+      "iconFilter": "brightness(0) invert(1)",
+      "shadowCard": "0 1px 2px rgba(0, 0, 0, 0.20), 0 1px 6px -1px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.16)",
+      "shadowCardHover": "0 1px 2px -2px rgba(0, 0, 0, 0.46), 0 3px 6px rgba(0, 0, 0, 0.34), 0 5px 12px 4px rgba(0, 0, 0, 0.28)"
+    }
+  },
+  "product": {
+    "hero": {
+      "gradient": "linear-gradient(45deg, #0C65AF, #1E88E5)",
+      "gradientStart": "#0C65AF",
+      "gradientEnd": "#1E88E5",
+      "gradientHover": "linear-gradient(45deg, #0952A5, #1976D2)",
+      "gradientHoverStart": "#0952A5",
+      "gradientHoverEnd": "#1976D2",
+      "gradientActive": "linear-gradient(45deg, #063F80, #1266AD)",
+      "gradientActiveStart": "#063F80",
+      "gradientActiveEnd": "#1266AD",
+      "shine": "rgba(255, 255, 255, 0.30)"
+    },
+    "trial": {
+      "gradient": "linear-gradient(45deg, #FFD700, #F8A726)",
+      "gradientStart": "#FFD700",
+      "gradientEnd": "#F8A726",
+      "gradientHover": "linear-gradient(45deg, #F8A726, #FFD700)",
+      "gradientHoverStart": "#F8A726",
+      "gradientHoverEnd": "#FFD700",
+      "text": "#3D2B0E",
+      "shadow": "0 4px 15px rgba(248, 167, 38, 0.30)",
+      "shadowHover": "0 6px 20px rgba(248, 167, 38, 0.50)",
+      "desktopShadow": {
+        "color": "#F8A726",
+        "opacity": 0.22,
+        "hoverOpacity": 0.34,
+        "blurPx": 10,
+        "hoverBlurPx": 14,
+        "offsetYPx": 2,
+        "hoverOffsetYPx": 3,
+        "hoverLiftPx": 2
+      }
+    },
+    "data": {
+      "buttonMotion": {
+        "stateProperty": "backgroundColor",
+        "ripple": true,
+        "overlay": false
+      },
+      "light": {
+        "surface": "#FFFFFF",
+        "surfaceMuted": "#F8FAFC",
+        "text": "#1D1D1B",
+        "textSecondary": "#374151",
+        "actionBackground": "#000000",
+        "actionText": "#FFFFFF",
+        "actionHoverBackground": "#0A0A0A",
+        "actionPressedBackground": "#1F1F1F",
+        "outlineHoverBackground": "#F5F5F5",
+        "outlinePressedBackground": "#E0E0E0",
+        "ripple": "#004D88",
+        "border": "rgba(0, 0, 0, 0.12)",
+        "cardText": "rgba(0, 0, 0, 0.87)"
+      },
+      "dark": {
+        "surface": "#121D27",
+        "surfaceMuted": "#0F1822",
+        "text": "#F2F6F9",
+        "textSecondary": "#899AA8",
+        "actionBackground": "#F2F6F9",
+        "actionText": "#0B1118",
+        "actionHoverBackground": "#E8ECEF",
+        "actionPressedBackground": "#D6DADF",
+        "outlineHoverBackground": "#1B262F",
+        "outlinePressedBackground": "#2D3740",
+        "ripple": "#69B8ED",
+        "border": "rgba(242, 246, 249, 0.18)",
+        "cardText": "rgba(242, 246, 249, 0.92)"
+      }
+    },
+    "toolbox": {
+      "light": {
+        "surface": "#F5F5F5",
+        "cardSurface": "#FFFFFF",
+        "text": "#212121",
+        "textSecondary": "#757575",
+        "accent": "#0070C5",
+        "focusOutline": "rgba(0, 112, 197, 0.30)",
+        "newOverlay": "rgba(255, 255, 255, 0.00)",
+        "gradientStrong": "rgba(232, 241, 250, 0.97)",
+        "gradientClear": "rgba(245, 245, 245, 0.10)",
+        "tagSuccessBorder": "#B7EB8F",
+        "tagSuccessSurface": "#F6FFED",
+        "tagSuccessText": "#389E0D",
+        "tagFeaturedBorder": "#FFBB96",
+        "tagFeaturedSurface": "#FFF2E8",
+        "tagFeaturedText": "#D4380D"
+      },
+      "dark": {
+        "surface": "#121D27",
+        "cardSurface": "#172431",
+        "text": "#F2F6F9",
+        "textSecondary": "#BCC8D2",
+        "accent": "#69B8ED",
+        "focusOutline": "rgba(105, 184, 237, 0.56)",
+        "newOverlay": "rgba(23, 36, 49, 0.90)",
+        "gradientStrong": "rgba(23, 58, 86, 0.94)",
+        "gradientClear": "rgba(18, 29, 39, 0.10)",
+        "tagSuccessBorder": "#54D497",
+        "tagSuccessSurface": "#143426",
+        "tagSuccessText": "#54D497",
+        "tagFeaturedBorder": "#F2A06D",
+        "tagFeaturedSurface": "#3B2519",
+        "tagFeaturedText": "#FFBB96"
+      }
+    },
+    "corporate": {
+      "surface": "#0C65AF",
+      "grid": "#1F78C0",
+      "gradientStrong": "#084C83",
+      "gradientClear": "#0C65AF",
+      "text": "#FFFFFF",
+      "actionText": "#1D1D1B",
+      "textSecondary": "rgba(255, 255, 255, 0.82)",
+      "borderSecondary": "rgba(255, 255, 255, 0.72)",
+      "surfaceHover": "rgba(255, 255, 255, 0.12)",
+      "surfaceActive": "rgba(255, 255, 255, 0.24)"
+    },
+    "fieldwork": {
+      "surface": "#173426",
+      "text": "#FFFFFF",
+      "textSecondary": "rgba(255, 255, 255, 0.88)",
+      "surfaceHover": "rgba(0, 0, 0, 0.44)",
+      "surfaceActive": "rgba(0, 0, 0, 0.64)",
+      "textSurfaceHover": "rgba(0, 0, 0, 0.28)"
+    },
+    "asset": {
+      "previewLight": "#DFE6EC",
+      "previewDark": "#1C2B39",
+      "previewBrand": "#0C65AF",
+      "appBackground": "#1C2B39"
+    },
+    "reference": {
+      "heroGlow": "rgba(12, 101, 175, 0.18)",
+      "heroPlane": "rgba(12, 101, 175, 0.06)",
+      "checkerMuted": "#DDDDDD",
+      "semanticHover": "rgba(127, 127, 127, 0.12)",
+      "semanticActive": "rgba(127, 127, 127, 0.18)",
+      "cardOverlayStrong": "rgba(4, 12, 18, 0.92)",
+      "cardOverlayClear": "rgba(4, 12, 18, 0.08)",
+      "codeBarBorder": "rgba(255, 255, 255, 0.12)",
+      "codeBarText": "#AEBBC7",
+      "codeActionBorder": "rgba(255, 255, 255, 0.14)",
+      "codeActionText": "#CBD5DF",
+      "codeActionHover": "rgba(255, 255, 255, 0.10)",
+      "toastSurface": "#101820",
+      "toastText": "#FFFFFF"
+    }
+  },
+  "typography": {
+    "families": {
+      "heading": [
+        "Ubuntu",
+        "Segoe UI",
+        "sans-serif"
+      ],
+      "body": [
+        "Roboto",
+        "Segoe UI",
+        "Arial",
+        "sans-serif"
+      ],
+      "mono": [
+        "JetBrains Mono",
+        "SFMono-Regular",
+        "Consolas",
+        "monospace"
+      ]
+    },
+    "weights": {
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    },
+    "scale": {
+      "display": {
+        "sizePx": 48,
+        "lineHeight": 1.12,
+        "weight": 700
+      },
+      "h1": {
+        "sizePx": 34,
+        "lineHeight": 1.2,
+        "weight": 700
+      },
+      "h2": {
+        "sizePx": 24,
+        "lineHeight": 1.25,
+        "weight": 700
+      },
+      "h3": {
+        "sizePx": 18,
+        "lineHeight": 1.35,
+        "weight": 500
+      },
+      "bodyLarge": {
+        "sizePx": 18,
+        "lineHeight": 1.55,
+        "weight": 400
+      },
+      "body": {
+        "sizePx": 16,
+        "lineHeight": 1.5,
+        "weight": 400
+      },
+      "control": {
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 500
+      },
+      "caption": {
+        "sizePx": 12,
+        "lineHeight": 1.4,
+        "weight": 400
+      }
+    },
+    "qtScale": {
+      "body": {
+        "sizePx": 14,
+        "weight": 400
+      },
+      "heading1": {
+        "sizePx": 28,
+        "weight": 700
+      },
+      "heading2": {
+        "sizePx": 20,
+        "weight": 700
+      },
+      "mono": {
+        "sizePx": 12,
+        "weight": 400
+      }
+    }
+  },
+  "spacingPx": {
+    "0": 0,
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "7": 32,
+    "8": 40,
+    "9": 48,
+    "10": 64
+  },
+  "radiusPx": {
+    "field": 6,
+    "button": 8,
+    "card": 10,
+    "panel": 12,
+    "section": 14,
+    "hero": 16,
+    "pill": 999
+  },
+  "control": {
+    "heightPx": {
+      "small": 34,
+      "medium": 40,
+      "large": 48
+    },
+    "paddingX": 16,
+    "iconPx": 18
+  },
+  "desktop": {
+    "fontFamilies": {
+      "heading": "NextGIS Ubuntu",
+      "body": "NextGIS Roboto",
+      "mono": "JetBrains Mono"
+    },
+    "component": {
+      "button": {
+        "iconTextGapPx": 10,
+        "qtNativeIconTextGapPx": 4,
+        "text": {
+          "idleTextColorToken": "text",
+          "idleBorder": "transparent",
+          "hoverTextColorToken": "linkHover",
+          "hoverBorderColorToken": "borderStrong",
+          "hoverSurfaceColorToken": "transparent",
+          "pressedTextColorToken": "brandActive",
+          "pressedBorderColorToken": "brandActive",
+          "pressedSurfaceColorToken": "brandSoft"
+        }
+      },
+      "field": {
+        "searchPaddingLeftPx": 38,
+        "searchIconOffsetPx": 12,
+        "searchIconSizePx": 18,
+        "searchIconColorToken": "textMuted"
+      },
+      "tag": {
+        "heightPx": 28,
+        "paddingHorizontalPx": 9,
+        "paddingVerticalPx": 3,
+        "contentSpacingPx": 6
+      },
+      "notice": {
+        "paddingHorizontalPx": 16,
+        "paddingVerticalPx": 14,
+        "contentSpacingPx": 10,
+        "accentWidthPx": 3
+      },
+      "selectionControl": {
+        "indicatorSizePx": 18,
+        "indicatorRadiusPx": 4,
+        "radioDotSizePx": 6,
+        "focusBorderWidthPx": 2,
+        "focusColorToken": "feedbackRing",
+        "feedbackExpansionPx": 4,
+        "feedbackStrokeWidthPx": 2,
+        "feedbackOnAccentOpacity": 0.24,
+        "feedbackPeakPercent": 45,
+        "feedbackPeakExpansionPx": 2,
+        "checkboxFeedbackShape": "roundedIndicator",
+        "radioFeedbackShape": "circle"
+      },
+      "disclosure": {
+        "headerHeightPx": 48,
+        "paddingHorizontalPx": 12,
+        "contentPaddingPx": 12,
+        "motion": {
+          "property": "clipHeight",
+          "contentGeometry": "stable",
+          "animatedBottomRadiusPx": 0
+        }
+      },
+      "expandableSection": {
+        "headerHeightPx": 88,
+        "headerPaddingHorizontalPx": 24,
+        "headerContentSpacingPx": 14,
+        "iconSizePx": 40,
+        "iconGlyphSizePx": 18,
+        "chevronSizePx": 20,
+        "titleDescriptionSpacingPx": 4,
+        "titleLineHeightPx": 24,
+        "descriptionLineHeightPx": 20,
+        "contentPaddingHorizontalPx": 24,
+        "contentPaddingBottomPx": 28
+      },
+      "comboBox": {
+        "heightPx": 42,
+        "contentPaddingRightPx": 38,
+        "qtContentPaddingRightPx": 0,
+        "dropDownWidthPx": 38,
+        "popupMode": "below",
+        "popupOffsetPx": 8,
+        "popupPaddingPx": 6,
+        "popupItemHeightPx": 36,
+        "popupItemPaddingHorizontalPx": 10,
+        "popupItemSpacingPx": 2,
+        "popupMinimumWidthPx": 210,
+        "popupRadiusPx": 10,
+        "popupBorderWidthPx": 1,
+        "popupBorderOwner": "singleOverlay",
+        "arrowSizePx": 18,
+        "arrowColorToken": "text"
+      },
+      "spinBox": {
+        "heightPx": 42,
+        "contentPaddingRightPx": 30,
+        "buttonWidthPx": 28,
+        "buttonHeightPx": 20,
+        "buttonInsetPx": 1,
+        "arrowSizePx": 14,
+        "arrowColorToken": "textSecondary",
+        "arrowDisabledColorToken": "textDisabled"
+      },
+      "card": {
+        "contentPaddingPx": 16,
+        "borderWidthPx": 1,
+        "hoverOverlayOpacity": 0.04,
+        "pressedOverlayOpacity": 0.065,
+        "dataFocusOverlayOpacity": 0.12,
+        "rippleStartScale": 0.3,
+        "rippleOpacity": 0.1,
+        "pressedScale": 0.997,
+        "selectionIndicatorGapPx": 10,
+        "iconSlotSurfaceToken": "transparent",
+        "iconSlotBorderToken": "transparent"
+      },
+      "focusFrame": {
+        "strokeWidthPx": 2,
+        "marginPx": 3,
+        "radiusOffsetPx": 3
+      },
+      "tab": {
+        "paddingHorizontalPx": 14,
+        "paddingVerticalPx": 9,
+        "spacingPx": 4,
+        "underlineHeightPx": 2,
+        "idleScale": 0.25,
+        "pressedScale": 0.65,
+        "pressedOpacity": 0.65,
+        "idleTextColorToken": "textMuted",
+        "hoverTextColorToken": "linkHover",
+        "pressedTextColorToken": "text",
+        "selectedTextColorToken": "text",
+        "underlineColorToken": "brand"
+      },
+      "themeSwitch": {
+        "paddingPx": 3,
+        "buttonWidthPx": 36,
+        "buttonHeightPx": 32
+      },
+      "itemView": {
+        "rowHeightPx": 38,
+        "cellPaddingHorizontalPx": 10,
+        "indentationPx": 16,
+        "iconSizePx": 18
+      },
+      "table": {
+        "headerHeightPx": 40,
+        "rowHeightPx": 44,
+        "cellPaddingHorizontalPx": 12,
+        "cellPaddingVerticalPx": 4
+      },
+      "scrollBar": {
+        "extentPx": 8,
+        "minimumThumbPx": 32,
+        "radiusPx": 4,
+        "marginPx": 0,
+        "borderWidthPx": 0,
+        "trackVisible": false,
+        "pressedColorToken": "brand"
+      },
+      "progress": {
+        "heightPx": 10
+      },
+      "spinner": {
+        "sizePx": 24,
+        "strokeWidthPx": 3,
+        "periodMs": 900,
+        "labelSpacingPx": 12,
+        "backgroundColorToken": "brandSoft",
+        "accentColorToken": "link",
+        "accentArcDegrees": 90,
+        "accentCenterDegrees": 90,
+        "capStyle": "flat"
+      },
+      "wizard": {
+        "style": "classic",
+        "pageFillAvailable": true,
+        "pageMarginPx": 24,
+        "pageSpacingPx": 16,
+        "navigationMarginPx": 16,
+        "navigationSpacingPx": 8,
+        "buttonMinimumWidthPx": 96,
+        "sidebarWidthPx": 196,
+        "titleBottomSpacingPx": 8
+      },
+      "toggle": {
+        "stateMinimumWidthPx": 92,
+        "stateHeightPx": 28
+      },
+      "toast": {
+        "minimumWidthPx": 180,
+        "paddingHorizontalPx": 14,
+        "paddingVerticalPx": 10,
+        "bottomOffsetPx": 24,
+        "durationMs": 2200
+      },
+  "pageBackground": {
+    "qtRoadsAsset": "assets/backgrounds/for-mainpage-roads-qt-4x.png",
+        "toolboxAsset": "assets/backgrounds/topo-bg.svg",
+        "dataRouteAsset": "assets/backgrounds/data-route.svg",
+        "dataCollageAsset": "assets/backgrounds/main-right-pic.webp",
+        "fieldworkAsset": "assets/backgrounds/field-data.webp",
+        "mainGridStepPx": 40,
+        "mainGridWidthPx": 2,
+        "mainRoadsTopPx": -72,
+        "mainRoadsRightPx": -100,
+        "mainRoadsWidthPx": 310,
+        "mainRoadsHeightPx": 440,
+        "mainIsolinesLeftPx": -120,
+        "mainIsolinesTopPx": -110,
+        "mainIsolinesWidthPx": 370,
+        "mainIsolinesHeightPx": 610,
+        "workspaceGridStepPx": 26,
+        "workspaceGridWidthPx": 1,
+        "workspaceGridOpacityLight": 0.74,
+        "workspaceGridOpacityDark": 0.54,
+        "corporateGridStepPx": 32,
+        "corporateGridWidthPx": 2,
+        "dataRouteTopPx": 8,
+        "dataRouteRightPx": 96,
+        "dataRouteSizePx": 150,
+        "dataCollageWidthRatio": 0.59,
+        "dataCollageMaximumWidthPx": 660,
+        "dataCollageHorizontalOffsetRatio": 0.05,
+        "dataCollageOpacityDark": 0.82,
+        "toolboxDecorationOpacityDark": 0.72,
+        "mainDecorationOpacityDark": 0.16
+      }
+    },
+    "gallery": {
+      "contentMaxWidthPx": 1180,
+      "viewportMarginPx": 16,
+      "headerHeightPx": 68,
+      "themeSwitchWidthPx": 120,
+      "themeSwitchHeightPx": 42,
+      "pagePaddingTopPx": 48,
+      "pagePaddingBottomPx": 80,
+      "heroPaddingPx": 44,
+      "heroContentMaxWidthPx": 760,
+      "heroTitleSizePx": 54,
+      "heroLeadSizePx": 18,
+      "heroActionSpacingPx": 10,
+      "heroDesktopHeightPx": 372,
+      "heroDecoration": {
+        "asset": "assets/backgrounds/for-mainpage-isolines.svg",
+        "widthPx": 460,
+        "heightPx": 560,
+        "topPercent": -24,
+        "rightPx": -90,
+        "rotationDeg": 30,
+        "planeTopPercent": 81.55,
+        "planeBottomPercent": 50,
+        "glowCenterXPercent": 88,
+        "glowCenterYPercent": 20,
+        "glowRadiusPercent": 30
+      },
+      "quickNavigationMarginTopPx": 24,
+      "quickNavigationPaddingPx": 10,
+      "quickNavigationLinkHeightPx": 42,
+      "quickNavigationVariant": "navigationLink",
+      "navigationScrollOffsetPx": 20,
+      "sectionMarginTopPx": 20,
+      "sectionIntroMarginVerticalPx": 22,
+      "sectionIntroLineHeightPx": 24,
+      "colorGridSpacingPx": 12,
+      "colorSampleHeightPx": 92,
+      "colorSamplePaddingPx": 12,
+      "colorBodyTitleSpacingPx": 6,
+      "componentGridSpacingPx": 16,
+      "componentPanelPaddingPx": 20,
+      "productActionPanelPaddingHorizontalPx": 14,
+      "productActionPanelPaddingVerticalPx": 14,
+      "productActionPanelContentGapPx": 16,
+      "productActionPanelActionGapPx": 10,
+      "productActionPanelCopySpacingPx": 2,
+      "typeStagePaddingPx": 42,
+      "typeStageDisplaySizePx": 64,
+      "typeSpecimenTokenWidthPx": 120,
+      "typeSpecimenPaddingHorizontalPx": 16,
+      "typeSpecimenPaddingVerticalPx": 18,
+      "backgroundDemoHeightPx": 400,
+      "backgroundCaptionHeightPx": 68,
+      "motionProgressTargetPercent": 82
+    },
+    "motion": {
+      "vectorSupersampling": 2
+    },
+    "fontResources": {
+      "roboto": {
+        "400": "assets/fonts/qt/roboto-400.ttf",
+        "500": "assets/fonts/qt/roboto-500.ttf",
+        "700": "assets/fonts/qt/roboto-700.ttf"
+      },
+      "ubuntu": {
+        "400": "assets/fonts/qt/ubuntu-400.ttf",
+        "500": "assets/fonts/qt/ubuntu-500.ttf",
+        "700": "assets/fonts/qt/ubuntu-700.ttf"
+      }
+    }
+  },
+  "motion": {
+    "instantMs": 0,
+    "fastMs": 120,
+    "normalMs": 180,
+    "slowMs": 300,
+    "easingStandard": "cubic-bezier(0.2, 0, 0, 1)",
+    "easingEnter": "cubic-bezier(0, 0, 0.2, 1)",
+    "easingExit": "cubic-bezier(0.4, 0, 1, 1)",
+    "feedback": [
+      "color",
+      "background-color",
+      "border-color",
+      "opacity",
+      "focus ring",
+      "chevron rotation",
+      "disclosure height"
+    ],
+    "allowedLift": [
+      "trial promotion button"
+    ],
+    "avoid": [
+      "default button displacement",
+      "default card lift",
+      "hover scale"
+    ]
+  },
+  "component": {
+    "button": {
+      "className": "ng-button",
+      "states": [
+        "hover",
+        "active",
+        "focus-visible",
+        "disabled",
+        "pressed"
+      ],
+      "modifiers": [
+        "ng-button--primary",
+        "ng-button--secondary",
+        "ng-button--text",
+        "ng-button--ghost",
+        "ng-button--danger",
+        "ng-button--icon",
+        "ng-button--hero",
+        "ng-button--trial",
+        "ng-button--toggle"
+      ],
+      "qt": {
+        "selector": "QPushButton",
+        "property": "ngstdButtonVariant"
+      }
+    },
+    "field": {
+      "className": "ng-field",
+      "modifiers": [
+        "ng-field--search",
+        "ng-field--error"
+      ],
+      "qt": {
+        "selectors": [
+          "QLineEdit",
+          "QTextEdit",
+          "QPlainTextEdit"
+        ],
+        "property": "ngstdError"
+      }
+    },
+    "combobox": {
+      "className": "ng-combobox",
+      "qt": {
+        "selector": "QComboBox",
+        "property": "_ngstdRole"
+      }
+    },
+    "spinbox": {
+      "className": "ng-spinbox",
+      "qt": {
+        "selectors": [
+          "QSpinBox",
+          "QDoubleSpinBox"
+        ],
+        "property": "ngstdError"
+      }
+    },
+    "checkbox": {
+      "className": "ng-checkbox",
+      "states": [
+        "hover",
+        "checked",
+        "focus-visible",
+        "disabled"
+      ],
+      "qt": {
+        "selector": "QCheckBox",
+        "property": "_ngstdKeyboardFocus"
+      }
+    },
+    "radio": {
+      "className": "ng-radio",
+      "states": [
+        "hover",
+        "checked",
+        "focus-visible",
+        "disabled"
+      ],
+      "qt": {
+        "selector": "QRadioButton",
+        "property": "ngFocus"
+      }
+    },
+    "spinner": {
+      "className": "ng-spinner",
+      "states": [
+        "running",
+        "stopped"
+      ],
+      "qt": {
+        "selector": "ngstd::widgets::Spinner",
+        "property": "running"
+      }
+    },
+    "toast": {
+      "className": "ng-toast",
+      "states": [
+        "hidden",
+        "visible"
+      ],
+      "qt": {
+        "selector": "QFrame",
+        "property": "_ngstdRole"
+      }
+    },
+    "tag": {
+      "className": "ng-tag",
+      "tones": [
+        "brand",
+        "success",
+        "warning",
+        "danger"
+      ]
+    },
+    "notice": {
+      "className": "ng-notice",
+      "tones": [
+        "info",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "qtProperty": "ngstdTone"
+    },
+    "disclosure": {
+      "className": "ng-disclosure",
+      "partClassNames": [
+        "ng-disclosure__trigger",
+        "ng-disclosure__region",
+        "ng-disclosure__clip",
+        "ng-disclosure__content"
+      ],
+      "states": [
+        "collapsed",
+        "expanded"
+      ],
+      "qt": {
+        "selector": "QToolButton",
+        "property": "_ngstdRole",
+        "clipSelector": "ngstd::widgets::RevealWidget"
+      }
+    },
+    "card": {
+      "className": "ng-card",
+      "modifiers": [
+        "ng-card--interactive",
+        "ng-card--selected",
+        "ng-card--media",
+        "ng-card--background",
+        "ng-card--selectable"
+      ],
+      "states": [
+        "hover",
+        "pressed",
+        "selected",
+        "focus-visible",
+        "disabled"
+      ],
+      "qtProperties": [
+        "ngstdCardVariant",
+        "ngstdSelected"
+      ]
+    },
+    "tabs": {
+      "className": "ng-tabs",
+      "partClassNames": [
+        "ng-tabs__list",
+        "ng-tabs__tab",
+        "ng-tabs__panel"
+      ],
+      "qt": {
+        "selector": "QTabWidget",
+        "property": "_ngstdRole"
+      }
+    },
+    "themeSwitch": {
+      "className": "ng-theme-switch",
+      "partClassNames": [
+        "ng-theme-switch__button"
+      ],
+      "states": [
+        "system",
+        "light",
+        "dark"
+      ],
+      "qt": {
+        "selector": "QFrame",
+        "property": "_ngstdRole",
+        "value": "themeSwitch"
+      }
+    },
+    "itemView": {
+      "className": "ng-item-view",
+      "qt": {
+        "selectors": [
+          "QListView",
+          "QTreeView"
+        ],
+        "property": "_ngstdRole"
+      }
+    },
+    "table": {
+      "className": "ng-table",
+      "qt": {
+        "selectors": [
+          "QTableView",
+          "QTableWidget"
+        ],
+        "property": "_ngstdRole"
+      }
+    },
+    "scrollbar": {
+      "className": "ng-scrollbar",
+      "qt": {
+        "selector": "QScrollBar",
+        "property": "orientation"
+      }
+    },
+    "monoText": {
+      "className": "ng-text--mono",
+      "qt": {
+        "selector": "QLabel",
+        "property": "ngstdTypographyRole"
+      }
+    },
+    "pageBackground": {
+      "className": "ng-page-background",
+      "variants": [
+        "main",
+        "toolbox",
+        "data",
+        "workspace",
+        "corporate",
+        "fieldwork"
+      ]
+    }
+  },
+  "productComponent": {
+    "dataButton": {
+      "className": "ng-data-button",
+      "partClassNames": [
+        "ng-data-button__content"
+      ],
+      "modifiers": [
+        "ng-data-button--filled",
+        "ng-data-button--outline"
+      ]
+    },
+    "dataCard": {
+      "className": "ng-data-card"
+    },
+    "toolboxCard": {
+      "className": "ng-toolbox-card",
+      "modifiers": [
+        "ng-toolbox-card--new"
+      ]
+    }
+  },
+  "qt": {
+    "properties": {
+    "_ngstdRole": [
+      "page",
+      "panel",
+      "card",
+      "cardIcon",
+        "notice",
+        "iconButton",
+        "disclosure",
+        "heading1",
+        "heading2",
+        "muted",
+        "tag",
+        "pageBackground",
+        "galleryHeader",
+        "headerBrand",
+        "themeSwitch",
+        "themeButton",
+        "toggleState",
+        "wizard",
+        "wizardHeader",
+        "wizardPage",
+        "wizardPageStack",
+        "wizardNavigation",
+        "wizardRuler",
+        "disclosureContent",
+        "disclosureTitle",
+        "searchField",
+        "quickNavigation",
+        "quickLink",
+        "expandableSection",
+        "expandableSectionHeader",
+        "componentPanel",
+        "sampleStage",
+        "typeScale",
+        "typeSpecimen",
+        "animatedTabs",
+        "animatedTabBar",
+        "comboPopup",
+        "itemView",
+        "table",
+        "tableViewport",
+        "selectableCard",
+        "cardMedia",
+        "cardBody",
+        "nestedPanel",
+        "privateShowcase",
+        "backgroundCaption",
+        "separator",
+        "semanticState",
+        "semanticCopy",
+        "semanticToken",
+        "semanticValue",
+        "semanticTitle",
+        "toast",
+        "secondary",
+        "eyebrow",
+        "heroTitle",
+        "heroLead",
+        "navigationLabel",
+        "navigationNumber",
+        "navigationText",
+        "navigationArrow",
+        "panelHeading",
+        "typeStageDisplay",
+        "sourceCardLabel",
+        "dataCardTitle",
+        "dataCardDescription",
+        "toolboxTag",
+        "toolboxCardTitle",
+        "toolboxCardBody",
+        "onImageTitle",
+        "onImageBody",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "ngstdButtonVariant": [
+        "primary",
+        "secondary",
+        "text",
+        "ghost",
+        "danger",
+        "icon",
+        "hero",
+        "trial",
+        "dataFilled",
+        "dataOutline",
+        "onBrand",
+        "onBrandSecondary",
+        "photo",
+        "photoText"
+      ],
+      "ngstdCardVariant": [
+        "data",
+        "toolbox",
+        "toolboxNew",
+        "media",
+        "background",
+        "panel",
+        "selectable"
+      ],
+      "ngstdError": [
+        "true",
+        "false"
+      ],
+      "ngstdSelected": [
+        "true",
+        "false"
+      ],
+      "ngstdTone": [
+        "info",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "ngstdPageBackgroundVariant": [
+        "main",
+        "toolbox",
+        "data",
+        "workspace",
+        "corporate",
+        "fieldwork"
+      ],
+      "_ngstdSize": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "ngstdTypographyRole": [
+        "display",
+        "heading1",
+        "heading2",
+        "heading3",
+        "bodyLarge",
+        "body",
+        "control",
+        "caption",
+        "mono"
+      ],
+      "ngFocus": [
+        "false",
+        "true"
+      ],
+    "ngKeyboardFocus": [
+      "false",
+      "true"
+    ],
+    "ngDisclosureAnimating": [
+      "false",
+      "true"
+    ],
+      "ngPopupPlacement": [
+        "below",
+        "above"
+      ],
+      "ngPopupAlignment": [
+        "left",
+        "center",
+        "right"
+      ],
+      "ngSelectionMode": [
+        "checkbox",
+        "radio"
+      ]
+    },
+    "components": {
+      "wizard": {
+        "selector": "QWizard",
+        "childSelectors": [
+          "QWizardPage",
+          "QDialogButtonBox",
+          "QAbstractButton"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <g fill="none" stroke="#0070c5" opacity="0.12" stroke-width="1.4">
+    <!-- contour lines: each path starts and ends at the same Y so tiles are seamless -->
+    <path d="M0 22  C100 2   200 42  300 22  C400 2   500 42  600 22"/>
+    <path d="M0 66  C120 44  180 90  300 66  C420 43  480 90  600 66"/>
+    <path d="M0 110 C100 88  220 132 300 110 C400 88  500 132 600 110"/>
+    <path d="M0 154 C110 130 200 176 300 154 C400 130 490 178 600 154"/>
+    <path d="M0 198 C130 175 170 222 300 198 C430 174 470 223 600 198"/>
+    <path d="M0 242 C100 219 220 265 300 242 C400 219 500 266 600 242"/>
+    <path d="M0 286 C120 263 210 310 300 286 C390 263 490 311 600 286"/>
+    <path d="M0 330 C110 307 210 354 300 330 C390 307 500 355 600 330"/>
+    <path d="M0 374 C130 354 200 395 300 374 C400 352 480 396 600 374"/>
+    <!-- elevation points at local peaks -->
+    <circle cx="150" cy="2"   r="2.5"/>
+    <circle cx="420" cy="43"  r="2"/>
+    <circle cx="180" cy="90"  r="1.8"/>
+    <circle cx="100" cy="88"  r="2"/>
+    <circle cx="470" cy="223" r="2.5"/>
+    <circle cx="210" cy="310" r="1.8"/>
+  </g>
+</svg>

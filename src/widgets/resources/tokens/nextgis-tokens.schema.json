@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextgis.com/schemas/ngstd-widgets-tokens-1.0.json",
+  "title": "NextGIS desktop design tokens",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "color",
+    "typography",
+    "spacingPx",
+    "radiusPx",
+    "control",
+    "desktop",
+    "motion"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}\\.[0-9]{2}$"
+    },
+    "color": {
+      "$ref": "#/$defs/colorTree"
+    },
+    "typography": {
+      "type": "object",
+      "required": ["families", "scale", "qtScale"],
+      "additionalProperties": {
+        "$ref": "#/$defs/tokenNode"
+      }
+    },
+    "spacingPx": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[0-9]+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/nonNegativeNumber"
+      }
+    },
+    "radiusPx": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/nonNegativeNumber"
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": ["heightPx", "paddingX", "iconPx"],
+      "additionalProperties": {
+        "$ref": "#/$defs/tokenNode"
+      }
+    },
+    "motion": {
+      "type": "object",
+      "required": [
+        "instantMs",
+        "fastMs",
+        "normalMs",
+        "slowMs",
+        "easingStandard",
+        "easingEnter",
+        "easingExit"
+      ],
+      "properties": {
+        "easingStandard": {
+          "$ref": "#/$defs/easing"
+        },
+        "easingEnter": {
+          "$ref": "#/$defs/easing"
+        },
+        "easingExit": {
+          "$ref": "#/$defs/easing"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tokenNode"
+      }
+    },
+    "desktop": {
+      "type": "object",
+      "required": ["component", "fontFamilies", "fontResources"],
+      "additionalProperties": {
+        "$ref": "#/$defs/tokenNode"
+      }
+    }
+  },
+  "additionalProperties": {
+    "$ref": "#/$defs/tokenNode"
+  },
+  "$defs": {
+    "nonNegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "color": {
+      "type": "string",
+      "pattern": "^(#[0-9A-Fa-f]{3,8}|rgba?\\([^)]*\\)|transparent)$"
+    },
+    "easing": {
+      "type": "string",
+      "pattern": "^cubic-bezier\\((-?[0-9.]+, ?){3}-?[0-9.]+\\)$"
+    },
+    "colorTree": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/color"
+          },
+          {
+            "$ref": "#/$defs/colorTree"
+          }
+        ]
+      }
+    },
+    "tokenNode": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tokenNode"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/tokenNode"
+          }
+        }
+      ]
+    }
+  }
+}
