@@ -230,9 +230,9 @@ void ThemeController::setOptions(const ThemeOptions &options)
     const bool visualOptionsChanged =
         previousOptions.animationPolicy() != d->options.animationPolicy() ||
         previousOptions.features() != d->options.features();
-    const bool themeModeChanged = previousMode != d->options.themeMode();
+    const bool themeModeOptionChanged = previousMode != d->options.themeMode();
     if (d->manager &&
-        (visualOptionsChanged || themeModeChanged ||
+        (visualOptionsChanged || themeModeOptionChanged ||
          targetScheme != d->colorScheme)) {
         d->manager->apply(this);
     }
