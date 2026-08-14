@@ -33,10 +33,12 @@ private slots:
     void lateChildrenAreDecorated();
     void scopedStyleSpecializationSurvivesPolish();
     void keyboardFocusStateTracksFocusReason();
+    void keyboardFocusClearsWhenWindowDeactivatesAndTracksTheme();
     void topLevelKeyboardFocusDoesNotCreateWindow();
-    void equivalentSystemModeDoesNotRepolishScope();
+    void equivalentSystemModeReappliesWithoutSchemeSignal();
     void systemModeTracksApplicationPalette();
     void applicationThemeDoesNotReplaceStyle();
+    void applicationThemeReplacesWindowStyleSheetOnModeChange();
     void applicationThemeStylesIndependentToolTips();
     void scopedThemeSurvivesApplicationDetach();
     void destroyingRootDestroysController();
@@ -226,6 +228,40 @@ void ThemeLifecycleTest::keyboardFocusStateTracksFocusReason()
     QVERIFY(!button.property("_ngstdKeyboardFocus").isValid());
 }
 
+void ThemeLifecycleTest::
+    keyboardFocusClearsWhenWindowDeactivatesAndTracksTheme()
+{
+    QWidget root;
+    QPushButton button(QStringLiteral("Action"), &root);
+    ThemeOptions options;
+    options.setThemeMode(ThemeMode::Dark);
+    ThemeController *controller = ThemeController::attach(&root, options);
+    root.show();
+    button.show();
+
+    QFocusEvent keyboardFocusIn(QEvent::FocusIn, Qt::TabFocusReason);
+    QApplication::sendEvent(&button, &keyboardFocusIn);
+    QFocusFrame *focusFrame = root.findChild<QFocusFrame *>(
+        QStringLiteral("_ngstdKeyboardFocusFrame"));
+    QVERIFY(focusFrame);
+    QVERIFY(focusFrame->isVisible());
+    QCOMPARE(focusFrame->property("_ngstdColorScheme").toString(),
+             QStringLiteral("dark"));
+
+    QEvent deactivateEvent(QEvent::WindowDeactivate);
+    QApplication::sendEvent(&root, &deactivateEvent);
+    QVERIFY(!button.property("_ngstdKeyboardFocus").toBool());
+    QVERIFY(!focusFrame->isVisible());
+    QVERIFY(!focusFrame->widget());
+
+    controller->setThemeMode(ThemeMode::Light);
+    QApplication::sendEvent(&button, &keyboardFocusIn);
+    QCOMPARE(focusFrame->property("_ngstdColorScheme").toString(),
+             QStringLiteral("light"));
+
+    controller->detach();
+}
+
 void ThemeLifecycleTest::topLevelKeyboardFocusDoesNotCreateWindow()
 {
     QWidget root;
@@ -254,7 +290,7 @@ void ThemeLifecycleTest::topLevelKeyboardFocusDoesNotCreateWindow()
     controller->detach();
 }
 
-void ThemeLifecycleTest::equivalentSystemModeDoesNotRepolishScope()
+void ThemeLifecycleTest::equivalentSystemModeReappliesWithoutSchemeSignal()
 {
     QWidget root;
     ThemeController *controller = ThemeController::attach(&root);
@@ -274,6 +310,9 @@ void ThemeLifecycleTest::equivalentSystemModeDoesNotRepolishScope()
              explicitMode == ThemeMode::Dark ? ColorScheme::Dark
                                              : ColorScheme::Light);
     QCOMPARE(root.styleSheet(), styleSheet);
+    QCOMPARE(root.styleSheet().count(
+                 QStringLiteral("ngstd::widgets scoped theme: begin")),
+             1);
     QCOMPARE(root.palette(), palette);
     QCOMPARE(schemeSpy.count(), 0);
     controller->detach();
@@ -311,6 +350,54 @@ void ThemeLifecycleTest::applicationThemeDoesNotReplaceStyle()
     QCOMPARE(qApp->style(), originalStyle);
     controller->detach();
     QCOMPARE(qApp->style(), originalStyle);
+}
+
+void ThemeLifecycleTest::
+    applicationThemeReplacesWindowStyleSheetOnModeChange()
+{
+    QWidget window;
+    const QString userStyleSheet = QStringLiteral(
+        "QWidget#applicationThemeWindow { margin: 1px; }");
+    window.setObjectName(QStringLiteral("applicationThemeWindow"));
+    window.setStyleSheet(userStyleSheet);
+
+    ThemeOptions options;
+    options.setThemeMode(ThemeMode::Light);
+    ThemeController *controller =
+        ThemeController::applyToApplication(qApp, options);
+    QVERIFY(controller);
+
+    window.show();
+    QCoreApplication::processEvents();
+    const QString lightStyleSheet = window.styleSheet();
+    QVERIFY(lightStyleSheet.contains(userStyleSheet));
+    QCOMPARE(lightStyleSheet.count(
+                 QStringLiteral("ngstd::widgets scoped theme: begin")),
+             1);
+    QCOMPARE(lightStyleSheet.count(
+                 QStringLiteral("ngstd::widgets scoped theme: end")),
+             1);
+
+    controller->setThemeMode(ThemeMode::Dark);
+    QCoreApplication::processEvents();
+    const QString darkStyleSheet = window.styleSheet();
+    QVERIFY(darkStyleSheet.contains(userStyleSheet));
+    QVERIFY(darkStyleSheet != lightStyleSheet);
+    QCOMPARE(darkStyleSheet.count(
+                 QStringLiteral("ngstd::widgets scoped theme: begin")),
+             1);
+    QCOMPARE(darkStyleSheet.count(
+                 QStringLiteral("ngstd::widgets scoped theme: end")),
+             1);
+
+    controller->setThemeMode(ThemeMode::Light);
+    QCoreApplication::processEvents();
+    QCOMPARE(window.styleSheet().count(
+                 QStringLiteral("ngstd::widgets scoped theme: begin")),
+             1);
+
+    controller->detach();
+    QCOMPARE(window.styleSheet(), userStyleSheet);
 }
 
 void ThemeLifecycleTest::applicationThemeStylesIndependentToolTips()

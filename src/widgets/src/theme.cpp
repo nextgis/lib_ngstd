@@ -28,16 +28,73 @@
 
 namespace {
 
+const QString &styleSheetBlockBegin()
+{
+    static const QString marker =
+        QStringLiteral("/* ngstd::widgets scoped theme: begin */");
+    return marker;
+}
+
+const QString &styleSheetBlockEnd()
+{
+    static const QString marker =
+        QStringLiteral("/* ngstd::widgets scoped theme: end */");
+    return marker;
+}
+
+const QString &legacyStyleSheetMarker()
+{
+    static const QString marker =
+        QStringLiteral("/* ngstd::widgets scoped theme */");
+    return marker;
+}
+
 QString resourcePath(const QString &referencePath)
 {
     return QStringLiteral(":/ngstd/widgets/") + referencePath;
 }
 
+QString removeThemeStyleSheetBlock(QString styleSheet)
+{
+    int blockStart = styleSheet.indexOf(styleSheetBlockBegin());
+    while (blockStart >= 0) {
+        int removalStart = blockStart;
+        while (removalStart > 0 &&
+               styleSheet.at(removalStart - 1).isSpace()) {
+            --removalStart;
+        }
+        int removalEnd = styleSheet.indexOf(styleSheetBlockEnd(), blockStart);
+        removalEnd = removalEnd < 0
+                         ? styleSheet.size()
+                         : removalEnd + styleSheetBlockEnd().size();
+        while (removalEnd < styleSheet.size() &&
+               styleSheet.at(removalEnd).isSpace()) {
+            ++removalEnd;
+        }
+        styleSheet.remove(removalStart, removalEnd - removalStart);
+        blockStart = styleSheet.indexOf(styleSheetBlockBegin());
+    }
+
+    const int legacyStart = styleSheet.indexOf(legacyStyleSheetMarker());
+    if (legacyStart >= 0) {
+        int removalStart = legacyStart;
+        while (removalStart > 0 &&
+               styleSheet.at(removalStart - 1).isSpace()) {
+            --removalStart;
+        }
+        styleSheet.truncate(removalStart);
+    }
+    return styleSheet;
+}
+
 QString combinedStyleSheet(const QString &original, const QString &theme)
 {
-    if (original.isEmpty()) return theme;
-    return original + QStringLiteral("\n/* ngstd::widgets scoped theme */\n") +
-           theme;
+    const QString cleanOriginal = removeThemeStyleSheetBlock(original);
+    const QString themeBlock = styleSheetBlockBegin() + QLatin1Char('\n') +
+                               theme + QLatin1Char('\n') +
+                               styleSheetBlockEnd();
+    if (cleanOriginal.isEmpty()) return themeBlock;
+    return cleanOriginal + QLatin1Char('\n') + themeBlock;
 }
 
 QString schemeName(ngstd::widgets::ColorScheme scheme)
@@ -173,8 +230,10 @@ void ThemeController::setOptions(const ThemeOptions &options)
     const bool visualOptionsChanged =
         previousOptions.animationPolicy() != d->options.animationPolicy() ||
         previousOptions.features() != d->options.features();
+    const bool themeModeChanged = previousMode != d->options.themeMode();
     if (d->manager &&
-        (visualOptionsChanged || targetScheme != d->colorScheme)) {
+        (visualOptionsChanged || themeModeChanged ||
+         targetScheme != d->colorScheme)) {
         d->manager->apply(this);
     }
     emit optionsChanged(d->options);
@@ -383,6 +442,11 @@ void ThemeController::applyState()
         }
         rootWidget->update();
     }
+    if (d->focusFrame) {
+        d->focusFrame->setProperty("_ngstdColorScheme",
+                                   schemeName(d->colorScheme));
+        d->focusFrame->update();
+    }
     if (previousScheme != d->colorScheme)
         emit colorSchemeChanged(d->colorScheme);
 }
@@ -396,10 +460,16 @@ void ThemeController::decorateWidget(QWidget *widget)
     const bool firstDecoration = !d->journal->containsWidget(widget);
     d->journal->captureWidget(widget);
     if (firstDecoration) widget->setPalette(palette(d->colorScheme));
+    const QString colorSchemeName = schemeName(d->colorScheme);
     if (d->applicationWide && widget->isWindow() &&
-        !widget->property("_ngstdThemeStyleApplied").toBool()) {
+        (!widget->property("_ngstdThemeStyleApplied").toBool() ||
+         widget->property("_ngstdThemeStyleScheme").toString() !=
+             colorSchemeName)) {
         d->journal->setProperty(
             widget, QByteArrayLiteral("_ngstdThemeStyleApplied"), true);
+        d->journal->setProperty(
+            widget, QByteArrayLiteral("_ngstdThemeStyleScheme"),
+            colorSchemeName);
         widget->setStyleSheet(combinedStyleSheet(
             widget->styleSheet(), styleSheet(d->colorScheme)));
     }
@@ -437,6 +507,8 @@ void ThemeController::setKeyboardFocus(QWidget *widget, bool focused)
             d->focusFrame->setProperty("_ngstdRole",
                                        QStringLiteral("focusFrame"));
         }
+        d->focusFrame->setProperty("_ngstdColorScheme",
+                                   schemeName(d->colorScheme));
         d->focusFrame->setWidget(widget);
         d->focusFrame->show();
         d->focusFrame->raise();
@@ -445,6 +517,19 @@ void ThemeController::setKeyboardFocus(QWidget *widget, bool focused)
         d->focusFrame->setWidget(nullptr);
         d->focusFrame->hide();
     }
+}
+
+void ThemeController::clearKeyboardFocus()
+{
+    if (!d->focusFrame) return;
+    QWidget *focusWidget = d->focusFrame->widget();
+    if (focusWidget && d->journal) {
+        d->journal->setProperty(focusWidget,
+                                QByteArrayLiteral("_ngstdKeyboardFocus"),
+                                false);
+    }
+    d->focusFrame->setWidget(nullptr);
+    d->focusFrame->hide();
 }
 
 } // namespace widgets

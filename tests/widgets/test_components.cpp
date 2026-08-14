@@ -417,6 +417,10 @@ void ComponentsTest::cardButtonOwnsAnimatedExpandedBody()
     card.setExpandedBodyWidget(expandedBody);
     QCOMPARE(card.expandedBodyWidget(), expandedBody);
     QVERIFY(card.isAncestorOf(expandedBody));
+    QFrame *expandedDivider = card.findChild<QFrame *>(
+        QStringLiteral("_ngstdCardExpandedBodyDivider"));
+    QVERIFY(expandedDivider);
+    QVERIFY(expandedDivider->isHidden());
     QVERIFY(!card.isExpanded());
     host.resize(320, 300);
     host.show();
@@ -430,12 +434,16 @@ void ComponentsTest::cardButtonOwnsAnimatedExpandedBody()
     QVERIFY(card.height() > collapsedHeight);
     QVERIFY(card.sizeHint().height() > collapsedSizeHintHeight);
     QCOMPARE(card.maximumHeight(), collapsedMaximumHeight);
+    QVERIFY(!expandedDivider->isHidden());
+    QCOMPARE(expandedDivider->property("_ngstdRole").toString(),
+             QStringLiteral("divider"));
     const QRect expandedRectangle(expandedBody->mapTo(&card, QPoint(0, 0)),
                                   expandedBody->size());
     QVERIFY(card.rect().contains(expandedRectangle));
     QCOMPARE(expandedSpy.count(), 1);
     card.collapse();
     QVERIFY(!card.isExpanded());
+    QVERIFY(expandedDivider->isHidden());
     QCOMPARE(card.sizeHint().height(), collapsedSizeHintHeight);
     QCOMPARE(card.maximumHeight(), collapsedMaximumHeight);
     QCOMPARE(expandedSpy.count(), 2);
@@ -448,6 +456,8 @@ void ComponentsTest::cardButtonOwnsAnimatedExpandedBody()
         card.findChild<QWidget *>(QStringLiteral("_ngstdCardExpandedBody"));
     QVERIFY(expandedBodyReveal);
     QVERIFY(card.contentLayout()->indexOf(expandedBodyReveal) > 0);
+    QVERIFY(card.contentLayout()->indexOf(expandedDivider)
+            < card.contentLayout()->indexOf(expandedBodyReveal));
 
     QCOMPARE(card.takeExpandedBodyWidget(), expandedBody);
     QVERIFY(!expandedBody->parent());

@@ -89,6 +89,7 @@ private:
     NGSTD_WIDGETS_LOCAL void applyState();
     NGSTD_WIDGETS_LOCAL void decorateWidget(QWidget *widget);
     NGSTD_WIDGETS_LOCAL void setKeyboardFocus(QWidget *widget, bool focused);
+    NGSTD_WIDGETS_LOCAL void clearKeyboardFocus();
 
     Q_DISABLE_COPY(ThemeController)
     QScopedPointer<ThemeControllerPrivate> d;

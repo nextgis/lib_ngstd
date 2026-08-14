@@ -4,7 +4,7 @@
 
 QWidget {
 color: #F2F6F9;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 14px;
     font-weight: 400;
 }
@@ -402,7 +402,7 @@ border: 2px solid #69B8ED;
 QLabel[ngstdTypographyRole="title"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 48px;
     font-weight: 700;
 }
@@ -410,7 +410,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="heading1"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 34px;
     font-weight: 700;
 }
@@ -419,7 +419,7 @@ QLabel[ngstdTypographyRole="heading1Subtitle"] {
 min-height: 24px;
     background: transparent;
     color: #BCC8D2;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 400;
 }
@@ -427,7 +427,7 @@ min-height: 24px;
 QLabel[ngstdTypographyRole="heading2"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 24px;
     font-weight: 700;
 }
@@ -435,7 +435,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="heading3"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 500;
 }
@@ -443,7 +443,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="bodyLarge"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 400;
 }
@@ -451,7 +451,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="heading4"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 16px;
     font-weight: 500;
 }
@@ -459,7 +459,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="bodySmall"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 14px;
     font-weight: 400;
 }
@@ -467,7 +467,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="body"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 16px;
     font-weight: 400;
 }
@@ -475,7 +475,7 @@ background: transparent;
 QLabel[ngstdTypographyRole="control"] {
 background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 14px;
     font-weight: 500;
 }
@@ -499,7 +499,7 @@ color: #6E7F8D;
 QLabel[ngstdTypographyRole="caption"] {
 background: transparent;
     color: #899AA8;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 12px;
     font-weight: 400;
 }
@@ -734,7 +734,7 @@ min-height: 46px;
     border-radius: 6px;
     background: #F2F6F9;
     color: #0B1118;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 16px;
     font-weight: 500;
 }
@@ -757,7 +757,7 @@ min-height: 46px;
     border-radius: 6px;
     background: transparent;
     color: #F2F6F9;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 16px;
     font-weight: 500;
 }
@@ -873,7 +873,6 @@ background: #173A56;
 QPushButton:disabled,
 QPushButton[ngstdButtonVariant="primary"]:disabled,
 QPushButton[ngstdButtonVariant="secondary"]:disabled,
-QPushButton[ngstdButtonVariant="ghost"]:disabled,
 QPushButton[ngstdButtonVariant="danger"]:disabled,
 QPushButton[ngstdButtonVariant="hero"]:disabled,
 QPushButton[ngstdButtonVariant="trial"]:disabled,
@@ -885,6 +884,18 @@ QPushButton[ngstdButtonVariant="photo"]:disabled,
 QPushButton[ngstdButtonVariant="photoText"]:disabled {
 background: #172431;
     border-color: #2A3A49;
+    color: #6E7F8D;
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:disabled {
+background: transparent;
+    border-color: transparent;
+    color: #6E7F8D;
+}
+
+QPushButton[ngstdButtonVariant="text"]:disabled {
+background: transparent;
+    border-color: transparent;
     color: #6E7F8D;
 }
 
@@ -1275,7 +1286,7 @@ background-color: #0B1118;
 
 QWizard QWidget[_ngstdRole="wizardPage"],
 QWizard QWidget[_ngstdRole="wizardPageStack"] {
-background-color: #10263A;
+background-color: #0F1822;
     color: #F2F6F9;
 }
 
@@ -1284,7 +1295,7 @@ border-color: #2A3A49;
 }
 
 QWizardPage {
-background-color: #10263A;
+background-color: #0F1822;
     color: #F2F6F9;
 }
 

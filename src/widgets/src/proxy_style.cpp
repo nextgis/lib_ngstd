@@ -645,9 +645,13 @@ bool paintFocusFrame(const QStyleOption *option, QPainter *painter,
         -strokeWidth * 0.5);
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
+    const QWidget *schemeWidget = focusFrame->property("_ngstdColorScheme")
+                                      .isValid()
+                                      ? focusFrame
+                                      : focusWidget;
     painter->setPen(QPen(
         DesignTokens::color(ColorRole::Focus,
-                            internal::colorSchemeFor(focusWidget)),
+                            internal::colorSchemeFor(schemeWidget)),
         strokeWidth));
     painter->setBrush(Qt::NoBrush);
     painter->drawRoundedRect(bounds, radius + margin, radius + margin);

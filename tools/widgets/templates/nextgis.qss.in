@@ -1281,7 +1281,6 @@ QToolButton[_ngstdRole="iconButton"]:checked:pressed {
 QPushButton:disabled,
 QPushButton[ngstdButtonVariant="primary"]:disabled,
 QPushButton[ngstdButtonVariant="secondary"]:disabled,
-QPushButton[ngstdButtonVariant="ghost"]:disabled,
 QPushButton[ngstdButtonVariant="danger"]:disabled,
 QPushButton[ngstdButtonVariant="hero"]:disabled,
 QPushButton[ngstdButtonVariant="trial"]:disabled,
@@ -1293,6 +1292,18 @@ QPushButton[ngstdButtonVariant="photo"]:disabled,
 QPushButton[ngstdButtonVariant="photoText"]:disabled {
     background: {{surfaceMuted}};
     border-color: {{border}};
+    color: {{textDisabled}};
+}
+
+QPushButton[ngstdButtonVariant="ghost"]:disabled {
+    background: transparent;
+    border-color: transparent;
+    color: {{textDisabled}};
+}
+
+QPushButton[ngstdButtonVariant="text"]:disabled {
+    background: transparent;
+    border-color: transparent;
     color: {{textDisabled}};
 }
 
@@ -1683,7 +1694,7 @@ QFrame[nextGisShellArea="sidebar"] {
 
 QWizard QWidget[_ngstdRole="wizardPage"],
 QWizard QWidget[_ngstdRole="wizardPageStack"] {
-    background-color: {{surfaceBrand}};
+    background-color: {{pageSoft}};
     color: {{text}};
 }
 
@@ -1692,7 +1703,7 @@ QWizard QFrame {
 }
 
 QWizardPage {
-    background-color: {{surfaceBrand}};
+    background-color: {{pageSoft}};
     color: {{text}};
 }
 

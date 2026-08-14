@@ -74,7 +74,17 @@ void ResourcesTest::styleSheetUsesStableProperties()
     QVERIFY(styleSheet.contains(QStringLiteral(
         "QWizard QPushButton[ngstdButtonVariant=\"icon\"]")));
     QVERIFY(styleSheet.contains(QStringLiteral("max-width: 38px;")));
-    QVERIFY(styleSheet.contains(QStringLiteral("background-color: #F2F8FC")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "QWizard QWidget[_ngstdRole=\"wizardPageStack\"] {\nbackground-color: #F1F5F9;")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "QPushButton[ngstdButtonVariant=\"text\"]:disabled")));
+    QVERIFY(styleSheet.contains(QStringLiteral("border-color: transparent;")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "font-family: \"Roboto\", \"Segoe UI\", sans-serif;")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "font-family: \"Ubuntu\", \"Segoe UI\", sans-serif;")));
+    QVERIFY(!styleSheet.contains(QStringLiteral("NextGIS Roboto")));
+    QVERIFY(!styleSheet.contains(QStringLiteral("NextGIS Ubuntu")));
     QVERIFY(styleSheet.contains(QStringLiteral("QToolTip")));
     QVERIFY(!styleSheet.contains(QStringLiteral("ngState")));
     QVERIFY(!styleSheet.contains(QStringLiteral("ngVariant")));

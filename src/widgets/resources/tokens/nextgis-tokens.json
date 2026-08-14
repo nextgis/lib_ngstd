@@ -390,8 +390,8 @@
   },
   "desktop": {
     "fontFamilies": {
-      "heading": "NextGIS Ubuntu",
-      "body": "NextGIS Roboto",
+      "heading": "Ubuntu",
+      "body": "Roboto",
       "mono": "JetBrains Mono"
     },
     "component": {

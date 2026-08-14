@@ -39,6 +39,10 @@ void TokensTest::providesTypedTokens()
     QVERIFY(DesignTokens::componentMetric(
                 ComponentMetric::ExpandableSectionHeaderHeight) > 0);
     QVERIFY(DesignTokens::font(TypographyRole::Body).pixelSize() > 0);
+    QCOMPARE(DesignTokens::font(TypographyRole::Body).family(),
+             QStringLiteral("Roboto"));
+    QCOMPARE(DesignTokens::font(TypographyRole::Heading4).family(),
+             QStringLiteral("Ubuntu"));
     QCOMPARE(DesignTokens::typography(TypographyRole::Body).weight,
              QFont::Normal);
     QCOMPARE(DesignTokens::typography(TypographyRole::Heading1).weight,

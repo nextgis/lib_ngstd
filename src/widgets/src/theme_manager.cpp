@@ -246,6 +246,15 @@ bool ThemeManager::eventFilter(QObject *watched, QEvent *event)
             controller->setKeyboardFocus(widget, keyboardFocus);
         }
     }
+    else if (event->type() == QEvent::WindowDeactivate ||
+             event->type() == QEvent::Hide ||
+             event->type() == QEvent::Close) {
+        QWidget *widget = qobject_cast<QWidget *>(watched);
+        if (widget && widget->isWindow()) {
+            ThemeController *controller = controllerFor(widget);
+            if (controller) controller->clearKeyboardFocus();
+        }
+    }
     return QObject::eventFilter(watched, event);
 }
 

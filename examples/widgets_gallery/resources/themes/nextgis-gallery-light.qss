@@ -88,7 +88,7 @@ background: #DCECF7;
 QLabel[_ngstdRole="eyebrow"] {
 background: transparent;
     color: #0C65AF;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 13px;
     font-weight: 700;
 }
@@ -96,7 +96,7 @@ background: transparent;
 QLabel[_ngstdRole="heroTitle"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 54px;
     font-weight: 700;
 }
@@ -104,7 +104,7 @@ background: transparent;
 QLabel[_ngstdRole="heroLead"] {
 background: transparent;
     color: #374151;
-    font-family: "NextGIS Roboto", "Segoe UI", sans-serif;
+    font-family: "Roboto", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 400;
 }
@@ -140,7 +140,7 @@ background: transparent;
 QLabel[_ngstdRole="panelHeading"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 700;
 }
@@ -227,7 +227,7 @@ background: #F2F8FC;
 QLabel[_ngstdRole="typeStageDisplay"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 64px;
     font-weight: 700;
 }
@@ -285,7 +285,7 @@ background: transparent;
 QLabel[_ngstdRole="dataCardTitle"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-family: "Ubuntu", "Roboto", sans-serif;
     font-size: 18px;
     font-weight: 500;
 }
@@ -316,7 +316,7 @@ border-color: #FFBB96;
 QLabel[_ngstdRole="toolboxCardTitle"] {
 background: transparent;
     color: #212121;
-    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-family: "Ubuntu", "Roboto", sans-serif;
     font-size: 22px;
     font-weight: 700;
 }
@@ -324,7 +324,7 @@ background: transparent;
 QLabel[_ngstdRole="toolboxCardBody"] {
 background: transparent;
     color: #212121;
-    font-family: "NextGIS Ubuntu", "NextGIS Roboto", sans-serif;
+    font-family: "Ubuntu", "Roboto", sans-serif;
     font-size: 16px;
     font-weight: 400;
 }
@@ -332,7 +332,7 @@ background: transparent;
 QLabel[_ngstdRole="onImageTitle"] {
 background: transparent;
     color: #FFFFFF;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 18px;
     font-weight: 700;
 }
@@ -347,7 +347,7 @@ background: transparent;
 QLabel[_ngstdRole="heading1"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 28px;
     font-weight: 700;
 }
@@ -355,7 +355,7 @@ background: transparent;
 QLabel[_ngstdRole="heading2"] {
 background: transparent;
     color: #1D1D1B;
-    font-family: "NextGIS Ubuntu", "Segoe UI", sans-serif;
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-size: 20px;
     font-weight: 700;
 }
@@ -381,7 +381,8 @@ background: transparent;
 }
 
 QToolButton[_ngstdRole="iconButton"],
-QPushButton[ngstdButtonVariant="icon"] {
+QPushButton[ngstdButtonVariant="icon"],
+QPushButton[ngstdIconOnly="true"] {
 min-width: 38px;
     max-width: 38px;
     min-height: 40px;
@@ -420,11 +421,11 @@ border: 0;
     border-bottom: 1px solid #D7DEE5;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    background: #F6F8FA;
+    background: #DFE6EC;
 }
 
 QFrame[_ngstdRole="assetPreview"][dark="true"] {
-background: #1B2A38;
+background: #1C2B39;
 }
 
 QFrame[_ngstdRole="assetPreview"][adaptive="true"] {
@@ -453,10 +454,10 @@ color: #0C65AF;
 
 QPlainTextEdit[_ngstdRole="codeBlock"] {
 padding: 18px;
-    border: 1px solid #2A3A49;
+    border: 1px solid #B8C4CF;
     border-radius: 10px;
-    background: #0F1822;
-    color: #D8E2EA;
+    background: #101820;
+    color: #E7EDF2;
     font-family: "NextGIS Roboto Mono", monospace;
     font-size: 13px;
 }

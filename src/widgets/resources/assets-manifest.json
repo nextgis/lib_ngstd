@@ -544,13 +544,13 @@
     {
       "alias": ":/ngstd/widgets/qt/nextgis-dark.qss",
       "license": "GPL-2.0-only",
-      "sha256": "6172b64b8ce197f5bf721a50b1600cd6ee6563f97b7e39c7fa7d1543a7cd358a",
+      "sha256": "b8e146fe68c6d03a2395fde4c5b3baf42f47cee9e4f67cff6feb166ba706eeb0",
       "source": "themes/nextgis-dark.qss"
     },
     {
       "alias": ":/ngstd/widgets/qt/nextgis-light.qss",
       "license": "GPL-2.0-only",
-      "sha256": "31477232b7d045cf8e4fa747807e52f0d19bb2533ce7c653599ac0f398507305",
+      "sha256": "55eb4f4ec9397f151173490c9e28655a7f05593291c9c0467212393a1deea468",
       "source": "themes/nextgis-light.qss"
     }
   ]

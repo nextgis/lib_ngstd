@@ -15,6 +15,7 @@
 #include <QButtonGroup>
 #include <QElapsedTimer>
 #include <QEvent>
+#include <QFrame>
 #include <QImage>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -600,6 +601,7 @@ public:
     QVBoxLayout *contentLayout = nullptr;
     QPointer<QWidget> topWidget;
     QPointer<QWidget> bodyWidget;
+    QPointer<QFrame> expandedBodyDivider;
     QPointer<RevealWidget> expandedBodyReveal;
     QPointer<QWidget> selectionIndicatorAnchor;
     QPixmap backgroundPixmap;
@@ -759,10 +761,13 @@ QWidget *CardButton::bodyWidget() const
 
 void CardButton::setBodyWidget(QWidget *widget)
 {
-    const int insertionIndex =
-        d->expandedBodyReveal
-            ? d->contentLayout->indexOf(d->expandedBodyReveal.data())
-            : d->contentLayout->count();
+    int insertionIndex = d->contentLayout->count();
+    if (d->expandedBodyDivider)
+        insertionIndex =
+            d->contentLayout->indexOf(d->expandedBodyDivider.data());
+    else if (d->expandedBodyReveal)
+        insertionIndex =
+            d->contentLayout->indexOf(d->expandedBodyReveal.data());
     replaceWidget(d->contentLayout, &d->bodyWidget, widget,
                   insertionIndex);
 }
@@ -789,9 +794,21 @@ void CardButton::setExpandedBodyWidget(QWidget *widget)
         d->expandedBodyReveal = new RevealWidget(this);
         d->expandedBodyReveal->setObjectName(
             QStringLiteral("_ngstdCardExpandedBody"));
+        d->expandedBodyDivider = new QFrame(this);
+        d->expandedBodyDivider->setObjectName(
+            QStringLiteral("_ngstdCardExpandedBodyDivider"));
+        WidgetStyle::setDivider(d->expandedBodyDivider.data());
+        d->expandedBodyDivider->setVisible(false);
+        d->contentLayout->addWidget(d->expandedBodyDivider.data());
         d->contentLayout->addWidget(d->expandedBodyReveal.data());
         const auto refreshCardGeometry =
             [this]() { activateLayoutHierarchy(this, d->contentLayout); };
+        connect(d->expandedBodyReveal.data(),
+                &RevealWidget::revealProgressChanged, this,
+                [this](qreal progress) {
+                    if (d->expandedBodyDivider)
+                        d->expandedBodyDivider->setVisible(progress > 0.0);
+                });
         connect(d->expandedBodyReveal.data(),
                 &RevealWidget::expandedChanged, this, refreshCardGeometry);
         connect(d->expandedBodyReveal.data(), &RevealWidget::expandedChanged,
