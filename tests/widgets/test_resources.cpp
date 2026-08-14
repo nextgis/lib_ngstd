@@ -22,7 +22,9 @@ private slots:
 void ResourcesTest::publicAssetsExist()
 {
     QVERIFY(QFile::exists(iconResourcePath(IconRole::Search)));
+    QVERIFY(QFile::exists(logoResourcePath(LogoRole::Data)));
     QVERIFY(QFile::exists(logoResourcePath(LogoRole::Horizontal)));
+    QVERIFY(!logoPixmap(LogoRole::Data, QSize(42, 42), 1.0).isNull());
 }
 
 void ResourcesTest::horizontalLogoKeepsAspectRatio()
@@ -64,6 +66,16 @@ void ResourcesTest::styleSheetUsesStableProperties()
     QVERIFY(styleSheet.contains(QStringLiteral("ngstdCardVariant")));
     QVERIFY(styleSheet.contains(QStringLiteral("ngstdError")));
     QVERIFY(styleSheet.contains(QStringLiteral("ngstdSelected")));
+    QVERIFY(styleSheet.contains(QStringLiteral("wizardPageStack")));
+    QVERIFY(styleSheet.contains(QStringLiteral("wizardNavigation")));
+    QVERIFY(styleSheet.contains(QStringLiteral("nextGisShellArea")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "QWizard[_ngstdRole=\"wizard\"] {\nbackground-color: #FFFFFF;")));
+    QVERIFY(styleSheet.contains(QStringLiteral(
+        "QWizard QPushButton[ngstdButtonVariant=\"icon\"]")));
+    QVERIFY(styleSheet.contains(QStringLiteral("max-width: 38px;")));
+    QVERIFY(styleSheet.contains(QStringLiteral("background-color: #F2F8FC")));
+    QVERIFY(styleSheet.contains(QStringLiteral("QToolTip")));
     QVERIFY(!styleSheet.contains(QStringLiteral("ngState")));
     QVERIFY(!styleSheet.contains(QStringLiteral("ngVariant")));
 }

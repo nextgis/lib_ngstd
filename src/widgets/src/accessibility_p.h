@@ -11,12 +11,14 @@ namespace ngstd {
 namespace widgets {
 
 class Button;
+class CardButton;
 class ComboBox;
 class Disclosure;
 
 namespace internal {
 
 QAccessible::Id registerButtonAccessibility(Button *button);
+QAccessible::Id registerCardButtonAccessibility(CardButton *button);
 QAccessible::Id registerComboBoxAccessibility(ComboBox *comboBox);
 QAccessible::Id registerDisclosureAccessibility(Disclosure *disclosure);
 void unregisterAccessibility(QAccessible::Id identifier);

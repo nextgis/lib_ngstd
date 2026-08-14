@@ -282,7 +282,7 @@
       "bold": 700
     },
     "scale": {
-      "display": {
+      "title": {
         "sizePx": 48,
         "lineHeight": 1.12,
         "weight": 700
@@ -291,6 +291,11 @@
         "sizePx": 34,
         "lineHeight": 1.2,
         "weight": 700
+      },
+      "h1Subtitle": {
+        "sizePx": 18,
+        "lineHeightPx": 24,
+        "weight": 400
       },
       "h2": {
         "sizePx": 24,
@@ -302,6 +307,11 @@
         "lineHeight": 1.35,
         "weight": 500
       },
+      "h4": {
+        "sizePx": 16,
+        "lineHeight": 1.4,
+        "weight": 500
+      },
       "bodyLarge": {
         "sizePx": 18,
         "lineHeight": 1.55,
@@ -310,6 +320,11 @@
       "body": {
         "sizePx": 16,
         "lineHeight": 1.5,
+        "weight": 400
+      },
+      "bodySmall": {
+        "sizePx": 14,
+        "lineHeight": 1.45,
         "weight": 400
       },
       "control": {
@@ -516,6 +531,7 @@
       },
       "itemView": {
         "rowHeightPx": 38,
+        "compactRowHeightPx": 30,
         "cellPaddingHorizontalPx": 10,
         "indentationPx": 16,
         "iconSizePx": 18
@@ -558,6 +574,10 @@
         "navigationSpacingPx": 8,
         "buttonMinimumWidthPx": 96,
         "sidebarWidthPx": 196,
+        "sidebarRowHeightPx": 50,
+        "sidebarIconSizePx": 26,
+        "sidebarIconExtentPx": 36,
+        "completionIconSizePx": 90,
         "titleBottomSpacingPx": 8
       },
       "toggle": {
@@ -1061,7 +1081,9 @@
         "media",
         "background",
         "panel",
-        "selectable"
+        "selectable",
+        "surfaceBrand",
+        "surfaceMuted"
       ],
       "ngstdError": [
         "true",
@@ -1091,15 +1113,24 @@
         "large"
       ],
       "ngstdTypographyRole": [
-        "display",
+        "title",
         "heading1",
+        "heading1Subtitle",
         "heading2",
         "heading3",
+        "heading4",
         "bodyLarge",
         "body",
+        "bodySmall",
         "control",
         "caption",
         "mono"
+      ],
+      "ngstdTextColorRole": [
+        "text",
+        "secondary",
+        "muted",
+        "disabled"
       ],
       "ngFocus": [
         "false",

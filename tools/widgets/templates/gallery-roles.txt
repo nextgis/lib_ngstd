@@ -51,8 +51,4 @@ typeScale
 typeSpecimen
 typeStageDisplay
 warning
-wizardHeader
-wizardNavigation
-wizardPageStack
-wizardRuler
 codeBlock

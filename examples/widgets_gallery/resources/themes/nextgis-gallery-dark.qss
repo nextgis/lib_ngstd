@@ -382,9 +382,9 @@ background: transparent;
 
 QToolButton[_ngstdRole="iconButton"],
 QPushButton[ngstdButtonVariant="icon"] {
-min-width: 40px;
-    max-width: 40px;
-    min-height: 38px;
+min-width: 38px;
+    max-width: 38px;
+    min-height: 40px;
     max-height: 40px;
     padding: 0;
     border-radius: 8px;
@@ -407,31 +407,6 @@ QToolButton[_ngstdRole="iconButton"]:checked:pressed {
 background: #0952A5;
     border-color: #0952A5;
     color: #FFFFFF;
-}
-
-QWizard QWidget[_ngstdRole="wizardPage"],
-QWizard QWidget[_ngstdRole="wizardPageStack"] {
-background-color: #0F1822;
-    color: #F2F6F9;
-}
-
-QWidget[_ngstdRole="wizardHeader"] {
-background-color: #121D27;
-    border: 0;
-    border-bottom: 1px solid #2A3A49;
-}
-
-QWidget[_ngstdRole="wizardNavigation"] {
-background-color: #121D27;
-    border: 0;
-    border-top: 1px solid #2A3A49;
-}
-
-QFrame[_ngstdRole="wizardRuler"] {
-min-height: 1px;
-    max-height: 1px;
-    border: 0;
-    background: #2A3A49;
 }
 
 QFrame[_ngstdRole="assetCard"] {

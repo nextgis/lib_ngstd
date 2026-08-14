@@ -64,6 +64,9 @@ QString iconResourcePath(IconRole role)
     case IconRole::AlertTriangle:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/lucide/alert-triangle.svg");
+    case IconRole::Blocks:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/blocks.svg");
     case IconRole::Check:
         return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/check.svg");
     case IconRole::CheckCircle:
@@ -72,6 +75,15 @@ QString iconResourcePath(IconRole role)
     case IconRole::ChevronDown:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/lucide/chevron-down.svg");
+    case IconRole::ChevronUp:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/chevron-up.svg");
+    case IconRole::ChevronLeft:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/chevron-left.svg");
+    case IconRole::ChevronRight:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/chevron-right.svg");
     case IconRole::CloseCircle:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/lucide/x-circle.svg");
@@ -84,12 +96,26 @@ QString iconResourcePath(IconRole role)
         return QStringLiteral(":/ngstd/widgets/assets/icons/ant/ellipsis.svg");
     case IconRole::Flame:
         return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/flame.svg");
+    case IconRole::Folder:
+        return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/folder.svg");
+    case IconRole::FolderClock:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/folder-clock.svg");
+    case IconRole::FolderInput:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/folder-input.svg");
     case IconRole::Gradient:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/lucide/gradient.svg");
     case IconRole::Grid:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/mdi/dots-grid.svg");
+    case IconRole::HardDrive:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/hard-drive.svg");
+    case IconRole::Help:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/circle-help.svg");
     case IconRole::Information:
         return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/info.svg");
     case IconRole::Layers:
@@ -100,12 +126,27 @@ QString iconResourcePath(IconRole role)
     case IconRole::Monitor:
         return QStringLiteral(
             ":/ngstd/widgets/assets/icons/lucide/monitor.svg");
+    case IconRole::MonitorCog:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/monitor-cog.svg");
     case IconRole::Moon:
         return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/moon.svg");
+    case IconRole::Package:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/package.svg");
     case IconRole::Search:
         return QStringLiteral(":/ngstd/widgets/assets/icons/ant/search.svg");
+    case IconRole::Settings:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/icons/lucide/settings.svg");
     case IconRole::Sun:
         return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/sun.svg");
+    case IconRole::Undo:
+        return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/undo.svg");
+    case IconRole::User:
+        return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/user.svg");
+    case IconRole::Users:
+        return QStringLiteral(":/ngstd/widgets/assets/icons/lucide/users.svg");
     }
     return QString();
 }
@@ -125,6 +166,9 @@ QPixmap iconPixmap(IconRole role, const QSize &logicalSize,
 QString logoResourcePath(LogoRole role)
 {
     switch (role) {
+    case LogoRole::Data:
+        return QStringLiteral(
+            ":/ngstd/widgets/assets/logos/nextgis-data.svg");
     case LogoRole::Horizontal:
         return QStringLiteral(
             ":/ngstd/widgets/assets/logos/nextgis-horizontal.svg");

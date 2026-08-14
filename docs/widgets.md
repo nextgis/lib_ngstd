@@ -35,6 +35,10 @@ The component API contains `Button`, `SearchField`, `Tag`, `Notice`, `Toast`,
 `Spinner`, `TableWidget`, `ThemeSwitch`, `PageBackground`, `Card`,
 `CardButton`, `RevealWidget`, `Disclosure`, and `ComboBox`.
 
+Use `Button::setLogoRole()` for logo-only actions. The button owns theme-aware
+logo selection, painting, and minimum geometry; consumers only choose the
+public `LogoRole` and logical size.
+
 Container setters take ownership. Matching `take*Widget()` methods transfer
 ownership back to the caller.
 

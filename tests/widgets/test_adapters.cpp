@@ -28,14 +28,59 @@ class AdaptersTest final : public QObject
 private slots:
     void comboAdapterPreservesUserDelegate();
     void comboAdapterUsesScopedPopupSurface();
+    void ownedComboAdaptsToItsContent();
+    void ownedComboReservesCheckIndicatorWidth();
     void ownedComboPopupUsesPublicPlacement();
     void ownedComboSupportsKeyboardAndAccessibility();
     void ownedComboPopupUsesReadablePalette();
     void ownedComboPopupAnimatesLikeReference();
     void wizardAdapterIsConservativeByDefault();
     void wizardAdapterHandlesLatePages();
+    void wizardAdapterOwnsPageEntranceMotion();
     void wizardHeaderTextUsesThemeColor();
 };
+
+void AdaptersTest::ownedComboAdaptsToItsContent()
+{
+    ComboBox comboBox;
+    QCOMPARE(comboBox.sizeAdjustPolicy(), QComboBox::AdjustToContents);
+
+    comboBox.addItem(QStringLiteral("System default"));
+    const int shortWidth = comboBox.sizeHint().width();
+    const int expectedMinimum =
+        comboBox.fontMetrics().horizontalAdvance(
+            QStringLiteral("System default")) +
+        DesignTokens::componentMetric(
+            ComponentMetric::ComboBoxDropDownWidth) +
+        DesignTokens::spacing(3) * 2;
+    QVERIFY(comboBox.minimumSizeHint().width() >= expectedMinimum);
+    comboBox.addItem(QStringLiteral("A substantially longer language name"));
+    QVERIFY(comboBox.sizeHint().width() > shortWidth);
+    QVERIFY(comboBox.minimumSizeHint().width() > expectedMinimum);
+}
+
+void AdaptersTest::ownedComboReservesCheckIndicatorWidth()
+{
+    ComboBox plainComboBox;
+    plainComboBox.addItem(QStringLiteral("Packages"));
+
+    ComboBox checkableComboBox;
+    checkableComboBox.addItem(QStringLiteral("Packages"));
+    QStandardItemModel *model =
+        qobject_cast<QStandardItemModel *>(checkableComboBox.model());
+    QVERIFY(model);
+    QStandardItem *item = model->item(0);
+    QVERIFY(item);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Checked);
+
+    const int indicatorWidth = DesignTokens::componentMetric(
+        ComponentMetric::SelectionIndicatorSize);
+    const int indicatorSpacing = DesignTokens::spacing(2);
+    QVERIFY(checkableComboBox.minimumSizeHint().width() >=
+            plainComboBox.minimumSizeHint().width() + indicatorWidth +
+                indicatorSpacing);
+}
 
 void AdaptersTest::comboAdapterPreservesUserDelegate()
 {
@@ -295,6 +340,29 @@ void AdaptersTest::wizardAdapterHandlesLatePages()
     QTRY_COMPARE(page->accessibleName(), QStringLiteral("Late page"));
     adapter->detach();
     QCOMPARE(page->accessibleName(), QString());
+}
+
+void AdaptersTest::wizardAdapterOwnsPageEntranceMotion()
+{
+    QWizard wizard;
+    QWizardPage *page = new QWizardPage;
+    page->setProperty("_ngstdAnimationPolicy", QStringLiteral("enabled"));
+    wizard.addPage(page);
+    WizardAdapter *adapter = WizardAdapter::attach(&wizard);
+    QVERIFY(adapter);
+
+    adapter->animatePageEntrance(page);
+    QVariantAnimation *animation = adapter->findChild<QVariantAnimation *>(
+        QStringLiteral("_ngstdWizardPageEntranceAnimation"));
+    QVERIFY(animation);
+    QCOMPARE(animation->duration(),
+             DesignTokens::duration(MotionDuration::Normal));
+    QCOMPARE(animation->state(), QAbstractAnimation::Running);
+    QVERIFY(qobject_cast<QGraphicsOpacityEffect *>(page->graphicsEffect()));
+
+    adapter->animatePageEntrance(page);
+    QVERIFY(qobject_cast<QGraphicsOpacityEffect *>(page->graphicsEffect()));
+    QTRY_VERIFY_WITH_TIMEOUT(!page->graphicsEffect(), 1000);
 }
 
 void AdaptersTest::wizardHeaderTextUsesThemeColor()

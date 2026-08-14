@@ -12,8 +12,10 @@
 
 #include <QAbstractButton>
 #include <QButtonGroup>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QPainter>
+#include <QStringList>
 #include <QTimer>
 #include <QToolButton>
 #include <QVariant>
@@ -106,18 +108,16 @@ ThemeSwitch::ThemeSwitch(QWidget *parent)
     layout->setContentsMargins(padding, padding, padding, padding);
     layout->setSpacing(padding);
     d->buttonGroup->setExclusive(true);
-    const QList<QPair<IconRole, QString>> definitions = {
-        {IconRole::Monitor, tr("System theme")},
-        {IconRole::Sun, tr("Light theme")},
-        {IconRole::Moon, tr("Dark theme")},
+    const QList<IconRole> definitions = {
+        IconRole::Monitor,
+        IconRole::Sun,
+        IconRole::Moon,
     };
     for (int index = 0; index < definitions.size(); ++index) {
         ThemeSwitchButton *themeButton = new ThemeSwitchButton(this);
         themeButton->setProperty("_ngstdRole", QStringLiteral("themeButton"));
         themeButton->setProperty("_ngstdThemeIcon",
-                                 static_cast<int>(definitions[index].first));
-        themeButton->setToolTip(definitions[index].second);
-        themeButton->setAccessibleName(definitions[index].second);
+                                 static_cast<int>(definitions[index]));
         themeButton->setCheckable(true);
         themeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
         themeButton->setFixedSize(buttonWidth, buttonHeight);
@@ -155,6 +155,7 @@ ThemeSwitch::ThemeSwitch(QWidget *parent)
     });
     connect(d->buttonGroup, &QButtonGroup::idClicked, this,
             [this](int index) { setThemeMode(modeForIndex(index)); });
+    retranslate();
     updateIcons();
 }
 
@@ -238,6 +239,16 @@ QToolButton *ThemeSwitch::button(ThemeMode mode) const
         d->buttonGroup->button(indexForMode(mode)));
 }
 
+void ThemeSwitch::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange) retranslate();
+    if (event->type() == QEvent::PaletteChange ||
+        event->type() == QEvent::StyleChange) {
+        setColorScheme(internal::colorSchemeFor(this));
+    }
+    QFrame::changeEvent(event);
+}
+
 void ThemeSwitch::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
@@ -284,6 +295,21 @@ qreal ThemeSwitch::selectionOpacity(int index) const
     if (index == d->previousIndex) return 1.0 - d->transitionProgress;
     if (index == d->targetIndex) return d->transitionProgress;
     return 0.0;
+}
+
+void ThemeSwitch::retranslate()
+{
+    const QStringList labels = {
+        tr("System theme"),
+        tr("Light theme"),
+        tr("Dark theme"),
+    };
+    for (int index = 0; index < d->buttons.size(); ++index) {
+        ThemeSwitchButton *themeButton = d->buttons.at(index);
+        const QString label = labels.value(index);
+        themeButton->setToolTip(label);
+        themeButton->setAccessibleName(label);
+    }
 }
 
 void ThemeSwitch::updateIcons()

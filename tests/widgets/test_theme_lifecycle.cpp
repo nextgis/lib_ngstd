@@ -14,6 +14,7 @@
 #include <QStyle>
 #include <QTabWidget>
 #include <QTest>
+#include <QToolTip>
 #include <QVariantAnimation>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -32,9 +33,11 @@ private slots:
     void lateChildrenAreDecorated();
     void scopedStyleSpecializationSurvivesPolish();
     void keyboardFocusStateTracksFocusReason();
+    void topLevelKeyboardFocusDoesNotCreateWindow();
     void equivalentSystemModeDoesNotRepolishScope();
     void systemModeTracksApplicationPalette();
     void applicationThemeDoesNotReplaceStyle();
+    void applicationThemeStylesIndependentToolTips();
     void scopedThemeSurvivesApplicationDetach();
     void destroyingRootDestroysController();
     void applicationThemeChangesWithProxyStyle();
@@ -223,6 +226,34 @@ void ThemeLifecycleTest::keyboardFocusStateTracksFocusReason()
     QVERIFY(!button.property("_ngstdKeyboardFocus").isValid());
 }
 
+void ThemeLifecycleTest::topLevelKeyboardFocusDoesNotCreateWindow()
+{
+    QWidget root;
+    QPushButton button(QStringLiteral("Action"), &root);
+    ThemeController *controller = ThemeController::attach(&root);
+    root.show();
+    button.show();
+
+    QFocusEvent childFocusIn(QEvent::FocusIn, Qt::TabFocusReason);
+    QApplication::sendEvent(&button, &childFocusIn);
+    QFocusFrame *focusFrame = root.findChild<QFocusFrame *>(
+        QStringLiteral("_ngstdKeyboardFocusFrame"));
+    QVERIFY(focusFrame);
+    QVERIFY(focusFrame->isVisible());
+
+    QFocusEvent rootFocusIn(QEvent::FocusIn, Qt::TabFocusReason);
+    QApplication::sendEvent(&root, &rootFocusIn);
+    QVERIFY(root.property("_ngstdKeyboardFocus").toBool());
+    QVERIFY(!focusFrame->isVisible());
+    QVERIFY(!focusFrame->widget());
+    for (QWidget *topLevelWidget : QApplication::topLevelWidgets()) {
+        QVERIFY(topLevelWidget->objectName() !=
+                QStringLiteral("_ngstdKeyboardFocusFrame"));
+    }
+
+    controller->detach();
+}
+
 void ThemeLifecycleTest::equivalentSystemModeDoesNotRepolishScope()
 {
     QWidget root;
@@ -280,6 +311,37 @@ void ThemeLifecycleTest::applicationThemeDoesNotReplaceStyle()
     QCOMPARE(qApp->style(), originalStyle);
     controller->detach();
     QCOMPARE(qApp->style(), originalStyle);
+}
+
+void ThemeLifecycleTest::applicationThemeStylesIndependentToolTips()
+{
+    const QString originalStyleSheet = qApp->styleSheet();
+    const QPalette originalToolTipPalette = QToolTip::palette();
+    ThemeOptions options;
+    options.setThemeMode(ThemeMode::Dark);
+    ThemeController *controller =
+        ThemeController::applyToApplication(qApp, options);
+    QVERIFY(controller);
+    QCOMPARE(qApp->styleSheet(), originalStyleSheet);
+    QCOMPARE(QToolTip::palette().color(QPalette::ToolTipBase),
+             ThemeController::palette(ColorScheme::Dark)
+                 .color(QPalette::ToolTipBase));
+
+    QWidget toolTipWindow(nullptr, Qt::ToolTip);
+    toolTipWindow.ensurePolished();
+    QVERIFY(toolTipWindow.styleSheet().contains(QStringLiteral("QToolTip")));
+    QCOMPARE(toolTipWindow.palette().color(QPalette::ToolTipBase),
+             ThemeController::palette(ColorScheme::Dark)
+                 .color(QPalette::ToolTipBase));
+
+    controller->setThemeMode(ThemeMode::Light);
+    QCOMPARE(QToolTip::palette().color(QPalette::ToolTipBase),
+             ThemeController::palette(ColorScheme::Light)
+                 .color(QPalette::ToolTipBase));
+
+    controller->detach();
+    QCOMPARE(qApp->styleSheet(), originalStyleSheet);
+    QCOMPARE(QToolTip::palette(), originalToolTipPalette);
 }
 
 void ThemeLifecycleTest::scopedThemeSurvivesApplicationDetach()

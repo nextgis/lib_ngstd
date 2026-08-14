@@ -12,6 +12,7 @@
 
 #include <QAbstractItemModel>
 #include <QApplication>
+#include <QCursor>
 #include <QEvent>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
@@ -38,6 +39,10 @@ public:
     explicit ComboPopupFrame(QWidget *parent) : QFrame(parent, Qt::Popup)
     {
         setAttribute(Qt::WA_TranslucentBackground);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAutoFillBackground(false);
+        setWindowFlag(Qt::FramelessWindowHint, true);
+        setWindowFlag(Qt::NoDropShadowWindowHint, true);
         setFrameShape(QFrame::NoFrame);
     }
 
@@ -80,6 +85,7 @@ public:
     ComboBoxPopupAlignment alignment = ComboBoxPopupAlignment::Left;
     qreal arrowProgress = 0.0;
     bool closingPopup = false;
+    bool suppressNextShow = false;
     QAccessible::Id accessibleIdentifier = 0;
 };
 
@@ -87,6 +93,7 @@ ComboBox::ComboBox(QWidget *parent) : QComboBox(parent), d(new ComboBoxPrivate)
 {
     d->accessibleIdentifier = internal::registerComboBoxAccessibility(this);
     setProperty("_ngstdPopupOpen", false);
+    setSizeAdjustPolicy(QComboBox::AdjustToContents);
     d->arrowAnimation = new QVariantAnimation(this);
     d->arrowAnimation->setObjectName(
         QStringLiteral("_ngstdComboBoxArrowAnimation"));
@@ -101,7 +108,8 @@ ComboBox::ComboBox(QWidget *parent) : QComboBox(parent), d(new ComboBoxPrivate)
         QStringLiteral("_ngstdComboBoxPopupAnimation"));
     connect(d->popupAnimation, &QVariantAnimation::valueChanged, this,
             [this](const QVariant &value) {
-                if (d->popupEffect) d->popupEffect->setOpacity(value.toReal());
+                if (d->popupEffect)
+                    d->popupEffect->setOpacity(value.toReal());
             });
     connect(d->popupAnimation, &QVariantAnimation::finished, this, [this]() {
         if (!d->closingPopup || !d->popup) return;
@@ -150,9 +158,21 @@ void ComboBox::resetPopupAlignment()
     setPopupAlignment(ComboBoxPopupAlignment::Left);
 }
 
+QSize ComboBox::sizeHint() const
+{
+    return contentAwareSizeHint(QComboBox::sizeHint());
+}
+
+QSize ComboBox::minimumSizeHint() const
+{
+    return contentAwareSizeHint(QComboBox::minimumSizeHint());
+}
+
 bool ComboBox::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == d->popup && event->type() == QEvent::Hide) {
+        if (rect().contains(mapFromGlobal(QCursor::pos())))
+            d->suppressNextShow = true;
         if (!d->closingPopup) {
             setProperty("_ngstdPopupOpen", false);
             animateArrow(0.0);
@@ -197,6 +217,14 @@ void ComboBox::hidePopup()
 
 void ComboBox::showPopup()
 {
+    if (d->suppressNextShow) {
+        d->suppressNextShow = false;
+        return;
+    }
+    if (d->popup && d->popup->isVisible()) {
+        hidePopup();
+        return;
+    }
     if (!model() || count() == 0) return;
     if (!d->popup) {
         d->popup = new ComboPopupFrame(this);
@@ -213,6 +241,8 @@ void ComboBox::showPopup()
         d->popupView = new QListView(d->popup);
         d->popupView->setObjectName(QStringLiteral("_ngstdComboBoxPopupView"));
         d->popupView->setProperty("_ngstdComboBoxPopupView", true);
+        d->popupView->setFrameShape(QFrame::NoFrame);
+        d->popupView->setAutoFillBackground(false);
         d->popupView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         d->popupView->setSelectionMode(QAbstractItemView::SingleSelection);
         d->popupView->setSpacing(DesignTokens::componentMetric(
@@ -257,12 +287,14 @@ void ComboBox::showPopup()
         qMax(rowHeight,
              visibleRows * (rowHeight + popupSpacing * 2) +
                  popupPadding * 2 + popupBorder * 2);
+    const int popupItemPadding = internal::tokenInteger(QStringLiteral(
+        "desktop.component.comboBox.popupItemPaddingHorizontalPx"));
     const int contentWidth =
         d->popupView->sizeHintForColumn(modelColumn()) +
         (allRowsVisible
              ? 0
              : d->popupView->verticalScrollBar()->sizeHint().width()) +
-        12;
+        popupItemPadding * 2 + popupPadding * 2 + popupBorder * 2;
     const QSize popupSize(qMax(width(), contentWidth), popupHeight);
 
     QScreen *targetScreen = screen();
@@ -336,6 +368,43 @@ void ComboBox::animateArrow(qreal target)
         d->arrowProgress = boundedTarget;
         update();
     }
+}
+
+QSize ComboBox::contentAwareSizeHint(const QSize &base) const
+{
+    const auto textWidth = [this](const QString &text) {
+        const QFontMetrics metrics = fontMetrics();
+        return qMax(metrics.horizontalAdvance(text),
+                    metrics.boundingRect(text).width());
+    };
+    int widestContent = textWidth(placeholderText());
+    for (int index = 0; index < count(); ++index) {
+        int itemWidth = textWidth(itemText(index));
+        if (!itemIcon(index).isNull())
+            itemWidth += iconSize().width() + DesignTokens::spacing(2);
+        const QModelIndex itemIndex = model()->index(
+            index, modelColumn(), rootModelIndex());
+        if (itemIndex.flags() & Qt::ItemIsUserCheckable) {
+            itemWidth += DesignTokens::componentMetric(
+                             ComponentMetric::SelectionIndicatorSize) +
+                         DesignTokens::spacing(2);
+        }
+        widestContent = qMax(widestContent, itemWidth);
+    }
+
+    QStyleOptionComboBox option;
+    initStyleOption(&option);
+    const QSize fitted = style()->sizeFromContents(
+        QStyle::CT_ComboBox, &option,
+        QSize(widestContent, fontMetrics().height()), this);
+    QSize result = base.expandedTo(fitted);
+    const int textSafety = 4;
+    result.setWidth(qMax(
+        result.width(),
+        widestContent + DesignTokens::componentMetric(
+                            ComponentMetric::ComboBoxDropDownWidth) +
+            DesignTokens::spacing(3) * 2 + textSafety));
+    return result;
 }
 
 void ComboBox::animatePopup(qreal target, bool hideWhenDone)

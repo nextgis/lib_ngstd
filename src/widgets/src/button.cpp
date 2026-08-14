@@ -72,6 +72,14 @@ bool isPromotional(ButtonVariant variant)
     return variant == ButtonVariant::Hero || variant == ButtonVariant::Trial;
 }
 
+LogoRole themedLogoRole(LogoRole role, ColorScheme scheme)
+{
+    if (scheme != ColorScheme::Dark) return role;
+    if (role == LogoRole::Horizontal) return LogoRole::HorizontalOnDark;
+    if (role == LogoRole::Symbol) return LogoRole::SymbolOnDark;
+    return role;
+}
+
 qreal trialEffectMetric(const QString &name)
 {
     return internal::tokenNumber(
@@ -139,10 +147,10 @@ QBrush diagonalGradient(const QRectF &rectangle, const QString &startToken,
                         const QString &endToken)
 {
     QLinearGradient gradient(rectangle.bottomLeft(), rectangle.topRight());
-    gradient.setColorAt(
-        0.0, internal::cssColor(internal::tokenString(startToken)));
-    gradient.setColorAt(
-        1.0, internal::cssColor(internal::tokenString(endToken)));
+    gradient.setColorAt(0.0,
+                        internal::cssColor(internal::tokenString(startToken)));
+    gradient.setColorAt(1.0,
+                        internal::cssColor(internal::tokenString(endToken)));
     return QBrush(gradient);
 }
 
@@ -159,11 +167,11 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
                         QStyle::State state, ColorScheme scheme)
 {
     ButtonBevel bevel;
-    bevel.radius = DesignTokens::radius(
-        variant == ButtonVariant::DataFilled ||
-                variant == ButtonVariant::DataOutline
-            ? RadiusRole::Field
-            : RadiusRole::Button);
+    bevel.radius =
+        DesignTokens::radius(variant == ButtonVariant::DataFilled ||
+                                     variant == ButtonVariant::DataOutline
+                                 ? RadiusRole::Field
+                                 : RadiusRole::Button);
     const bool enabled = state & QStyle::State_Enabled;
     const bool checked = state & QStyle::State_On;
     const bool down = state & QStyle::State_Sunken;
@@ -175,9 +183,9 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
         return bevel;
     }
     if (checked) {
-        const ColorRole role = down ? ColorRole::BrandActive
-                                    : (hovered ? ColorRole::BrandHover
-                                               : ColorRole::Brand);
+        const ColorRole role =
+            down ? ColorRole::BrandActive
+                 : (hovered ? ColorRole::BrandHover : ColorRole::Brand);
         bevel.background = DesignTokens::color(role, scheme);
         bevel.border = DesignTokens::color(role, scheme);
         return bevel;
@@ -194,16 +202,16 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
         DesignTokens::color(ColorRole::BrandHover, scheme);
     const QColor pressedBorder =
         DesignTokens::color(ColorRole::BrandActive, scheme);
-    bevel.background = down ? pressedSurface : (hovered ? hoverSurface
-                                                        : surface);
-    bevel.border = down ? pressedBorder : (hovered ? hoverBorder
-                                                   : borderStrong);
+    bevel.background =
+        down ? pressedSurface : (hovered ? hoverSurface : surface);
+    bevel.border =
+        down ? pressedBorder : (hovered ? hoverBorder : borderStrong);
 
     switch (variant) {
     case ButtonVariant::Primary: {
-        const ColorRole role = down ? ColorRole::BrandActive
-                                    : (hovered ? ColorRole::BrandHover
-                                               : ColorRole::Brand);
+        const ColorRole role =
+            down ? ColorRole::BrandActive
+                 : (hovered ? ColorRole::BrandHover : ColorRole::Brand);
         bevel.background = DesignTokens::color(role, scheme);
         bevel.border = DesignTokens::color(role, scheme);
         break;
@@ -214,28 +222,28 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
         break;
     case ButtonVariant::Text:
         bevel.background = down ? pressedSurface : Qt::transparent;
-        bevel.border = down ? pressedBorder
-                            : (hovered ? borderStrong : Qt::transparent);
+        bevel.border =
+            down ? pressedBorder : (hovered ? borderStrong : Qt::transparent);
         break;
     case ButtonVariant::Ghost:
-        bevel.background = down ? pressedSurface
-                                : (hovered ? hoverSurface : Qt::transparent);
+        bevel.background =
+            down ? pressedSurface : (hovered ? hoverSurface : Qt::transparent);
         bevel.border = Qt::transparent;
         break;
     case ButtonVariant::Danger:
         bevel.background =
-            down ? DesignTokens::color(ColorRole::DangerAction, scheme)
-                 : (hovered
-                        ? DesignTokens::color(ColorRole::DangerSoft, scheme)
-                        : surface);
+            down
+                ? DesignTokens::color(ColorRole::DangerAction, scheme)
+                : (hovered ? DesignTokens::color(ColorRole::DangerSoft, scheme)
+                           : surface);
         bevel.border =
             down ? DesignTokens::color(ColorRole::DangerAction, scheme)
                  : DesignTokens::color(ColorRole::Danger, scheme);
         break;
     case ButtonVariant::Hero: {
-        const QString stateName = down ? QStringLiteral("Active")
-                                      : (hovered ? QStringLiteral("Hover")
-                                                 : QString());
+        const QString stateName =
+            down ? QStringLiteral("Active")
+                 : (hovered ? QStringLiteral("Hover") : QString());
         const QString suffix = stateName.isEmpty() ? QString() : stateName;
         bevel.background = diagonalGradient(
             rectangle,
@@ -250,9 +258,8 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
             hovered || down
                 ? QStringLiteral("product.trial.gradientHoverStart")
                 : QStringLiteral("product.trial.gradientStart"),
-            hovered || down
-                ? QStringLiteral("product.trial.gradientHoverEnd")
-                : QStringLiteral("product.trial.gradientEnd"));
+            hovered || down ? QStringLiteral("product.trial.gradientHoverEnd")
+                            : QStringLiteral("product.trial.gradientEnd"));
         bevel.borderWidth = 0.0;
         break;
     case ButtonVariant::DataFilled:
@@ -261,43 +268,38 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
                                     QStringLiteral("actionPressedBackground"))
                  : (hovered
                         ? dataProductColor(
-                              scheme,
-                              QStringLiteral("actionHoverBackground"))
-                        : DesignTokens::color(
-                              ColorRole::DataActionBackground, scheme));
+                              scheme, QStringLiteral("actionHoverBackground"))
+                        : DesignTokens::color(ColorRole::DataActionBackground,
+                                              scheme));
         bevel.borderWidth = 0.0;
         break;
     case ButtonVariant::DataOutline:
         bevel.background =
-            down ? dataProductColor(
-                       scheme, QStringLiteral("outlinePressedBackground"))
+            down ? dataProductColor(scheme,
+                                    QStringLiteral("outlinePressedBackground"))
                  : (hovered
                         ? dataProductColor(
-                              scheme,
-                              QStringLiteral("outlineHoverBackground"))
+                              scheme, QStringLiteral("outlineHoverBackground"))
                         : QColor(Qt::transparent));
         bevel.border =
             DesignTokens::color(ColorRole::DataActionBackground, scheme);
         break;
     case ButtonVariant::OnBrand:
         bevel.background =
-            down ? DesignTokens::color(ColorRole::CorporateSurfaceHover,
-                                       scheme)
-                 : (hovered
-                        ? QColor(Qt::transparent)
-                        : DesignTokens::color(ColorRole::CorporateText,
-                                              scheme));
-        bevel.border =
-            DesignTokens::color(ColorRole::CorporateText, scheme);
+            down
+                ? DesignTokens::color(ColorRole::CorporateSurfaceHover, scheme)
+                : (hovered ? QColor(Qt::transparent)
+                           : DesignTokens::color(ColorRole::CorporateText,
+                                                 scheme));
+        bevel.border = DesignTokens::color(ColorRole::CorporateText, scheme);
         break;
     case ButtonVariant::OnBrandSecondary:
         bevel.background =
             down ? DesignTokens::color(ColorRole::CorporateSurfaceActive,
                                        scheme)
-                 : (hovered
-                        ? DesignTokens::color(
-                              ColorRole::CorporateSurfaceHover, scheme)
-                        : QColor(Qt::transparent));
+                 : (hovered ? DesignTokens::color(
+                                  ColorRole::CorporateSurfaceHover, scheme)
+                            : QColor(Qt::transparent));
         bevel.border = DesignTokens::color(
             down || hovered ? ColorRole::CorporateText
                             : ColorRole::CorporateBorderSecondary,
@@ -307,24 +309,22 @@ ButtonBevel buttonBevel(const QRectF &rectangle, ButtonVariant variant,
         bevel.background =
             down ? DesignTokens::color(ColorRole::FieldworkSurfaceActive,
                                        scheme)
-                 : (hovered
-                        ? DesignTokens::color(
-                              ColorRole::FieldworkSurfaceHover, scheme)
-                        : QColor(Qt::transparent));
-        bevel.border = hovered || down
-                           ? QColor(Qt::transparent)
-                           : DesignTokens::color(ColorRole::FieldworkText,
-                                                 scheme);
+                 : (hovered ? DesignTokens::color(
+                                  ColorRole::FieldworkSurfaceHover, scheme)
+                            : QColor(Qt::transparent));
+        bevel.border =
+            hovered || down
+                ? QColor(Qt::transparent)
+                : DesignTokens::color(ColorRole::FieldworkText, scheme);
         break;
     case ButtonVariant::PhotoText:
         bevel.background =
-            down ? DesignTokens::color(ColorRole::FieldworkSurfaceHover,
-                                       scheme)
-                 : (hovered
-                        ? internal::cssColor(internal::tokenString(
-                              QStringLiteral(
-                                  "product.fieldwork.textSurfaceHover")))
-                        : QColor(Qt::transparent));
+            down
+                ? DesignTokens::color(ColorRole::FieldworkSurfaceHover, scheme)
+                : (hovered ? internal::cssColor(
+                                 internal::tokenString(QStringLiteral(
+                                     "product.fieldwork.textSurfaceHover")))
+                           : QColor(Qt::transparent));
         bevel.border = Qt::transparent;
         break;
     }
@@ -335,9 +335,9 @@ void paintButtonBevel(QPainter *painter, const QStyleOptionButton &option,
                       ButtonVariant variant, const QWidget *widget)
 {
     if (!painter) return;
-    const ButtonBevel bevel = buttonBevel(
-        QRectF(option.rect), variant, option.state,
-        internal::colorSchemeFor(widget));
+    const ButtonBevel bevel =
+        buttonBevel(QRectF(option.rect), variant, option.state,
+                    internal::colorSchemeFor(widget));
     const qreal inset = bevel.borderWidth * 0.5;
     const QRectF bounds =
         QRectF(option.rect).adjusted(inset, inset, -inset, -inset);
@@ -367,8 +367,12 @@ public:
     QVariantAnimation *rippleAnimation = nullptr;
     QVariantAnimation *rippleOpacityAnimation = nullptr;
     QPointer<TrialButtonEffect> trialEffect;
+    QSizePolicy nonIconSizePolicy;
     ButtonVariant variant = ButtonVariant::Default;
     IconRole iconRole = IconRole::Information;
+    ButtonIconPlacement iconPlacement = ButtonIconPlacement::Leading;
+    LogoRole logoRole = LogoRole::Horizontal;
+    QSize logoSize;
     qreal shineProgress = 0.0;
     qreal shineTarget = 0.0;
     qreal stateProgress = 1.0;
@@ -379,8 +383,11 @@ public:
     qreal rippleOpacity = 0.0;
     QPointF rippleOrigin;
     bool hasIconRole = false;
+    bool hasLogoRole = false;
     bool loading = false;
+    bool iconOnly = false;
     bool pointerInside = false;
+    bool iconSizePolicyActive = false;
     QStyle::State startState = QStyle::State_None;
     QStyle::State targetState = QStyle::State_None;
     QAccessible::Id accessibleIdentifier = 0;
@@ -420,9 +427,11 @@ void Button::setVariant(ButtonVariant variant)
     d->trialProgress = 0.0;
     d->trialTarget = 0.0;
     d->variant = variant;
+    updateIconSizePolicy();
     WidgetStyle::setButtonVariant(this, variant);
     updatePromotionalMotion();
     updateRoleIcon();
+    updateGeometry();
     update();
     emit variantChanged(variant);
 }
@@ -430,6 +439,28 @@ void Button::setVariant(ButtonVariant variant)
 void Button::resetVariant()
 {
     setVariant(ButtonVariant::Default);
+}
+
+bool Button::iconOnly() const
+{
+    return d->iconOnly;
+}
+
+void Button::setIconOnly(bool iconOnly)
+{
+    if (d->iconOnly == iconOnly) return;
+    d->iconOnly = iconOnly;
+    setProperty("ngstdIconOnly", iconOnly);
+    updateIconSizePolicy();
+    WidgetStyle::refresh(this);
+    updateGeometry();
+    update();
+    emit iconOnlyChanged(iconOnly);
+}
+
+void Button::resetIconOnly()
+{
+    setIconOnly(false);
 }
 
 IconRole Button::iconRole() const
@@ -445,9 +476,11 @@ bool Button::hasIconRole() const
 void Button::setIconRole(IconRole role)
 {
     if (d->hasIconRole && d->iconRole == role) return;
+    d->hasLogoRole = false;
     d->iconRole = role;
     d->hasIconRole = true;
     updateRoleIcon();
+    updateGeometry();
 }
 
 void Button::clearIconRole()
@@ -455,6 +488,68 @@ void Button::clearIconRole()
     if (!d->hasIconRole) return;
     d->hasIconRole = false;
     setIcon(QIcon());
+    updateGeometry();
+}
+
+ButtonIconPlacement Button::iconPlacement() const
+{
+    return d->iconPlacement;
+}
+
+void Button::setIconPlacement(ButtonIconPlacement placement)
+{
+    if (d->iconPlacement == placement) return;
+    d->iconPlacement = placement;
+    setProperty("_ngstdButtonIconPlacement",
+                placement == ButtonIconPlacement::Trailing
+                    ? QStringLiteral("trailing")
+                    : QStringLiteral("leading"));
+    update();
+    emit iconPlacementChanged(placement);
+}
+
+void Button::resetIconPlacement()
+{
+    setIconPlacement(ButtonIconPlacement::Leading);
+}
+
+LogoRole Button::logoRole() const
+{
+    return d->logoRole;
+}
+
+QSize Button::logoSize() const
+{
+    return d->logoSize;
+}
+
+bool Button::hasLogoRole() const
+{
+    return d->hasLogoRole;
+}
+
+void Button::setLogoRole(LogoRole role, const QSize &logicalSize)
+{
+    if (logicalSize.isEmpty()) return;
+    if (d->hasLogoRole && d->logoRole == role && d->logoSize == logicalSize) {
+        return;
+    }
+    d->hasIconRole = false;
+    d->hasLogoRole = true;
+    d->logoRole = role;
+    d->logoSize = logicalSize;
+    setIcon(QIcon());
+    updateGeometry();
+    update();
+}
+
+void Button::clearLogoRole()
+{
+    if (!d->hasLogoRole) return;
+    d->hasLogoRole = false;
+    d->logoSize = QSize();
+    updateGeometry();
+    update();
 }
 
 bool Button::isLoading() const
@@ -488,18 +583,30 @@ void Button::resetLoading()
 QSize Button::sizeHint() const
 {
     QSize result = QPushButton::sizeHint();
-    if (d->variant != ButtonVariant::Icon && !text().isEmpty()) {
+    const bool iconSized =
+        d->iconOnly || d->variant == ButtonVariant::Icon;
+    if (d->hasLogoRole) {
+        result.setWidth(
+            qMax(result.width(),
+                 d->logoSize.width() + 2 * DesignTokens::spacing(2)));
+        result.setHeight(qMax(result.height(), d->logoSize.height()));
+    }
+    if (iconSized) {
+        const int extent = DesignTokens::controlHeight(ControlSize::Medium);
+        result = QSize(extent, extent);
+    }
+    if (!iconSized && !text().isEmpty()) {
         int minimumLabelWidth = fontMetrics().horizontalAdvance(text()) + 2;
         if (d->hasIconRole) {
             minimumLabelWidth += DesignTokens::controlIconSize() +
                                  internal::buttonIconTextGap();
         }
-        const int minimumButtonWidth =
-            minimumLabelWidth + DesignTokens::controlPadding() * 2 +
-            DesignTokens::spacing(2) + 2;
+        const int minimumButtonWidth = minimumLabelWidth +
+                                       DesignTokens::controlPadding() * 2 +
+                                       DesignTokens::spacing(2) + 2;
         result.setWidth(qMax(result.width(), minimumButtonWidth));
     }
-    if (d->hasIconRole && !text().isEmpty()) {
+    if (!iconSized && d->hasIconRole && !text().isEmpty()) {
         result.rwidth() += internal::buttonIconTextGap() -
                            internal::nativeButtonIconTextGap();
     }
@@ -584,6 +691,8 @@ void Button::paintEvent(QPaintEvent *event)
         [this, &currentOption,
          animatedStateMask](QStyle::State state) -> QStyleOptionButton {
         QStyleOptionButton option = currentOption;
+        if (d->iconOnly || d->variant == ButtonVariant::Icon)
+            option.text.clear();
         option.state &= ~animatedStateMask;
         option.state |= state;
         if (d->hasIconRole) {
@@ -722,9 +831,8 @@ void Button::paintEvent(QPaintEvent *event)
                 ColorRole::FeedbackRing, internal::colorSchemeFor(this));
         }
         internal::paintSelectionFeedback(
-            &painter, QRectF(rect()),
-            DesignTokens::radius(RadiusRole::Button), feedback,
-            feedbackColor);
+            &painter, QRectF(rect()), DesignTokens::radius(RadiusRole::Button),
+            feedback, feedbackColor);
     }
 
     QStyleOptionButton blendedLabelOption(targetLabelOption);
@@ -739,12 +847,22 @@ void Button::paintEvent(QPaintEvent *event)
     blendedLabelOption.palette.setColor(QPalette::Text, contentColor);
     if (d->hasIconRole) {
         const int iconSize = DesignTokens::controlIconSize();
-        blendedLabelOption.icon = iconPixmap(
-            d->iconRole, QSize(iconSize, iconSize), devicePixelRatioF(),
-            contentColor);
+        blendedLabelOption.icon =
+            iconPixmap(d->iconRole, QSize(iconSize, iconSize),
+                       devicePixelRatioF(), contentColor);
         blendedLabelOption.iconSize = QSize(iconSize, iconSize);
     }
     drawControl(QStyle::CE_PushButtonLabel, blendedLabelOption, 1.0);
+    if (d->hasLogoRole) {
+        const QPixmap pixmap = logoPixmap(
+            themedLogoRole(d->logoRole, internal::colorSchemeFor(this)),
+            d->logoSize, devicePixelRatioF());
+        if (!pixmap.isNull()) {
+            QRect logoRectangle(QPoint(), d->logoSize);
+            logoRectangle.moveCenter(rect().center());
+            painter.drawPixmap(logoRectangle, pixmap, pixmap.rect());
+        }
+    }
 }
 
 void Button::resizeEvent(QResizeEvent *event)
@@ -800,8 +918,7 @@ void Button::initialize()
     d->rippleOpacityAnimation = new QVariantAnimation(this);
     d->rippleOpacityAnimation->setObjectName(
         QStringLiteral("_ngstdButtonRippleOpacityAnimation"));
-    connect(d->rippleOpacityAnimation,
-            &QVariantAnimation::valueChanged, this,
+    connect(d->rippleOpacityAnimation, &QVariantAnimation::valueChanged, this,
             [this](const QVariant &value) {
                 d->rippleOpacity = value.toReal();
                 update();
@@ -829,6 +946,8 @@ void Button::initialize()
     d->startState =
         QStyle::State_Enabled | QStyle::State_Raised | QStyle::State_Off;
     d->targetState = d->startState;
+    setProperty("_ngstdButtonIconPlacement", QStringLiteral("leading"));
+    setProperty("ngstdIconOnly", false);
     WidgetStyle::setButtonVariant(this, d->variant);
     updateLoadingGeometry();
 }
@@ -873,11 +992,10 @@ void Button::updateStateMotion()
     d->stateProgress = 0.0;
     d->stateAnimation->setStartValue(0.0);
     d->stateAnimation->setEndValue(1.0);
-    const MotionDuration duration = checkedChanged ? MotionDuration::Normal
-                                                   : MotionDuration::Fast;
+    const MotionDuration duration =
+        checkedChanged ? MotionDuration::Normal : MotionDuration::Fast;
     if (internal::MotionController::configure(
-            d->stateAnimation, this,
-            {duration, MotionEasing::Standard})) {
+            d->stateAnimation, this, {duration, MotionEasing::Standard})) {
         d->stateAnimation->start();
     }
     else {
@@ -969,14 +1087,30 @@ void Button::updateTrialEffect()
     d->trialEffect->setLift(lift);
 }
 
+void Button::updateIconSizePolicy()
+{
+    const bool iconSized =
+        d->iconOnly || d->variant == ButtonVariant::Icon;
+    if (iconSized && !d->iconSizePolicyActive) {
+        d->nonIconSizePolicy = sizePolicy();
+        d->iconSizePolicyActive = true;
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        return;
+    }
+    if (!iconSized && d->iconSizePolicyActive) {
+        setSizePolicy(d->nonIconSizePolicy);
+        d->iconSizePolicyActive = false;
+    }
+}
+
 void Button::updateRoleIcon()
 {
     if (!d->hasIconRole) return;
     const int iconSize = DesignTokens::controlIconSize();
     const ColorScheme scheme = internal::colorSchemeFor(this);
-    const QColor color = buttonContentColor(
-        d->variant, isEnabled(), isChecked(), isDown(), d->pointerInside,
-        scheme);
+    const QColor color =
+        buttonContentColor(d->variant, isEnabled(), isChecked(), isDown(),
+                           d->pointerInside, scheme);
     setIcon(iconPixmap(d->iconRole, QSize(iconSize, iconSize),
                        devicePixelRatioF(), color));
     setIconSize(QSize(iconSize, iconSize));

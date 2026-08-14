@@ -5,21 +5,49 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QFrame>
+#include <QGridLayout>
+#include <QImage>
+#include <QLabel>
 #include <QLineEdit>
+#include <QListView>
 #include <QProgressBar>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QStyleOptionButton>
 #include <QStyleOptionComboBox>
 #include <QStyleOptionSpinBox>
+#include <QStyleOptionViewItem>
 #include <QTabBar>
 #include <QTabWidget>
 #include <QTest>
 #include <QTreeWidget>
 #include <QVariantAnimation>
+#include <QVBoxLayout>
 #include <QWidget>
 
 using namespace ngstd::widgets;
+
+namespace {
+
+bool containsApproxColor(const QImage &image, const QColor &expected,
+                         int tolerance = 2)
+{
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            const QColor pixel = image.pixelColor(x, y);
+            if (qAbs(pixel.red() - expected.red()) <= tolerance &&
+                qAbs(pixel.green() - expected.green()) <= tolerance &&
+                qAbs(pixel.blue() - expected.blue()) <= tolerance &&
+                qAbs(pixel.alpha() - expected.alpha()) <= tolerance) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+} // namespace
 
 class StandardControlsTest final : public QObject
 {
@@ -28,14 +56,21 @@ class StandardControlsTest final : public QObject
 private slots:
     void standardQtClassesReceiveTheme();
     void selectionIndicatorsUseTokenGeometry();
+    void itemViewCheckIndicatorsReserveTextSpace();
     void selectionIndicatorsUseMotionPolicy();
     void selectedTabUsesTokenUnderline();
+    void tabSizingReservesPaintedTextInk();
     void selectedTabUsesMotionPolicy();
     void fieldBordersUseMotionPolicy();
+    void fieldPolishEnforcesTokenHeight();
+    void disabledSpinBoxStyleUsesDisabledTokens();
     void complexControlsUseTokenGeometry();
     void treeViewUsesTokenIndentation();
     void progressBarUsesTokenHeight();
+    void wizardPageLayoutNormalizesDescendantSpacing();
+    void wizardPageHeaderUsesDedicatedSpacing();
     void semanticStatesAreIndependent();
+    void semanticContainerStylesApplyPublicRoles();
 };
 
 void StandardControlsTest::standardQtClassesReceiveTheme()
@@ -82,6 +117,44 @@ void StandardControlsTest::selectionIndicatorsUseTokenGeometry()
         QStyle::SE_RadioButtonIndicator, &radioOption, &radioButton);
     QCOMPARE(radioIndicator.size(), QSize(expectedSize, expectedSize));
     QCOMPARE(radioIndicator.center().y(), radioButton.rect().center().y());
+}
+
+void StandardControlsTest::itemViewCheckIndicatorsReserveTextSpace()
+{
+    NextgisProxyStyle style(QStringLiteral("Fusion"));
+    QListView listView;
+    listView.setStyle(&style);
+
+    for (Qt::LayoutDirection direction :
+         {Qt::LeftToRight, Qt::RightToLeft}) {
+        QStyleOptionViewItem itemOption;
+        itemOption.initFrom(&listView);
+        itemOption.direction = direction;
+        itemOption.rect = QRect(0, 0, 240, 40);
+        itemOption.features = QStyleOptionViewItem::HasCheckIndicator |
+                              QStyleOptionViewItem::HasDisplay;
+        itemOption.checkState = Qt::Checked;
+        itemOption.text = QStringLiteral("Item");
+
+        const QRect indicatorRectangle = style.subElementRect(
+            QStyle::SE_ItemViewItemCheckIndicator, &itemOption, &listView);
+        const QRect textRectangle = style.subElementRect(
+            QStyle::SE_ItemViewItemText, &itemOption, &listView);
+        QCOMPARE(indicatorRectangle.size(),
+                 QSize(DesignTokens::componentMetric(
+                           ComponentMetric::SelectionIndicatorSize),
+                       DesignTokens::componentMetric(
+                           ComponentMetric::SelectionIndicatorSize)));
+        QCOMPARE(indicatorRectangle.center().y(),
+                 itemOption.rect.center().y());
+        QVERIFY(!indicatorRectangle.intersects(textRectangle));
+        if (direction == Qt::LeftToRight) {
+            QVERIFY(textRectangle.left() > indicatorRectangle.right());
+        }
+        else {
+            QVERIFY(textRectangle.right() < indicatorRectangle.left());
+        }
+    }
 }
 
 void StandardControlsTest::selectionIndicatorsUseMotionPolicy()
@@ -162,6 +235,30 @@ void StandardControlsTest::selectedTabUsesTokenUnderline()
     controller->detach();
 }
 
+void StandardControlsTest::tabSizingReservesPaintedTextInk()
+{
+    NextgisProxyStyle style(QStringLiteral("Fusion"));
+    QTabBar tabBar;
+    tabBar.setStyle(&style);
+    tabBar.addTab(QStringLiteral("General"));
+    tabBar.resize(320, 48);
+    QStyleOptionTab option;
+    option.initFrom(&tabBar);
+    option.text = QStringLiteral("General");
+    option.state |= QStyle::State_Selected;
+
+    const QSize tabSize = style.sizeFromContents(
+        QStyle::CT_TabBarTab, &option,
+        option.fontMetrics.size(Qt::TextSingleLine, option.text), &tabBar);
+    const int paintedTextWidth = QFontMetrics(
+        DesignTokens::font(TypographyRole::Control))
+                                     .boundingRect(option.text)
+                                     .width();
+    const int padding = DesignTokens::componentMetric(
+        ComponentMetric::TabPaddingHorizontal);
+    QVERIFY(tabSize.width() >= paintedTextWidth + padding * 2 + 4);
+}
+
 void StandardControlsTest::selectedTabUsesMotionPolicy()
 {
     NextgisProxyStyle style(QStringLiteral("Fusion"));
@@ -227,6 +324,85 @@ void StandardControlsTest::fieldBordersUseMotionPolicy()
     QCOMPARE(borderAnimation->state(), QAbstractAnimation::Stopped);
 }
 
+void StandardControlsTest::fieldPolishEnforcesTokenHeight()
+{
+    NextgisProxyStyle style(QStringLiteral("Fusion"));
+    QWidget root;
+    root.setStyle(&style);
+    root.setStyleSheet(QStringLiteral("QWidget { color: black; }"));
+    QGridLayout layout(&root);
+    QLineEdit lineEdit;
+    QSpinBox spinBox;
+    spinBox.setEnabled(false);
+    layout.addWidget(&lineEdit, 0, 0);
+    layout.addWidget(&spinBox, 0, 1);
+
+    root.resize(320, 96);
+    root.show();
+    QCoreApplication::processEvents();
+
+    const int expectedHeight =
+        DesignTokens::controlHeight(ControlSize::Medium);
+    QCOMPARE(lineEdit.height(), expectedHeight);
+    QCOMPARE(spinBox.height(), expectedHeight);
+    QCOMPARE(spinBox.minimumHeight(), expectedHeight);
+
+    style.unpolish(&spinBox);
+    QCOMPARE(spinBox.minimumHeight(), 0);
+}
+
+void StandardControlsTest::disabledSpinBoxStyleUsesDisabledTokens()
+{
+    NextgisProxyStyle style(QStringLiteral("Fusion"));
+    QWidget root;
+    root.setStyle(&style);
+    QVBoxLayout layout(&root);
+    QSpinBox spinBox;
+    spinBox.setValue(42);
+    spinBox.setEnabled(false);
+    spinBox.resize(96, DesignTokens::controlHeight(ControlSize::Medium));
+    layout.addWidget(&spinBox);
+
+    ThemeOptions options;
+    options.setThemeMode(ThemeMode::Light);
+    ThemeController *controller = ThemeController::attach(&root, options);
+    QVERIFY(controller);
+    root.show();
+    QCoreApplication::processEvents();
+
+    const QColor lightDisabledText =
+        DesignTokens::color(ColorRole::TextDisabled, ColorScheme::Light);
+    const QColor lightSurfaceMuted =
+        DesignTokens::color(ColorRole::SurfaceMuted, ColorScheme::Light);
+    QCOMPARE(spinBox.palette().color(QPalette::Disabled, QPalette::Text),
+             lightDisabledText);
+    if (QLineEdit *lineEdit = spinBox.findChild<QLineEdit *>()) {
+        QCOMPARE(lineEdit->palette().color(QPalette::Disabled,
+                                           QPalette::Text),
+                 lightDisabledText);
+    }
+    QImage lightImage(spinBox.size(), QImage::Format_ARGB32_Premultiplied);
+    lightImage.fill(Qt::transparent);
+    spinBox.render(&lightImage);
+    QVERIFY(containsApproxColor(lightImage, lightSurfaceMuted));
+    QVERIFY(containsApproxColor(lightImage, lightDisabledText, 8));
+
+    controller->setThemeMode(ThemeMode::Dark);
+    QCoreApplication::processEvents();
+    const QColor darkDisabledText =
+        DesignTokens::color(ColorRole::TextDisabled, ColorScheme::Dark);
+    const QColor darkSurfaceMuted =
+        DesignTokens::color(ColorRole::SurfaceMuted, ColorScheme::Dark);
+    QCOMPARE(spinBox.palette().color(QPalette::Disabled, QPalette::Text),
+             darkDisabledText);
+    QImage darkImage(spinBox.size(), QImage::Format_ARGB32_Premultiplied);
+    darkImage.fill(Qt::transparent);
+    spinBox.render(&darkImage);
+    QVERIFY(containsApproxColor(darkImage, darkSurfaceMuted));
+    QVERIFY(containsApproxColor(darkImage, darkDisabledText, 8));
+    controller->detach();
+}
+
 void StandardControlsTest::complexControlsUseTokenGeometry()
 {
     NextgisProxyStyle style(QStringLiteral("Fusion"));
@@ -245,6 +421,19 @@ void StandardControlsTest::complexControlsUseTokenGeometry()
     QCOMPARE(comboArrow.width(), DesignTokens::componentMetric(
                                      ComponentMetric::ComboBoxDropDownWidth));
     QVERIFY(!comboArrow.intersects(comboEdit));
+
+    const QSize comboContents = comboBox.fontMetrics().size(
+        Qt::TextSingleLine, QStringLiteral("System default"));
+    const QSize comboSize = style.sizeFromContents(
+        QStyle::CT_ComboBox, &comboOption, comboContents, &comboBox);
+    QCOMPARE(comboSize.height(),
+             DesignTokens::controlHeight(ControlSize::Medium));
+    comboBox.resize(comboSize);
+    comboOption.initFrom(&comboBox);
+    const QRect contentSizedEdit = style.subControlRect(
+        QStyle::CC_ComboBox, &comboOption, QStyle::SC_ComboBoxEditField,
+        &comboBox);
+    QVERIFY(contentSizedEdit.width() >= comboContents.width() + 4);
 
     QSpinBox spinBox;
     spinBox.setStyle(&style);
@@ -273,6 +462,23 @@ void StandardControlsTest::complexControlsUseTokenGeometry()
     QVERIFY(!upButton.intersects(spinEdit));
     QVERIFY(!downButton.intersects(spinEdit));
     QCOMPARE(upButton.bottom() + 1, downButton.top());
+
+    QLineEdit lineEdit;
+    lineEdit.setStyle(&style);
+    QStyleOptionFrame lineEditOption;
+    lineEditOption.initFrom(&lineEdit);
+    const QSize lineEditSize = style.sizeFromContents(
+        QStyle::CT_LineEdit, &lineEditOption,
+        lineEdit.fontMetrics().size(Qt::TextSingleLine,
+                                    QStringLiteral("Value")),
+        &lineEdit);
+    const QSize spinSize = style.sizeFromContents(
+        QStyle::CT_SpinBox, &spinOption,
+        spinBox.fontMetrics().size(Qt::TextSingleLine,
+                                   QStringLiteral("65535")),
+        &spinBox);
+    QCOMPARE(lineEditSize.height(), comboSize.height());
+    QCOMPARE(spinSize.height(), comboSize.height());
 }
 
 void StandardControlsTest::treeViewUsesTokenIndentation()
@@ -301,6 +507,61 @@ void StandardControlsTest::progressBarUsesTokenHeight()
     controller->detach();
 }
 
+void StandardControlsTest::wizardPageLayoutNormalizesDescendantSpacing()
+{
+    QWidget page;
+    QVBoxLayout rootLayout(&page);
+    rootLayout.setContentsMargins(31, 29, 27, 23);
+    rootLayout.setSpacing(14);
+
+    QWidget content(&page);
+    QGridLayout contentLayout(&content);
+    contentLayout.setContentsMargins(18, 14, 10, 6);
+    contentLayout.setHorizontalSpacing(28);
+    contentLayout.setVerticalSpacing(7);
+    rootLayout.addWidget(&content);
+
+    WidgetStyle::applyWizardPageLayout(&page);
+
+    const int pageMargin = DesignTokens::componentMetric(
+        ComponentMetric::WizardPageMargin);
+    QCOMPARE(rootLayout.contentsMargins(),
+             QMargins(pageMargin, pageMargin, pageMargin, pageMargin));
+    QCOMPARE(rootLayout.spacing(), DesignTokens::componentMetric(
+                                      ComponentMetric::WizardPageSpacing));
+    QCOMPARE(contentLayout.contentsMargins(),
+             QMargins(DesignTokens::spacing(4), DesignTokens::spacing(3),
+                      DesignTokens::spacing(2), DesignTokens::spacing(1)));
+    QCOMPARE(contentLayout.horizontalSpacing(), DesignTokens::spacing(6));
+    QCOMPARE(contentLayout.verticalSpacing(), DesignTokens::spacing(2));
+}
+
+void StandardControlsTest::wizardPageHeaderUsesDedicatedSpacing()
+{
+    QWidget page;
+    QVBoxLayout layout(&page);
+    QLabel title(QStringLiteral("Title"), &page);
+    QLabel subtitle(QStringLiteral("Subtitle"), &page);
+    QLabel body(QStringLiteral("Body"), &page);
+    layout.addWidget(&title);
+    layout.addWidget(&subtitle);
+    layout.addWidget(&body);
+
+    WidgetStyle::applyWizardPageLayout(&page);
+    WidgetStyle::applyWizardPageHeader(&title, &subtitle);
+
+    QCOMPARE(title.property("ngstdTypographyRole").toString(),
+             QStringLiteral("heading2"));
+    QCOMPARE(subtitle.property("ngstdTypographyRole").toString(),
+             QStringLiteral("heading1Subtitle"));
+    QLayout *headerLayout = layout.itemAt(0)->layout();
+    QVERIFY(headerLayout);
+    QCOMPARE(headerLayout->spacing(), DesignTokens::componentMetric(
+                                          ComponentMetric::WizardTitleBottomSpacing));
+    QCOMPARE(layout.spacing(), DesignTokens::componentMetric(
+                                   ComponentMetric::WizardPageSpacing));
+}
+
 void StandardControlsTest::semanticStatesAreIndependent()
 {
     QLineEdit lineEdit;
@@ -311,6 +572,35 @@ void StandardControlsTest::semanticStatesAreIndependent()
     WidgetStyle::setError(&lineEdit, false);
     QVERIFY(!lineEdit.property("ngstdError").toBool());
     QVERIFY(lineEdit.property("ngstdSelected").toBool());
+}
+
+void StandardControlsTest::semanticContainerStylesApplyPublicRoles()
+{
+    QFrame card;
+    card.setFrameShape(QFrame::StyledPanel);
+    WidgetStyle::setCardVariant(&card, CardVariant::Panel);
+    QCOMPARE(card.property("_ngstdRole").toString(), QStringLiteral("card"));
+    QCOMPARE(WidgetStyle::cardVariant(&card), CardVariant::Panel);
+    QVERIFY(card.testAttribute(Qt::WA_StyledBackground));
+    QCOMPARE(card.frameShape(), QFrame::NoFrame);
+
+    QFrame notice;
+    notice.setFrameShape(QFrame::StyledPanel);
+    WidgetStyle::setNoticeTone(&notice, SemanticTone::Warning);
+    QCOMPARE(notice.property("_ngstdRole").toString(),
+             QStringLiteral("notice"));
+    QCOMPARE(WidgetStyle::tone(&notice), SemanticTone::Warning);
+    QVERIFY(notice.testAttribute(Qt::WA_StyledBackground));
+    QCOMPARE(notice.frameShape(), QFrame::NoFrame);
+
+    QWidget page;
+    WidgetStyle::setPageBackgroundVariant(
+        &page, PageBackgroundVariant::Corporate);
+    QCOMPARE(page.property("_ngstdRole").toString(),
+             QStringLiteral("pageBackground"));
+    QCOMPARE(WidgetStyle::pageBackgroundVariant(&page),
+             PageBackgroundVariant::Corporate);
+    QVERIFY(page.testAttribute(Qt::WA_StyledBackground));
 }
 
 QTEST_MAIN(StandardControlsTest)

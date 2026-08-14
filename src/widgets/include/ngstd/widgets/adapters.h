@@ -13,6 +13,7 @@
 class QComboBox;
 class QEvent;
 class QWizard;
+class QWidget;
 
 namespace ngstd {
 namespace widgets {
@@ -71,6 +72,7 @@ public:
     bool isAttached() const;
 
     void apply();
+    void animatePageEntrance(QWidget *page);
     void detach();
 
 signals:

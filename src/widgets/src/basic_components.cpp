@@ -17,7 +17,9 @@
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPropertyAnimation>
+#include <QSizePolicy>
 #include <QStyle>
 #include <QTimer>
 #include <QToolButton>
@@ -25,6 +27,134 @@
 
 namespace ngstd {
 namespace widgets {
+
+class IconLabelPrivate final
+{
+public:
+    IconRole iconRole = IconRole::Information;
+    ColorRole colorRole = ColorRole::TextSecondary;
+    int iconSize = 0;
+    bool hasIconRole = false;
+};
+
+IconLabel::IconLabel(QWidget *parent)
+    : QLabel(parent), d(new IconLabelPrivate)
+{
+    setAlignment(Qt::AlignCenter);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    updateIcon();
+}
+
+IconLabel::IconLabel(IconRole iconRole, QWidget *parent)
+    : IconLabel(parent)
+{
+    setIconRole(iconRole);
+}
+
+IconLabel::~IconLabel() = default;
+
+IconRole IconLabel::iconRole() const
+{
+    return d->iconRole;
+}
+
+bool IconLabel::hasIconRole() const
+{
+    return d->hasIconRole;
+}
+
+void IconLabel::setIconRole(IconRole iconRole)
+{
+    if (d->hasIconRole && d->iconRole == iconRole) return;
+    const bool wasVisible = d->hasIconRole;
+    d->iconRole = iconRole;
+    d->hasIconRole = true;
+    updateIcon();
+    emit iconRoleChanged(d->iconRole);
+    if (!wasVisible) emit iconVisibilityChanged(true);
+}
+
+void IconLabel::clearIconRole()
+{
+    if (!d->hasIconRole) return;
+    d->hasIconRole = false;
+    updateIcon();
+    emit iconRoleChanged(d->iconRole);
+    emit iconVisibilityChanged(false);
+}
+
+ColorRole IconLabel::colorRole() const
+{
+    return d->colorRole;
+}
+
+void IconLabel::setColorRole(ColorRole colorRole)
+{
+    if (d->colorRole == colorRole) return;
+    d->colorRole = colorRole;
+    updateIcon();
+    emit colorRoleChanged(d->colorRole);
+}
+
+int IconLabel::iconSize() const
+{
+    return d->iconSize > 0 ? d->iconSize : DesignTokens::controlIconSize();
+}
+
+void IconLabel::setIconSize(int iconSize)
+{
+    const int normalizedSize = qMax(1, iconSize);
+    if (d->iconSize == normalizedSize) return;
+    d->iconSize = normalizedSize;
+    updateIcon();
+    emit iconSizeChanged(d->iconSize);
+}
+
+void IconLabel::resetIconSize()
+{
+    if (d->iconSize == 0) return;
+    d->iconSize = 0;
+    updateIcon();
+    emit iconSizeChanged(iconSize());
+}
+
+QSize IconLabel::sizeHint() const
+{
+    const int size = iconSize();
+    return QSize(size, size);
+}
+
+QSize IconLabel::minimumSizeHint() const
+{
+    return sizeHint();
+}
+
+void IconLabel::changeEvent(QEvent *event)
+{
+    QLabel::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange ||
+        event->type() == QEvent::StyleChange ||
+        event->type() == QEvent::EnabledChange ||
+        event->type() == QEvent::DevicePixelRatioChange) {
+        updateIcon();
+    }
+}
+
+void IconLabel::updateIcon()
+{
+    if (!d->hasIconRole) {
+        setPixmap(QPixmap());
+        updateGeometry();
+        return;
+    }
+    const int size = iconSize();
+    const ColorRole role = isEnabled() ? d->colorRole : ColorRole::TextDisabled;
+    const QColor color =
+        DesignTokens::color(role, internal::colorSchemeFor(this));
+    setPixmap(iconPixmap(d->iconRole, QSize(size, size),
+                         devicePixelRatioF(), color));
+    updateGeometry();
+}
 
 class SearchFieldPrivate final
 {
@@ -37,6 +167,8 @@ SearchField::SearchField(QWidget *parent)
     : QLineEdit(parent), d(new SearchFieldPrivate)
 {
     setProperty("_ngstdRole", QStringLiteral("searchField"));
+    setMinimumHeight(DesignTokens::controlHeight(ControlSize::Medium));
+    setClearButtonEnabled(true);
     d->searchAction = addAction(QIcon(), QLineEdit::LeadingPosition);
     const QList<QToolButton *> actionButtons = findChildren<QToolButton *>();
     for (QToolButton *actionButton : actionButtons) {
@@ -307,8 +439,10 @@ void Tag::paintEvent(QPaintEvent *event)
     QLabel::paintEvent(event);
     if (!d->hasIconRole) return;
     const ColorScheme scheme = internal::colorSchemeFor(this);
-    const QColor color =
-        DesignTokens::color(internal::colorRoleForTone(d->tone), scheme);
+    const QColor color = DesignTokens::color(
+        isEnabled() ? internal::colorRoleForTone(d->tone)
+                    : ColorRole::TextDisabled,
+        scheme);
     const int iconSize = DesignTokens::controlIconSize();
     const int horizontalPadding =
         DesignTokens::componentMetric(ComponentMetric::TagPaddingHorizontal);
@@ -359,20 +493,21 @@ Notice::Notice(QWidget *parent) : QFrame(parent), d(new NoticePrivate)
     d->iconLabel = new QLabel(this);
     d->textLabel = new QLabel(this);
     setProperty("_ngstdRole", QStringLiteral("notice"));
+    setProperty("_ngstdPaintedNotice", true);
     setFrameShape(QFrame::NoFrame);
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(
         DesignTokens::componentMetric(ComponentMetric::NoticeContentSpacing));
-    layout->setAlignment(Qt::AlignTop);
+    layout->setAlignment(Qt::AlignVCenter);
     d->iconLabel->setFixedSize(DesignTokens::controlIconSize(),
                                DesignTokens::controlIconSize());
     d->iconLabel->setAlignment(Qt::AlignCenter);
-    d->iconLabel->setStyleSheet(QStringLiteral("background: transparent;"));
+    d->iconLabel->setAttribute(Qt::WA_StyledBackground, false);
     d->textLabel->setWordWrap(true);
     d->textLabel->setTextFormat(Qt::RichText);
-    d->textLabel->setStyleSheet(QStringLiteral("background: transparent;"));
-    layout->addWidget(d->iconLabel, 0, Qt::AlignTop);
+    d->textLabel->setAttribute(Qt::WA_StyledBackground, false);
+    layout->addWidget(d->iconLabel, 0, Qt::AlignVCenter);
     layout->addWidget(d->textLabel, 1);
     WidgetStyle::setTone(this, d->tone);
     updateIcon();
@@ -428,7 +563,58 @@ void Notice::resetTone()
 void Notice::changeEvent(QEvent *event)
 {
     QFrame::changeEvent(event);
-    if (event->type() == QEvent::PaletteChange) updateIcon();
+    if (event->type() == QEvent::PaletteChange ||
+        event->type() == QEvent::EnabledChange) {
+        updateIcon();
+        update();
+    }
+}
+
+void Notice::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event)
+    const ColorScheme scheme = internal::colorSchemeFor(this);
+    ColorRole backgroundRole = ColorRole::SurfaceBrand;
+    if (!isEnabled())
+        backgroundRole = ColorRole::SurfaceMuted;
+    else if (d->tone == SemanticTone::Success)
+        backgroundRole = ColorRole::SuccessSoft;
+    else if (d->tone == SemanticTone::Warning)
+        backgroundRole = ColorRole::WarningSoft;
+    else if (d->tone == SemanticTone::Danger)
+        backgroundRole = ColorRole::DangerSoft;
+
+    constexpr qreal borderWidth = 1.0;
+    const qreal radius = DesignTokens::radius(RadiusRole::Button);
+    const QRectF bounds = QRectF(rect()).adjusted(
+        borderWidth * 0.5, borderWidth * 0.5,
+        -borderWidth * 0.5, -borderWidth * 0.5);
+    QPainterPath shape;
+    shape.addRoundedRect(bounds, radius, radius);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.fillPath(shape, DesignTokens::color(backgroundRole, scheme));
+    painter.setPen(QPen(DesignTokens::color(ColorRole::Border, scheme),
+                        borderWidth));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(shape);
+
+    painter.save();
+    painter.setClipPath(shape);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(DesignTokens::color(
+        isEnabled() ? internal::colorRoleForTone(d->tone)
+                    : ColorRole::TextDisabled,
+        scheme));
+    const qreal accentWidth = DesignTokens::componentMetric(
+        ComponentMetric::NoticeAccentWidth);
+    const QRectF accent(layoutDirection() == Qt::RightToLeft
+                            ? rect().right() - accentWidth + 1.0
+                            : rect().left(),
+                        rect().top(), accentWidth, rect().height());
+    painter.drawRect(accent);
+    painter.restore();
 }
 
 void Notice::updateText()

@@ -178,8 +178,10 @@ QWidget *RevealWidget::takeContentWidget()
     contentWidget->removeEventFilter(this);
     contentWidget->setParent(nullptr);
     d->contentWidget.clear();
+    const int previousHeight = d->contentHeight;
     d->contentHeight = 0;
     setFixedHeight(0);
+    if (previousHeight != 0) emit contentHeightChanged(0);
     updateGeometry();
     return contentWidget;
 }
@@ -222,12 +224,15 @@ QSize RevealWidget::sizeHint() const
 {
     const QSize contentSize =
         d->contentWidget ? d->contentWidget->sizeHint() : QSize();
-    return QSize(contentSize.width(), qRound(d->contentHeight * d->progress));
+    const int revealedHeight = qRound(d->contentHeight * d->progress);
+    return QSize(contentSize.width(),
+                 d->expanded ? qMax(d->contentHeight, revealedHeight)
+                             : revealedHeight);
 }
 
 QSize RevealWidget::minimumSizeHint() const
 {
-    return QSize(0, 0);
+    return sizeHint();
 }
 
 bool RevealWidget::eventFilter(QObject *watched, QEvent *event)
@@ -268,12 +273,15 @@ void RevealWidget::refreshContentGeometry()
         d->contentWidget->hasHeightForWidth()
             ? d->contentWidget->heightForWidth(targetWidth)
             : -1;
+    const int preferredHeight =
+        heightForWidth >= 0 ? heightForWidth
+                            : d->contentWidget->sizeHint().height();
     const int widgetHeight =
-        qMax(0, heightForWidth >= 0 ? heightForWidth
-                                    : d->contentWidget->sizeHint().height());
+        qMax(0, qMax(preferredHeight, d->contentWidget->minimumHeight()));
     d->contentHeight = widgetHeight;
-    d->contentWidget->setGeometry(0, 0, targetWidth, widgetHeight);
-    setFixedHeight(qRound(d->contentHeight * d->progress));
+    const int revealedHeight = qRound(d->contentHeight * d->progress);
+    d->contentWidget->setGeometry(0, 0, targetWidth, revealedHeight);
+    setFixedHeight(revealedHeight);
     if (previousHeight != d->contentHeight)
         emit contentHeightChanged(d->contentHeight);
     updateGeometry();

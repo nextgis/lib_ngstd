@@ -14,14 +14,18 @@
 #include <ngstd/widgets/icons.h>
 
 #include <QAbstractButton>
+#include <QAbstractItemView>
 #include <QAbstractSpinBox>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDynamicPropertyChangeEvent>
 #include <QEvent>
 #include <QFocusFrame>
+#include <QFontMetrics>
 #include <QHash>
 #include <QLineEdit>
+#include <QItemSelectionModel>
+#include <QListView>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPointer>
@@ -226,8 +230,13 @@ public:
     explicit FieldAnimationState(QWidget *field, QObject *parent)
         : QObject(parent), m_field(field),
           m_borderAnimation(new QVariantAnimation(this)),
+          m_originalMinimumHeight(field->minimumHeight()),
+          m_appliedMinimumHeight(qMax(
+              field->minimumHeight(),
+              DesignTokens::controlHeight(ControlSize::Medium))),
           m_hovered(field->underMouse())
     {
+        field->setMinimumHeight(m_appliedMinimumHeight);
         field->setAttribute(Qt::WA_Hover, true);
         field->installEventFilter(this);
         m_currentBorder = targetBorder();
@@ -240,7 +249,15 @@ public:
                     m_currentBorder = internal::interpolateColor(
                         m_startBorder, m_targetBorder, value.toReal());
                     if (m_field) m_field->update();
-                });
+                 });
+    }
+
+    ~FieldAnimationState() override
+    {
+        if (m_field &&
+            m_field->minimumHeight() == m_appliedMinimumHeight) {
+            m_field->setMinimumHeight(m_originalMinimumHeight);
+        }
     }
 
     QColor border() const { return m_currentBorder; }
@@ -315,6 +332,8 @@ private:
     QColor m_currentBorder;
     QColor m_startBorder;
     QColor m_targetBorder;
+    int m_originalMinimumHeight;
+    int m_appliedMinimumHeight;
     bool m_hovered;
 };
 
@@ -368,6 +387,53 @@ private:
     int m_previousIndex;
     int m_targetIndex;
     qreal m_progress = 1.0;
+};
+
+class ItemViewUpdateState final : public QObject
+{
+public:
+    explicit ItemViewUpdateState(QAbstractItemView *view, QObject *parent)
+        : QObject(parent), m_view(view)
+    {
+        view->installEventFilter(this);
+        bindSelectionModel();
+    }
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override
+    {
+        if (watched != m_view)
+            return QObject::eventFilter(watched, event);
+        if (event->type() == QEvent::Show ||
+            event->type() == QEvent::Polish ||
+            event->type() == QEvent::StyleChange ||
+            event->type() == QEvent::DynamicPropertyChange) {
+            bindSelectionModel();
+        }
+        return QObject::eventFilter(watched, event);
+    }
+
+private:
+    void bindSelectionModel()
+    {
+        if (!m_view || m_selectionModel == m_view->selectionModel()) return;
+        if (m_selectionModel) disconnect(m_selectionModel, nullptr, this, nullptr);
+        m_selectionModel = m_view->selectionModel();
+        if (!m_selectionModel) return;
+        connect(m_selectionModel, &QItemSelectionModel::currentChanged, this,
+                [this](const QModelIndex &, const QModelIndex &) {
+                    if (m_view && m_view->viewport())
+                        m_view->viewport()->update();
+                });
+        connect(m_selectionModel, &QItemSelectionModel::selectionChanged,
+                this, [this](const QItemSelection &, const QItemSelection &) {
+                    if (m_view && m_view->viewport())
+                        m_view->viewport()->update();
+                });
+    }
+
+    QPointer<QAbstractItemView> m_view;
+    QPointer<QItemSelectionModel> m_selectionModel;
 };
 
 QColor fieldBorder(const QStyleOption *option, const QWidget *widget)
@@ -616,6 +682,9 @@ public:
             state = new SelectionAnimationState(radioButton, this);
         else if (QTabBar *tabBar = qobject_cast<QTabBar *>(widget))
             state = new TabAnimationState(tabBar, this);
+        else if (QAbstractItemView *itemView =
+                     qobject_cast<QAbstractItemView *>(widget))
+            state = new ItemViewUpdateState(itemView, this);
         else if (isField(widget))
             state = new FieldAnimationState(widget, this);
         if (!state) return;
@@ -746,6 +815,52 @@ QRect NextgisProxyStyle::subElementRect(SubElement element,
             option->direction, Qt::AlignLeading | Qt::AlignVCenter,
             QSize(indicatorSize, indicatorSize), option->rect);
     }
+    const QStyleOptionViewItem *itemOption =
+        qstyleoption_cast<const QStyleOptionViewItem *>(option);
+    if (itemOption &&
+        itemOption->features & QStyleOptionViewItem::HasCheckIndicator) {
+        if (element == QStyle::SE_ItemViewItemCheckIndicator) {
+            const QTreeView *treeView = qobject_cast<const QTreeView *>(widget);
+            if (!treeView && widget)
+                treeView = qobject_cast<const QTreeView *>(widget->parentWidget());
+            const bool compact = treeView &&
+                treeView->property("_ngstdCompactItems").toBool();
+            const int indicatorSize =
+                DesignTokens::componentMetric(
+                    ComponentMetric::SelectionIndicatorSize) -
+                (compact ? DesignTokens::spacing(1) : 0);
+            const int horizontalPadding = DesignTokens::spacing(compact ? 2 : 3);
+            const QRect contentRectangle = itemOption->rect.adjusted(
+                horizontalPadding, 0, -horizontalPadding, 0);
+            return QStyle::alignedRect(
+                itemOption->direction,
+                Qt::AlignLeading | Qt::AlignVCenter,
+                QSize(indicatorSize, indicatorSize), contentRectangle);
+        }
+        if (element == QStyle::SE_ItemViewItemText) {
+            QRect textRectangle = QProxyStyle::subElementRect(
+                element, option, widget);
+            const QRect indicatorRectangle = subElementRect(
+                QStyle::SE_ItemViewItemCheckIndicator, option, widget);
+            const QTreeView *treeView = qobject_cast<const QTreeView *>(widget);
+            if (!treeView && widget)
+                treeView = qobject_cast<const QTreeView *>(widget->parentWidget());
+            const int indicatorSpacing = DesignTokens::spacing(
+                treeView && treeView->property("_ngstdCompactItems").toBool()
+                    ? 1 : 2);
+            if (itemOption->direction == Qt::LeftToRight) {
+                textRectangle.setLeft(qMax(
+                    textRectangle.left(),
+                    indicatorRectangle.right() + 1 + indicatorSpacing));
+            }
+            else {
+                textRectangle.setRight(qMin(
+                    textRectangle.right(),
+                    indicatorRectangle.left() - 1 - indicatorSpacing));
+            }
+            return textRectangle;
+        }
+    }
     if (option && element == QStyle::SE_LineEditContents) {
         if (widget &&
             (qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()) ||
@@ -851,21 +966,54 @@ QSize NextgisProxyStyle::sizeFromContents(ContentsType type,
                                                    ControlSize::Medium)));
         break;
     case QStyle::CT_LineEdit:
-        result.setHeight(qMax(result.height(), DesignTokens::controlHeight(
-                                                   ControlSize::Medium)));
+        result.setHeight(DesignTokens::controlHeight(ControlSize::Medium));
         break;
     case QStyle::CT_ComboBox:
-        result.setHeight(qMax(
-            result.height(),
-            internal::tokenInteger(QStringLiteral(
-                "desktop.component.comboBox.heightPx"))));
+    {
+        const int textSafety = 4;
+        result.setWidth(qMax(
+            result.width(),
+            contentsSize.width() +
+                DesignTokens::componentMetric(
+                    ComponentMetric::ComboBoxDropDownWidth) +
+                DesignTokens::spacing(3) * 2 + textSafety));
+        result.setHeight(DesignTokens::controlHeight(ControlSize::Medium));
         break;
+    }
     case QStyle::CT_SpinBox:
-        result.setHeight(qMax(
-            result.height(),
-            internal::tokenInteger(QStringLiteral(
-                "desktop.component.spinBox.heightPx"))));
+        result.setHeight(DesignTokens::controlHeight(ControlSize::Medium));
         break;
+    case QStyle::CT_TabBarTab:
+    {
+        const QStyleOptionTab *tabOption =
+            qstyleoption_cast<const QStyleOptionTab *>(option);
+        if (tabOption) {
+            const QFont controlFont =
+                DesignTokens::font(TypographyRole::Control);
+            const QFont bodyFont =
+                DesignTokens::font(TypographyRole::BodySmall);
+            const int textWidth = qMax(
+                QFontMetrics(controlFont)
+                    .boundingRect(tabOption->text)
+                    .width(),
+                QFontMetrics(bodyFont)
+                    .boundingRect(tabOption->text)
+                    .width());
+            const int horizontalPadding = DesignTokens::componentMetric(
+                ComponentMetric::TabPaddingHorizontal);
+            result.setWidth(qMax(result.width(),
+                                 textWidth + horizontalPadding * 2 + 4));
+            const int verticalPadding = DesignTokens::componentMetric(
+                ComponentMetric::TabPaddingVertical);
+            const int textHeight = qMax(QFontMetrics(controlFont).height(),
+                                        QFontMetrics(bodyFont).height());
+            result.setHeight(qMax(
+                result.height(), textHeight + verticalPadding * 2 +
+                                     DesignTokens::componentMetric(
+                                         ComponentMetric::TabUnderlineHeight)));
+        }
+        break;
+    }
     case QStyle::CT_CheckBox:
     case QStyle::CT_RadioButton:
         result.setHeight(qMax(
@@ -875,7 +1023,9 @@ QSize NextgisProxyStyle::sizeFromContents(ContentsType type,
     case QStyle::CT_ItemViewItem:
         result.setHeight(qMax(
             result.height(), DesignTokens::componentMetric(
-                                 ComponentMetric::ItemViewRowHeight)));
+                widget && widget->property("_ngstdCompactItems").toBool()
+                    ? ComponentMetric::CompactItemViewRowHeight
+                    : ComponentMetric::ItemViewRowHeight)));
         break;
     default:
         break;
@@ -897,6 +1047,16 @@ void NextgisProxyStyle::drawPrimitive(PrimitiveElement element,
         if (treeView) return;
     }
     if (element == QStyle::PE_FrameFocusRect) {
+        const QAbstractItemView *itemView =
+            qobject_cast<const QAbstractItemView *>(widget);
+        if (!itemView && widget) {
+            itemView = qobject_cast<const QAbstractItemView *>(
+                widget->parentWidget());
+        }
+        if (itemView &&
+            itemView->property("_ngstdComboBoxPopupView").toBool()) {
+            return;
+        }
         if (paintFocusFrame(option, painter, widget)) return;
     }
     if (element == QStyle::PE_IndicatorCheckBox ||
@@ -1101,13 +1261,14 @@ void NextgisProxyStyle::drawControl(ControlElement element,
                 painter->drawRoundedRect(rowRectangle, radius, radius);
                 painter->restore();
             }
-            const QColor textColor = DesignTokens::color(
-                selected ? ColorRole::Link : ColorRole::Text, scheme);
+            const QColor textColor =
+                DesignTokens::color(ColorRole::Text, scheme);
             styledOption.palette.setColor(QPalette::Text, textColor);
             styledOption.palette.setColor(QPalette::HighlightedText,
                                           textColor);
             styledOption.state &= ~(QStyle::State_Selected |
-                                    QStyle::State_MouseOver);
+                                    QStyle::State_MouseOver |
+                                    QStyle::State_HasFocus);
             QProxyStyle::drawControl(element, &styledOption, painter, widget);
             if ((selected || hovered) && styledOption.index.isValid() &&
                 styledOption.index.model()->hasChildren(styledOption.index)) {
@@ -1142,6 +1303,44 @@ void NextgisProxyStyle::drawControl(ControlElement element,
                 paintArrow(painter, arrowRectangle, textColor, false,
                            rotation);
             }
+            return;
+        }
+        const QListView *listView = qobject_cast<const QListView *>(widget);
+        if (!listView && widget)
+            listView = qobject_cast<const QListView *>(widget->parentWidget());
+        if (itemOption && listView &&
+            (listView->property("_ngstdStrongSelection").toBool() ||
+             listView->property("_ngstdComboBoxPopupView").toBool())) {
+            QStyleOptionViewItem styledOption(*itemOption);
+            const bool selected =
+                styledOption.state & QStyle::State_Selected;
+            const bool hovered = styledOption.state & QStyle::State_MouseOver;
+            const ColorScheme scheme = internal::colorSchemeFor(listView);
+            if (selected || hovered) {
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setPen(Qt::NoPen);
+                painter->setBrush(DesignTokens::color(
+                    ColorRole::SurfaceBrand, scheme));
+                painter->drawRoundedRect(
+                    QRectF(styledOption.rect).adjusted(1.0, 1.0, -1.0, -1.0),
+                    DesignTokens::radius(RadiusRole::Field),
+                    DesignTokens::radius(RadiusRole::Field));
+                painter->restore();
+            }
+            const QColor textColor = DesignTokens::color(
+                selected ? ColorRole::Text : ColorRole::TextSecondary,
+                scheme);
+            styledOption.palette.setColor(QPalette::Text, textColor);
+            styledOption.palette.setColor(QPalette::HighlightedText,
+                                          textColor);
+            styledOption.font = DesignTokens::font(TypographyRole::BodySmall);
+            styledOption.font.setWeight(selected ? QFont::DemiBold
+                                                 : QFont::Normal);
+            styledOption.state &= ~(QStyle::State_Selected |
+                                    QStyle::State_MouseOver |
+                                    QStyle::State_HasFocus);
+            QProxyStyle::drawControl(element, &styledOption, painter, widget);
             return;
         }
     }
@@ -1216,10 +1415,18 @@ void NextgisProxyStyle::drawControl(ControlElement element,
                                 ? ColorRole::LinkHover
                                 : ColorRole::TextMuted;
             const QColor textColor = DesignTokens::color(textRole, scheme);
+            const QFont tabFont = DesignTokens::font(
+                styledOption.state & QStyle::State_Selected
+                    ? TypographyRole::Control
+                    : TypographyRole::BodySmall);
+            styledOption.fontMetrics = QFontMetrics(tabFont);
             styledOption.palette.setColor(QPalette::WindowText, textColor);
             styledOption.palette.setColor(QPalette::ButtonText, textColor);
             styledOption.palette.setColor(QPalette::Text, textColor);
+            painter->save();
+            painter->setFont(tabFont);
             QProxyStyle::drawControl(element, &styledOption, painter, widget);
+            painter->restore();
             return;
         }
     }

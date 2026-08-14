@@ -177,7 +177,10 @@ class StyleResourceBuilder:
                 failures.extend(self._check_output(output_path, content))
                 continue
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(content, encoding="utf-8")
+            with output_path.open(
+                "w", encoding="utf-8", newline="\n"
+            ) as output_file:
+                output_file.write(content)
 
         if failures:
             sys.stderr.write("\n".join(failures) + "\n")
@@ -317,6 +320,7 @@ class StyleResourceBuilder:
         trial = self.tokens["product"]["trial"]
         toolbox = self.tokens["product"]["toolbox"][theme]
         reference = self.tokens["product"]["reference"]
+        asset = self.tokens["product"]["asset"]
         values: Dict[str, Any] = {
             **theme_colors,
             **shared_colors,
@@ -573,6 +577,8 @@ class StyleResourceBuilder:
             "referenceSemanticHover": reference["semanticHover"],
             "referenceToastSurface": reference["toastSurface"],
             "referenceToastText": reference["toastText"],
+            "assetPreviewLight": asset["previewLight"],
+            "assetPreviewDark": asset["previewDark"],
             "panelRadius": radius["panel"],
             "qtBodySize": qt_scale["body"]["sizePx"],
             "qtBodyWeight": qt_scale["body"]["weight"],
@@ -589,18 +595,31 @@ class StyleResourceBuilder:
             "typeBodyLargeWeight": typography["scale"]["bodyLarge"]["weight"],
             "typeBodySize": typography["scale"]["body"]["sizePx"],
             "typeBodyWeight": typography["scale"]["body"]["weight"],
+            "typeBodySmallSize": typography["scale"]["bodySmall"]["sizePx"],
+            "typeBodySmallWeight": typography["scale"]["bodySmall"]["weight"],
             "typeCaptionSize": typography["scale"]["caption"]["sizePx"],
             "typeCaptionWeight": typography["scale"]["caption"]["weight"],
             "typeControlSize": typography["scale"]["control"]["sizePx"],
             "typeControlWeight": typography["scale"]["control"]["weight"],
-            "typeDisplaySize": typography["scale"]["display"]["sizePx"],
-            "typeDisplayWeight": typography["scale"]["display"]["weight"],
+            "typeTitleSize": typography["scale"]["title"]["sizePx"],
+            "typeTitleWeight": typography["scale"]["title"]["weight"],
             "typeHeading1Size": typography["scale"]["h1"]["sizePx"],
             "typeHeading1Weight": typography["scale"]["h1"]["weight"],
+            "typeHeading1SubtitleSize": typography["scale"]["h1Subtitle"][
+                "sizePx"
+            ],
+            "typeHeading1SubtitleWeight": typography["scale"]["h1Subtitle"][
+                "weight"
+            ],
+            "typeHeading1SubtitleLineHeight": typography["scale"][
+                "h1Subtitle"
+            ]["lineHeightPx"],
             "typeHeading2Size": typography["scale"]["h2"]["sizePx"],
             "typeHeading2Weight": typography["scale"]["h2"]["weight"],
             "typeHeading3Size": typography["scale"]["h3"]["sizePx"],
             "typeHeading3Weight": typography["scale"]["h3"]["weight"],
+            "typeHeading4Size": typography["scale"]["h4"]["sizePx"],
+            "typeHeading4Weight": typography["scale"]["h4"]["weight"],
             "space2": spacing["2"],
             "space3": spacing["3"],
             "space4": spacing["4"],

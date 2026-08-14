@@ -392,11 +392,16 @@ private:
     bool capture(const QString &name, QWidget *widget,
                  const QSize &size = QSize()) const
     {
-        QScopedPointer<QWidget> owner(widget);
+        QScopedPointer<QWidget> owner(new QWidget);
+        owner->setAttribute(Qt::WA_DontShowOnScreen, true);
+        widget->setParent(owner.data());
+        widget->move(0, 0);
         if (size.isValid())
             widget->resize(size);
         else
             widget->adjustSize();
+        owner->resize(widget->size().expandedTo(QSize(1, 1)));
+        owner->show();
         widget->show();
         QApplication::sendPostedEvents();
         QApplication::processEvents();
@@ -419,11 +424,16 @@ private:
         const QString &name, QWidget *widget, const QSize &size,
         const std::function<bool(QWidget *)> &prepare) const
     {
-        QScopedPointer<QWidget> owner(widget);
+        QScopedPointer<QWidget> owner(new QWidget);
+        owner->setAttribute(Qt::WA_DontShowOnScreen, true);
+        widget->setParent(owner.data());
+        widget->move(0, 0);
         if (size.isValid())
             widget->resize(size);
         else
             widget->adjustSize();
+        owner->resize(widget->size().expandedTo(QSize(1, 1)));
+        owner->show();
         widget->show();
         QApplication::sendPostedEvents();
         QApplication::processEvents();
@@ -735,25 +745,28 @@ private:
 
     bool captureKeyboardFocusFrame() const
     {
-        QWidget *panel = new QWidget;
-        QVBoxLayout *layout = new QVBoxLayout(panel);
+        QScopedPointer<QWidget> panel(new QWidget);
+        QVBoxLayout *layout = new QVBoxLayout(panel.data());
         layout->setContentsMargins(24, 18, 24, 18);
         Button *button = new Button(QStringLiteral("Keyboard focus"));
         button->setObjectName(QStringLiteral("focusTarget"));
         layout->addWidget(button);
-        return capturePrepared(
-            QStringLiteral("button-keyboard-focus"), panel, QSize(220, 80),
-            [](QWidget *widget) {
-                Button *focusTarget =
-                    widget->findChild<Button *>(QStringLiteral("focusTarget"));
-                if (!focusTarget) return false;
-                focusTarget->setFocus(Qt::TabFocusReason);
-                QApplication::processEvents();
-                QFocusFrame *focusFrame = widget->findChild<QFocusFrame *>(
-                    QStringLiteral("_ngstdKeyboardFocusFrame"));
-                return focusFrame && focusFrame->isVisible() &&
-                       focusFrame->widget() == focusTarget;
-            });
+        panel->resize(220, 80);
+        panel->show();
+        QApplication::sendPostedEvents();
+        QApplication::processEvents();
+        QWidget *focusedWidget = QApplication::focusWidget();
+        if (focusedWidget) focusedWidget->clearFocus();
+        QApplication::processEvents();
+        button->setFocus(Qt::TabFocusReason);
+        QApplication::processEvents();
+        QFocusFrame *focusFrame = panel->findChild<QFocusFrame *>(
+            QStringLiteral("_ngstdKeyboardFocusFrame"));
+        if (!focusFrame || !focusFrame->isVisible() ||
+            focusFrame->widget() != button) {
+            return false;
+        }
+        return save(QStringLiteral("button-keyboard-focus"), panel.data());
     }
 
     bool captureSpinBoxHover() const

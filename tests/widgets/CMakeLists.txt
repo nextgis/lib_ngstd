@@ -4,6 +4,34 @@ else()
     find_package(Qt5 5.15 REQUIRED COMPONENTS Test Widgets)
 endif()
 
+function(ngstd_import_static_qt_plugins target_name)
+    if(
+        NGSTD_WIDGETS_QT_PACKAGE STREQUAL "Qt6"
+        AND WIN32
+        AND NOT QT6_IS_SHARED_LIBS_BUILD
+    )
+        target_sources(
+            ${target_name}
+            PRIVATE static_qt_plugins.cpp
+        )
+        target_link_libraries(
+            ${target_name}
+            PRIVATE
+                Qt6::QWindowsIntegrationPlugin
+                Qt6::QWindowsVistaStylePlugin
+        )
+    endif()
+endfunction()
+
+set(ngstd_widgets_test_platform "offscreen")
+if(
+    NGSTD_WIDGETS_QT_PACKAGE STREQUAL "Qt6"
+    AND WIN32
+    AND NOT QT6_IS_SHARED_LIBS_BUILD
+)
+    set(ngstd_widgets_test_platform "windows")
+endif()
+
 function(ngstd_add_widget_test test_name source_file)
     add_executable(${test_name} ${source_file})
     set_target_properties(
@@ -28,6 +56,7 @@ function(ngstd_add_widget_test test_name source_file)
             ${NGSTD_WIDGETS_QT_PACKAGE}::Test
             ${NGSTD_WIDGETS_QT_PACKAGE}::Widgets
     )
+    ngstd_import_static_qt_plugins(${test_name})
     if(WIN32)
         add_test(
             NAME ${test_name}
@@ -41,8 +70,12 @@ function(ngstd_add_widget_test test_name source_file)
     endif()
     set_tests_properties(
         ${test_name}
-        PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+        PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=${ngstd_widgets_test_platform}"
     )
+    if(ngstd_widgets_test_platform STREQUAL "windows")
+        set_tests_properties(${test_name} PROPERTIES RUN_SERIAL TRUE)
+    endif()
 endfunction()
 
 ngstd_add_widget_test(
@@ -80,6 +113,7 @@ if(NGSTD_WIDGETS_QT_PACKAGE STREQUAL "Qt6")
             ngstd_widgets_build_options
             ${NGSTD_WIDGETS_QT_PACKAGE}::Widgets
     )
+    ngstd_import_static_qt_plugins(ngstd_widgets_visual_harness)
 
     add_executable(ngstd_widgets_visual_compare visual_compare.cpp)
     set_target_properties(
@@ -124,9 +158,16 @@ if(NGSTD_WIDGETS_QT_PACKAGE STREQUAL "Qt6")
     set_tests_properties(
         ngstd_widgets_capture_qt6_canonical
         PROPERTIES
-            ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_SCALE_FACTOR=1"
+            ENVIRONMENT
+                "QT_QPA_PLATFORM=${ngstd_widgets_test_platform};QT_SCALE_FACTOR=1"
             LABELS "widgets;visual;canonical"
     )
+    if(ngstd_widgets_test_platform STREQUAL "windows")
+        set_tests_properties(
+            ngstd_widgets_capture_qt6_canonical
+            PROPERTIES RUN_SERIAL TRUE
+        )
+    endif()
 
     set(widget_visual_baselines
         button
@@ -211,6 +252,10 @@ if(NOT NGSTD_WIDGETS_ENABLE_SANITIZERS)
             ${CMAKE_COMMAND}
             -DNGSTD_BUILD_DIRECTORY=${CMAKE_BINARY_DIR}
             -DNGSTD_SOURCE_DIRECTORY=${CMAKE_CURRENT_SOURCE_DIR}
+            -DNGSTD_QT_PACKAGE_NAME=${NGSTD_WIDGETS_QT_PACKAGE}
+            -DNGSTD_QT_PACKAGE_DIRECTORY=${${NGSTD_WIDGETS_QT_PACKAGE}_DIR}
+            "-DNGSTD_CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+            -DNGSTD_CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
             -P ${CMAKE_CURRENT_SOURCE_DIR}/run_install_consumer.cmake
     )
 endif()

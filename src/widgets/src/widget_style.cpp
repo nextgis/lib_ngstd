@@ -7,9 +7,68 @@
 #include <ngstd/widgets/design_tokens.h>
 
 #include <QAbstractButton>
+#include <QAbstractScrollArea>
+#include <QBoxLayout>
+#include <QFrame>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLayout>
 #include <QStyle>
 #include <QVariant>
+#include <QVBoxLayout>
 #include <QWidget>
+
+namespace {
+
+int nearestSpacingToken(int value)
+{
+    if (value <= 0) return 0;
+
+    int nearest = ngstd::widgets::DesignTokens::spacing(1);
+    int distance = qAbs(value - nearest);
+    for (int level = 2; level <= 10; ++level) {
+        const int candidate = ngstd::widgets::DesignTokens::spacing(level);
+        const int candidateDistance = qAbs(value - candidate);
+        if (candidateDistance < distance) {
+            nearest = candidate;
+            distance = candidateDistance;
+        }
+    }
+    return nearest;
+}
+
+int tokenSpacingOrInherited(int value)
+{
+    return value < 0 ? value : nearestSpacingToken(value);
+}
+
+void normalizeLayoutSpacing(QLayout *layout)
+{
+    if (!layout) return;
+
+    int left = 0;
+    int top = 0;
+    int right = 0;
+    int bottom = 0;
+    layout->getContentsMargins(&left, &top, &right, &bottom);
+    layout->setContentsMargins(nearestSpacingToken(left),
+                               nearestSpacingToken(top),
+                               nearestSpacingToken(right),
+                               nearestSpacingToken(bottom));
+
+    if (QGridLayout *grid = qobject_cast<QGridLayout *>(layout)) {
+        const int horizontalSpacing = grid->horizontalSpacing();
+        const int verticalSpacing = grid->verticalSpacing();
+        grid->setHorizontalSpacing(
+            tokenSpacingOrInherited(horizontalSpacing));
+        grid->setVerticalSpacing(
+            tokenSpacingOrInherited(verticalSpacing));
+        return;
+    }
+    layout->setSpacing(tokenSpacingOrInherited(layout->spacing()));
+}
+
+} // namespace
 
 namespace ngstd {
 namespace widgets {
@@ -57,9 +116,23 @@ SemanticTone WidgetStyle::tone(const QWidget *widget)
     return SemanticTone::Neutral;
 }
 
+void WidgetStyle::setNoticeTone(QWidget *widget, SemanticTone tone)
+{
+    if (!widget) return;
+    if (QFrame *frame = qobject_cast<QFrame *>(widget))
+        frame->setFrameShape(QFrame::NoFrame);
+    widget->setProperty("_ngstdRole", QStringLiteral("notice"));
+    widget->setAttribute(Qt::WA_StyledBackground, true);
+    setTone(widget, tone);
+}
+
 void WidgetStyle::setCardVariant(QWidget *widget, CardVariant variant)
 {
     if (!widget) return;
+    if (QFrame *frame = qobject_cast<QFrame *>(widget))
+        frame->setFrameShape(QFrame::NoFrame);
+    widget->setProperty("_ngstdRole", QStringLiteral("card"));
+    widget->setAttribute(Qt::WA_StyledBackground, true);
     const QString name = cardVariantName(variant);
     widget->setProperty("ngstdCardVariant",
                         name.isEmpty() ? QVariant() : QVariant(name));
@@ -71,7 +144,7 @@ CardVariant WidgetStyle::cardVariant(const QWidget *widget)
     if (!widget) return CardVariant::Default;
     const QString name = widget->property("ngstdCardVariant").toString();
     for (int value = static_cast<int>(CardVariant::Default);
-         value <= static_cast<int>(CardVariant::Selectable); ++value) {
+         value <= static_cast<int>(CardVariant::SurfaceMuted); ++value) {
         const CardVariant variant = static_cast<CardVariant>(value);
         if (cardVariantName(variant) == name) return variant;
     }
@@ -82,6 +155,8 @@ void WidgetStyle::setPageBackgroundVariant(QWidget *widget,
                                            PageBackgroundVariant variant)
 {
     if (!widget) return;
+    widget->setProperty("_ngstdRole", QStringLiteral("pageBackground"));
+    widget->setAttribute(Qt::WA_StyledBackground, true);
     widget->setProperty("ngstdPageBackgroundVariant",
                         pageBackgroundVariantName(variant));
     refresh(widget);
@@ -122,6 +197,94 @@ void WidgetStyle::setTypographyRole(QWidget *widget, TypographyRole role)
     widget->setProperty("ngstdTypographyRole", typographyRoleName(role));
     widget->setFont(DesignTokens::font(role));
     refresh(widget);
+}
+
+void WidgetStyle::setTextColorRole(QWidget *widget, ColorRole role)
+{
+    if (!widget) return;
+    widget->setProperty("ngstdTextColorRole", textColorRoleName(role));
+    refresh(widget);
+}
+
+void WidgetStyle::setSoftDivider(QWidget *widget)
+{
+    if (!widget) return;
+    widget->setProperty("_ngstdRole", QStringLiteral("softDivider"));
+    if (QFrame *frame = qobject_cast<QFrame *>(widget))
+        frame->setFrameShape(QFrame::NoFrame);
+    widget->setFixedHeight(1);
+    refresh(widget);
+}
+
+void WidgetStyle::setDivider(QWidget *widget)
+{
+    if (!widget) return;
+    if (QFrame *frame = qobject_cast<QFrame *>(widget))
+        frame->setFrameShape(QFrame::NoFrame);
+    widget->setProperty("_ngstdRole", QStringLiteral("divider"));
+    widget->setAttribute(Qt::WA_StyledBackground, true);
+    refresh(widget);
+}
+
+void WidgetStyle::setEmbeddedSurface(QWidget *surface)
+{
+    if (!surface) return;
+    surface->setProperty("ngstdSurfaceMode", QStringLiteral("embedded"));
+    if (QFrame *frame = qobject_cast<QFrame *>(surface))
+        frame->setFrameShape(QFrame::NoFrame);
+    surface->setAutoFillBackground(false);
+    QAbstractScrollArea *scrollArea =
+        qobject_cast<QAbstractScrollArea *>(surface);
+    if (scrollArea && scrollArea->viewport()) {
+        QWidget *viewport = scrollArea->viewport();
+        viewport->setProperty("ngstdSurfaceMode",
+                              QStringLiteral("embeddedViewport"));
+        viewport->setAutoFillBackground(false);
+        refresh(viewport);
+    }
+    refresh(surface);
+}
+
+void WidgetStyle::applyWizardPageLayout(QWidget *page)
+{
+    if (!page || !page->layout()) return;
+
+    const QList<QLayout *> layouts = page->findChildren<QLayout *>();
+    for (QLayout *layout : layouts) normalizeLayoutSpacing(layout);
+    normalizeLayoutSpacing(page->layout());
+
+    const int margin = DesignTokens::componentMetric(
+        ComponentMetric::WizardPageMargin);
+    page->layout()->setContentsMargins(margin, margin, margin, margin);
+    page->layout()->setSpacing(DesignTokens::componentMetric(
+        ComponentMetric::WizardPageSpacing));
+}
+
+void WidgetStyle::applyWizardPageHeader(QLabel *title, QLabel *subtitle)
+{
+    if (!title || !subtitle) return;
+    setTypographyRole(title, TypographyRole::Heading2);
+    setTypographyRole(subtitle, TypographyRole::Heading1Subtitle);
+    if (title->property("_ngstdWizardPageHeaderGrouped").toBool()) return;
+    if (title->parentWidget() != subtitle->parentWidget()) return;
+
+    QBoxLayout *parentLayout = qobject_cast<QBoxLayout *>(
+        title->parentWidget() ? title->parentWidget()->layout() : nullptr);
+    if (!parentLayout) return;
+    const int titleIndex = parentLayout->indexOf(title);
+    const int subtitleIndex = parentLayout->indexOf(subtitle);
+    if (titleIndex < 0 || subtitleIndex != titleIndex + 1) return;
+
+    parentLayout->removeWidget(title);
+    parentLayout->removeWidget(subtitle);
+    QVBoxLayout *headerLayout = new QVBoxLayout;
+    headerLayout->setContentsMargins(0, 0, 0, 0);
+    headerLayout->setSpacing(DesignTokens::componentMetric(
+        ComponentMetric::WizardTitleBottomSpacing));
+    headerLayout->addWidget(title);
+    headerLayout->addWidget(subtitle);
+    parentLayout->insertLayout(titleIndex, headerLayout);
+    title->setProperty("_ngstdWizardPageHeaderGrouped", true);
 }
 
 void WidgetStyle::refresh(QWidget *widget)
@@ -214,6 +377,10 @@ QString WidgetStyle::cardVariantName(CardVariant variant)
         return QStringLiteral("panel");
     case CardVariant::Selectable:
         return QStringLiteral("selectable");
+    case CardVariant::SurfaceBrand:
+        return QStringLiteral("surfaceBrand");
+    case CardVariant::SurfaceMuted:
+        return QStringLiteral("surfaceMuted");
     }
     return QString();
 }
@@ -240,19 +407,25 @@ QString WidgetStyle::pageBackgroundVariantName(PageBackgroundVariant variant)
 QString WidgetStyle::typographyRoleName(TypographyRole role)
 {
     switch (role) {
-    case TypographyRole::Display:
-        return QStringLiteral("display");
+    case TypographyRole::Title:
+        return QStringLiteral("title");
     case TypographyRole::Heading1:
         return QStringLiteral("heading1");
+    case TypographyRole::Heading1Subtitle:
+        return QStringLiteral("heading1Subtitle");
     case TypographyRole::Heading2:
         return QStringLiteral("heading2");
     case TypographyRole::Heading3:
         return QStringLiteral("heading3");
+    case TypographyRole::Heading4:
+        return QStringLiteral("heading4");
     case TypographyRole::BodyLarge:
         return QStringLiteral("bodyLarge");
     case TypographyRole::Body:
     case TypographyRole::QtBody:
         return QStringLiteral("body");
+    case TypographyRole::BodySmall:
+        return QStringLiteral("bodySmall");
     case TypographyRole::Control:
         return QStringLiteral("control");
     case TypographyRole::Caption:
@@ -265,6 +438,22 @@ QString WidgetStyle::typographyRoleName(TypographyRole role)
         return QStringLiteral("heading2");
     }
     return QStringLiteral("body");
+}
+
+QString WidgetStyle::textColorRoleName(ColorRole role)
+{
+    switch (role) {
+    case ColorRole::Text:
+        return QStringLiteral("text");
+    case ColorRole::TextSecondary:
+        return QStringLiteral("secondary");
+    case ColorRole::TextMuted:
+        return QStringLiteral("muted");
+    case ColorRole::TextDisabled:
+        return QStringLiteral("disabled");
+    default:
+        return QString();
+    }
 }
 
 } // namespace widgets

@@ -5,11 +5,14 @@
 #include <ngstd/widgets/design_tokens.h>
 #include <ngstd/widgets/disclosure.h>
 #include <ngstd/widgets/expandable_section.h>
+#include <ngstd/widgets/icons.h>
 #include <ngstd/widgets/motion_adapter.h>
+#include <ngstd/widgets/navigation_components.h>
 #include <ngstd/widgets/page_background.h>
 #include <ngstd/widgets/theme.h>
 #include <ngstd/widgets/theme_switch.h>
 #include <ngstd/widgets/view_components.h>
+#include <ngstd/widgets/widget_style.h>
 
 #include <QAbstractAnimation>
 #include <QAccessible>
@@ -21,6 +24,7 @@
 #include <QEvent>
 #include <QGraphicsDropShadowEffect>
 #include <QHeaderView>
+#include <QHBoxLayout>
 #include <QImage>
 #include <QLabel>
 #include <QListView>
@@ -28,8 +32,9 @@
 #include <QPixmap>
 #include <QPointer>
 #include <QProxyStyle>
-#include <QSignalSpy>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSignalSpy>
 #include <QTest>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -95,11 +100,15 @@ class ComponentsTest final : public QObject
     Q_OBJECT
 
 private slots:
+    void iconLabelUsesThemeTokens();
+    void buttonPaintsPublishedLogoRole();
+    void buttonSupportsLeadingAndTrailingIcons();
     void cardOwnershipIsSymmetric();
     void cardButtonUsesNativeButtonSemantics();
     void cardButtonOnlySelectableVariantToggles();
     void cardButtonReservesLeadingIndicatorSpace();
     void cardButtonAlignsSelectionIndicatorWithTitle();
+    void cardButtonOwnsAnimatedExpandedBody();
     void cardButtonUsesTokenStateColors();
     void cardButtonUsesDarkToolboxDecoration();
     void cardButtonAnimatesStateColors();
@@ -112,10 +121,15 @@ private slots:
     void pageBackgroundAppliesVariantDefaults();
     void pageBackgroundExposesCornerMode();
     void motionAdapterUsesTypedTokensAndPolicy();
+    void navigationComponentsOwnOneLogicalBoundary();
+    void embeddedSurfaceOwnsNoNestedFrame();
+    void wizardPageLayoutUsesDesignTokens();
     void searchFieldUsesLeadingAction();
     void buttonAnimatesVisualStates();
     void primaryButtonTransitionNeverExposesWhiteBackground();
     void disabledButtonIgnoresHoverMotion();
+    void iconButtonRemainsSquareInStretchingLayouts();
+    void secondaryIconOnlyButtonUsesSquareToken();
     void iconButtonKeepsPressedIconVisible();
     void promotionalButtonsAnimateLikeReference();
     void dataButtonUsesRippleMotion();
@@ -125,6 +139,8 @@ private slots:
     void loadingButtonSeparatesSpinnerFromText();
     void loadingButtonExposesBusyState();
     void comboBoxPopupFitsAllVisibleRows();
+    void comboBoxSecondClickClosesPopup();
+    void comboBoxSizeHintFitsLongestItem();
     void spinnerUsesElapsedTime();
     void spinnerRunsWithSystemPolicy();
     void spinnerHonorsReducedMotion();
@@ -134,6 +150,95 @@ private slots:
     void themeSwitchSupportsKeyboardSelection();
     void themeSwitchUsesPulseMotion();
 };
+
+void ComponentsTest::iconLabelUsesThemeTokens()
+{
+    IconLabel emptyLabel;
+    QVERIFY(!emptyLabel.hasIconRole());
+    QVERIFY(emptyLabel.pixmap(Qt::ReturnByValue).isNull());
+    QCOMPARE(emptyLabel.sizeHint(), QSize(DesignTokens::controlIconSize(),
+                                          DesignTokens::controlIconSize()));
+
+    IconLabel label(IconRole::HardDrive);
+    QCOMPARE(label.iconRole(), IconRole::HardDrive);
+    QVERIFY(label.hasIconRole());
+    QCOMPARE(label.colorRole(), ColorRole::TextSecondary);
+    QCOMPARE(label.iconSize(), DesignTokens::controlIconSize());
+    QCOMPARE(label.sizeHint(), QSize(DesignTokens::controlIconSize(),
+                                     DesignTokens::controlIconSize()));
+    QVERIFY(!label.pixmap(Qt::ReturnByValue).isNull());
+
+    label.setIconSize(DesignTokens::spacing(6));
+    QCOMPARE(label.iconSize(), DesignTokens::spacing(6));
+    QCOMPARE(label.sizeHint(),
+             QSize(DesignTokens::spacing(6), DesignTokens::spacing(6)));
+    label.resetIconSize();
+    QCOMPARE(label.iconSize(), DesignTokens::controlIconSize());
+    label.clearIconRole();
+    QVERIFY(!label.hasIconRole());
+    QVERIFY(label.pixmap(Qt::ReturnByValue).isNull());
+    QCOMPARE(label.sizeHint(), QSize(DesignTokens::controlIconSize(),
+                                     DesignTokens::controlIconSize()));
+}
+
+void ComponentsTest::buttonPaintsPublishedLogoRole()
+{
+    Button button;
+    button.setVariant(ButtonVariant::Ghost);
+    button.setLogoRole(LogoRole::Horizontal, QSize(142, 20));
+    button.resize(button.sizeHint());
+
+    QVERIFY(button.hasLogoRole());
+    QCOMPARE(button.logoRole(), LogoRole::Horizontal);
+    QCOMPARE(button.logoSize(), QSize(142, 20));
+    QVERIFY(button.minimumSizeHint().width() >= 158);
+
+    const QImage image = button.grab().toImage();
+    int logoColorPixels = 0;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            const QColor pixel = image.pixelColor(x, y);
+            if (pixel.alpha() > 0 &&
+                (pixel.lightness() < 128 || pixel.blue() > pixel.red() + 32)) {
+                ++logoColorPixels;
+            }
+        }
+    }
+    QVERIFY(logoColorPixels > 100);
+
+    button.clearLogoRole();
+    QVERIFY(!button.hasLogoRole());
+}
+
+void ComponentsTest::buttonSupportsLeadingAndTrailingIcons()
+{
+    ButtonPaintRecorder style;
+    Button button(QStringLiteral("Next"));
+    button.setStyle(&style);
+    button.setIconRole(IconRole::ChevronRight);
+    button.setIconPlacement(ButtonIconPlacement::Trailing);
+    button.resize(button.sizeHint());
+    button.show();
+    QPixmap image(button.size());
+    image.fill(Qt::transparent);
+    button.render(&image);
+
+    QCOMPARE(button.iconPlacement(), ButtonIconPlacement::Trailing);
+    QVERIFY(style.labelPixmapPainted);
+    QVERIFY(style.labelPixmapRectangle.left() >
+            style.labelTextRectangle.right());
+
+    style.labelPixmapPainted = false;
+    button.setIconRole(IconRole::ChevronLeft);
+    button.resetIconPlacement();
+    image.fill(Qt::transparent);
+    button.render(&image);
+
+    QCOMPARE(button.iconPlacement(), ButtonIconPlacement::Leading);
+    QVERIFY(style.labelPixmapPainted);
+    QVERIFY(style.labelPixmapRectangle.right() <
+            style.labelTextRectangle.left());
+}
 
 void ComponentsTest::cardOwnershipIsSymmetric()
 {
@@ -177,8 +282,23 @@ void ComponentsTest::cardButtonUsesNativeButtonSemantics()
     QAccessibleInterface *interface =
         QAccessible::queryAccessibleInterface(&second);
     QVERIFY(interface);
+    QCOMPARE(interface->role(), QAccessible::RadioButton);
+    QCOMPARE(interface->text(QAccessible::Value), QStringLiteral("checked"));
     QVERIFY(interface->state().checkable);
     QVERIFY(interface->state().checked);
+    auto *actions = static_cast<QAccessibleActionInterface *>(
+        interface->interface_cast(QAccessible::ActionInterface));
+    QVERIFY(actions);
+    actions->doAction(QAccessibleActionInterface::toggleAction());
+    QVERIFY(second.isChecked());
+
+    group.setExclusive(false);
+    first.setAutoExclusive(false);
+    second.setAutoExclusive(false);
+    QCOMPARE(interface->role(), QAccessible::CheckBox);
+    actions->doAction(QAccessibleActionInterface::toggleAction());
+    QVERIFY(!second.isChecked());
+    QCOMPARE(interface->text(QAccessible::Value), QStringLiteral("unchecked"));
 }
 
 void ComponentsTest::cardButtonOnlySelectableVariantToggles()
@@ -246,9 +366,15 @@ void ComponentsTest::cardButtonAlignsSelectionIndicatorWithTitle()
         card.setAutoExclusive(radio);
         card.setChecked(true);
         card.setProperty("_ngstdColorScheme", QStringLiteral("light"));
-        QLabel *title = new QLabel(QStringLiteral("Title"));
+        QWidget *titleHost = new QWidget;
+        QVBoxLayout *titleLayout = new QVBoxLayout(titleHost);
+        titleLayout->setContentsMargins(0, 0, 0, 0);
+        QLabel *title = new QLabel(QStringLiteral("Title"), titleHost);
         title->setFixedHeight(24);
-        card.setTopWidget(title);
+        titleLayout->addWidget(title);
+        card.setTopWidget(titleHost);
+        card.setSelectionIndicatorAnchor(title);
+        QCOMPARE(card.selectionIndicatorAnchor(), title);
         QWidget *body = new QWidget;
         body->setMinimumHeight(72);
         card.setBodyWidget(body);
@@ -256,21 +382,117 @@ void ComponentsTest::cardButtonAlignsSelectionIndicatorWithTitle()
         card.resize(240, 144);
         card.show();
         QCoreApplication::processEvents();
-        QCOMPARE(body->geometry().top() - title->geometry().bottom() - 1,
+        QCOMPARE(body->geometry().top() - titleHost->geometry().bottom() - 1,
                  card.contentLayout()->spacing());
 
         QPixmap pixmap(card.size());
         pixmap.fill(Qt::transparent);
         card.render(&pixmap);
         const QImage image = pixmap.toImage();
+        const QPoint titleOrigin = title->mapTo(&card, QPoint(0, 0));
         const QPoint titleCenter(indicatorCenterX,
-                                 title->geometry().center().y());
+                                 titleOrigin.y() + title->height() / 2);
         const QPoint cardCenter(indicatorCenterX, card.height() / 2);
         QVERIFY(containsColor(image, titleCenter, indicatorColor));
         QVERIFY(!containsColor(image, cardCenter, indicatorColor));
     };
     verifyAlignment(false);
     verifyAlignment(true);
+}
+
+void ComponentsTest::cardButtonOwnsAnimatedExpandedBody()
+{
+    QWidget host;
+    QVBoxLayout hostLayout(&host);
+    CardButton card;
+    hostLayout.addWidget(&card, 0, Qt::AlignTop);
+    card.setProperty("_ngstdAnimationPolicy", QStringLiteral("disabled"));
+    QWidget *body = new QWidget;
+    QWidget *expandedBody = new QWidget;
+    body->setFixedHeight(40);
+    expandedBody->setFixedHeight(80);
+    QSignalSpy expandedSpy(&card, &CardButton::expandedChanged);
+
+    card.setBodyWidget(body);
+    card.setExpandedBodyWidget(expandedBody);
+    QCOMPARE(card.expandedBodyWidget(), expandedBody);
+    QVERIFY(card.isAncestorOf(expandedBody));
+    QVERIFY(!card.isExpanded());
+    host.resize(320, 300);
+    host.show();
+    QApplication::processEvents();
+    const int collapsedHeight = card.height();
+    const int collapsedSizeHintHeight = card.sizeHint().height();
+    const int collapsedMaximumHeight = card.maximumHeight();
+    card.setExpanded(true);
+    QApplication::processEvents();
+    QVERIFY(card.isExpanded());
+    QVERIFY(card.height() > collapsedHeight);
+    QVERIFY(card.sizeHint().height() > collapsedSizeHintHeight);
+    QCOMPARE(card.maximumHeight(), collapsedMaximumHeight);
+    const QRect expandedRectangle(expandedBody->mapTo(&card, QPoint(0, 0)),
+                                  expandedBody->size());
+    QVERIFY(card.rect().contains(expandedRectangle));
+    QCOMPARE(expandedSpy.count(), 1);
+    card.collapse();
+    QVERIFY(!card.isExpanded());
+    QCOMPARE(card.sizeHint().height(), collapsedSizeHintHeight);
+    QCOMPARE(card.maximumHeight(), collapsedMaximumHeight);
+    QCOMPARE(expandedSpy.count(), 2);
+
+    QWidget *replacementBody = new QWidget;
+    card.setBodyWidget(replacementBody);
+    QCOMPARE(card.bodyWidget(), replacementBody);
+    QCOMPARE(card.contentLayout()->indexOf(replacementBody), 0);
+    QWidget *expandedBodyReveal =
+        card.findChild<QWidget *>(QStringLiteral("_ngstdCardExpandedBody"));
+    QVERIFY(expandedBodyReveal);
+    QVERIFY(card.contentLayout()->indexOf(expandedBodyReveal) > 0);
+
+    QCOMPARE(card.takeExpandedBodyWidget(), expandedBody);
+    QVERIFY(!expandedBody->parent());
+    delete expandedBody;
+
+    QScrollArea scrollArea;
+    scrollArea.setWidgetResizable(true);
+    QWidget *scrollContent = new QWidget;
+    scrollContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QVBoxLayout *scrollContentLayout = new QVBoxLayout(scrollContent);
+    scrollContentLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+    CardButton *scrollCard = new CardButton;
+    scrollCard->setProperty("_ngstdAnimationPolicy",
+                            QStringLiteral("enabled"));
+    QWidget *scrollCardHeader = new QWidget;
+    QWidget *scrollCardBody = new QWidget;
+    scrollCardHeader->setFixedHeight(40);
+    scrollCardBody->setFixedHeight(220);
+    scrollCard->setTopWidget(scrollCardHeader);
+    scrollCard->setExpandedBodyWidget(scrollCardBody);
+    QCOMPARE(scrollCard->sizePolicy().verticalPolicy(), QSizePolicy::Minimum);
+    scrollContentLayout->addWidget(scrollCard);
+    QWidget *followingContent = new QWidget;
+    followingContent->setFixedHeight(150);
+    scrollContentLayout->addWidget(followingContent);
+    scrollContentLayout->addStretch();
+    scrollArea.setWidget(scrollContent);
+    scrollArea.resize(320, 300);
+    scrollArea.show();
+    QApplication::processEvents();
+
+    scrollCard->setExpanded(true);
+    RevealWidget *scrollReveal = scrollCard->findChild<RevealWidget *>(
+        QStringLiteral("_ngstdCardExpandedBody"));
+    QVERIFY(scrollReveal);
+    QTRY_VERIFY_WITH_TIMEOUT(
+        qFuzzyCompare(scrollReveal->revealProgress(), 1.0), 1000);
+    const QRect scrollBodyRectangle(
+        scrollCardBody->mapTo(scrollCard, QPoint(0, 0)),
+        scrollCardBody->size());
+    QVERIFY(scrollCard->rect().contains(scrollBodyRectangle));
+    QCOMPARE(scrollContentLayout->indexOf(scrollCard), 0);
+    QVERIFY(followingContent->geometry().top() >
+            scrollCard->geometry().bottom());
+    QVERIFY(scrollArea.verticalScrollBar()->maximum() > 0);
 }
 
 void ComponentsTest::cardButtonUsesTokenStateColors()
@@ -557,15 +779,13 @@ void ComponentsTest::expandableSectionOwnsInteractionAndLayout()
     content->setFixedHeight(32);
     section.contentLayout()->addWidget(content);
     const QMargins margins = section.contentLayout()->contentsMargins();
-    QCOMPARE(
-        margins.left(),
-        DesignTokens::componentMetric(
-            ComponentMetric::ExpandableSectionContentPaddingHorizontal));
+    QCOMPARE(margins.left(),
+             DesignTokens::componentMetric(
+                 ComponentMetric::ExpandableSectionContentPaddingHorizontal));
     QCOMPARE(margins.left(), margins.right());
-    QCOMPARE(
-        margins.bottom(),
-        DesignTokens::componentMetric(
-            ComponentMetric::ExpandableSectionContentPaddingBottom));
+    QCOMPARE(margins.bottom(),
+             DesignTokens::componentMetric(
+                 ComponentMetric::ExpandableSectionContentPaddingBottom));
 
     QSignalSpy expandedSpy(&section, &ExpandableSection::expandedChanged);
     section.setExpanded(true);
@@ -592,9 +812,8 @@ void ComponentsTest::expandableSectionOwnsInteractionAndLayout()
              QStringLiteral("Components. Reusable controls and patterns."));
     QEvent enterEvent(QEvent::Enter);
     QApplication::sendEvent(header, &enterEvent);
-    QVariantAnimation *hoverAnimation =
-        section.findChild<QVariantAnimation *>(
-            QStringLiteral("_ngstdExpandableSectionHoverAnimation"));
+    QVariantAnimation *hoverAnimation = section.findChild<QVariantAnimation *>(
+        QStringLiteral("_ngstdExpandableSectionHoverAnimation"));
     QVERIFY(hoverAnimation);
     QCOMPARE(hoverAnimation->duration(),
              DesignTokens::duration(MotionDuration::Fast));
@@ -649,8 +868,7 @@ void ComponentsTest::motionAdapterUsesTypedTokensAndPolicy()
     QVariantAnimation animation;
     context.setProperty("_ngstdAnimationPolicy", QStringLiteral("enabled"));
     QVERIFY(MotionAdapter::configure(
-        &animation, &context,
-        {MotionDuration::Normal, MotionEasing::Enter}));
+        &animation, &context, {MotionDuration::Normal, MotionEasing::Enter}));
     QCOMPARE(animation.duration(),
              DesignTokens::duration(MotionDuration::Normal));
     QCOMPARE(animation.easingCurve(),
@@ -658,11 +876,101 @@ void ComponentsTest::motionAdapterUsesTypedTokensAndPolicy()
 
     context.setProperty("_ngstdAnimationPolicy", QStringLiteral("disabled"));
     QVERIFY(!MotionAdapter::configure(
-        &animation, &context,
-        {MotionDuration::Slow, MotionEasing::Exit}));
+        &animation, &context, {MotionDuration::Slow, MotionEasing::Exit}));
     QCOMPARE(animation.duration(), 0);
     QCOMPARE(animation.easingCurve(),
              DesignTokens::easingCurve(MotionEasing::Exit));
+}
+
+void ComponentsTest::navigationComponentsOwnOneLogicalBoundary()
+{
+    NavigationPanel panel;
+    panel.resize(48, 32);
+    QCOMPARE(panel.frameShape(), QFrame::NoFrame);
+    QCOMPARE(panel.property("_ngstdRole").toString(),
+             QStringLiteral("navigationPanel"));
+
+    NavigationListWidget *list = new NavigationListWidget(&panel);
+    list->setGeometry(panel.rect().adjusted(0, 0, -1, 0));
+    QCOMPARE(list->frameShape(), QFrame::NoFrame);
+    QCOMPARE(list->property("_ngstdRole").toString(),
+             QStringLiteral("navigationList"));
+    QVERIFY(!list->autoFillBackground());
+    QVERIFY(!list->viewport()->autoFillBackground());
+    QCOMPARE(list->iconSize(),
+             QSize(DesignTokens::componentMetric(
+                       ComponentMetric::WizardSidebarIconExtent),
+                   DesignTokens::componentMetric(
+                       ComponentMetric::WizardSidebarIconExtent)));
+
+    QListWidgetItem *currentItem =
+        new QListWidgetItem(QStringLiteral("Current"), list);
+    list->setStepState(currentItem, NavigationListWidget::StepState::Current);
+    QCOMPARE(list->stepState(currentItem),
+             NavigationListWidget::StepState::Current);
+    QVERIFY(!currentItem->icon().isNull());
+    QCOMPARE(currentItem->foreground().color(),
+             DesignTokens::color(ColorRole::Text, ColorScheme::Light));
+    QCOMPARE(currentItem->font().weight(), QFont::Medium);
+    QCOMPARE(currentItem->sizeHint().height(),
+             DesignTokens::componentMetric(
+                 ComponentMetric::WizardSidebarRowHeight));
+
+    list->setProperty("_ngstdColorScheme", QStringLiteral("dark"));
+    QEvent styleChange(QEvent::StyleChange);
+    QApplication::sendEvent(list, &styleChange);
+    QCOMPARE(currentItem->foreground().color(),
+             DesignTokens::color(ColorRole::Text, ColorScheme::Dark));
+
+    const QColor surface =
+        DesignTokens::color(ColorRole::Surface, ColorScheme::Light);
+    const QColor border =
+        DesignTokens::color(ColorRole::Border, ColorScheme::Light);
+    const QImage leftToRight = panel.grab().toImage();
+    QCOMPARE(leftToRight.pixelColor(0, panel.height() / 2), surface);
+    QCOMPARE(leftToRight.pixelColor(panel.width() - 1, panel.height() / 2),
+             border);
+
+    panel.setLayoutDirection(Qt::RightToLeft);
+    const QImage rightToLeft = panel.grab().toImage();
+    QCOMPARE(rightToLeft.pixelColor(0, panel.height() / 2), border);
+    QCOMPARE(rightToLeft.pixelColor(panel.width() - 1, panel.height() / 2),
+             surface);
+}
+
+void ComponentsTest::embeddedSurfaceOwnsNoNestedFrame()
+{
+    QListView view;
+    view.setFrameShape(QFrame::StyledPanel);
+    view.setAutoFillBackground(true);
+    view.viewport()->setAutoFillBackground(true);
+
+    WidgetStyle::setEmbeddedSurface(&view);
+
+    QCOMPARE(view.frameShape(), QFrame::NoFrame);
+    QCOMPARE(view.property("ngstdSurfaceMode").toString(),
+             QStringLiteral("embedded"));
+    QCOMPARE(view.viewport()->property("ngstdSurfaceMode").toString(),
+             QStringLiteral("embeddedViewport"));
+    QVERIFY(!view.autoFillBackground());
+    QVERIFY(!view.viewport()->autoFillBackground());
+}
+
+void ComponentsTest::wizardPageLayoutUsesDesignTokens()
+{
+    QWidget page;
+    QVBoxLayout *layout = new QVBoxLayout(&page);
+    layout->setContentsMargins(1, 2, 3, 4);
+    layout->setSpacing(5);
+
+    WidgetStyle::applyWizardPageLayout(&page);
+
+    const int margin =
+        DesignTokens::componentMetric(ComponentMetric::WizardPageMargin);
+    QCOMPARE(layout->contentsMargins(),
+             QMargins(margin, margin, margin, margin));
+    QCOMPARE(layout->spacing(), DesignTokens::componentMetric(
+                                    ComponentMetric::WizardPageSpacing));
 }
 
 void ComponentsTest::searchFieldUsesLeadingAction()
@@ -673,6 +981,8 @@ void ComponentsTest::searchFieldUsesLeadingAction()
     field.setText(QStringLiteral("Query"));
     field.setCursorPosition(0);
     field.resize(300, DesignTokens::controlHeight(ControlSize::Medium));
+    QCOMPARE(field.minimumHeight(),
+             DesignTokens::controlHeight(ControlSize::Medium));
     ThemeController *controller = ThemeController::attach(&root);
     QVERIFY(controller);
     root.resize(340, 80);
@@ -856,8 +1166,7 @@ void ComponentsTest::iconButtonKeepsPressedIconVisible()
 
     QTest::mousePress(&button, Qt::LeftButton, Qt::NoModifier,
                       button.rect().center());
-    const QImage iconImage =
-        button.icon().pixmap(button.iconSize()).toImage();
+    const QImage iconImage = button.icon().pixmap(button.iconSize()).toImage();
     const QColor expected =
         DesignTokens::color(ColorRole::BrandActive, ColorScheme::Light);
     bool containsExpectedColor = false;
@@ -870,11 +1179,11 @@ void ComponentsTest::iconButtonKeepsPressedIconVisible()
                 qAbs(pixel.red() - expected.red()) +
                 qAbs(pixel.green() - expected.green()) +
                 qAbs(pixel.blue() - expected.blue());
-            containsExpectedColor = containsExpectedColor ||
-                                    expectedDistance < 24;
-            containsWhite = containsWhite ||
-                            (pixel.red() > 245 && pixel.green() > 245 &&
-                             pixel.blue() > 245);
+            containsExpectedColor =
+                containsExpectedColor || expectedDistance < 24;
+            containsWhite =
+                containsWhite || (pixel.red() > 245 && pixel.green() > 245 &&
+                                  pixel.blue() > 245);
         }
     }
     QVERIFY(containsExpectedColor);
@@ -882,6 +1191,60 @@ void ComponentsTest::iconButtonKeepsPressedIconVisible()
     QTest::mouseRelease(&button, Qt::LeftButton, Qt::NoModifier,
                         button.rect().center());
     controller->detach();
+}
+
+void ComponentsTest::iconButtonRemainsSquareInStretchingLayouts()
+{
+    QWidget root;
+    QHBoxLayout layout(&root);
+    Button button;
+    const QSizePolicy regularPolicy = button.sizePolicy();
+    button.setVariant(ButtonVariant::Icon);
+    button.setIconRole(IconRole::Folder);
+    layout.addWidget(&button, 1);
+    root.resize(320, 80);
+    root.show();
+    QCoreApplication::processEvents();
+
+    const int extent = DesignTokens::controlHeight(ControlSize::Medium);
+    QCOMPARE(button.sizeHint(), QSize(extent, extent));
+    QCOMPARE(button.minimumSizeHint(), QSize(extent, extent));
+    QCOMPARE(button.size(), QSize(extent, extent));
+    QCOMPARE(button.sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
+    QCOMPARE(button.sizePolicy().verticalPolicy(), QSizePolicy::Fixed);
+
+    button.setVariant(ButtonVariant::Secondary);
+    QCOMPARE(button.sizePolicy(), regularPolicy);
+}
+
+void ComponentsTest::secondaryIconOnlyButtonUsesSquareToken()
+{
+    Button button(QStringLiteral("Show formats"));
+    QSignalSpy iconOnlySpy(&button, &Button::iconOnlyChanged);
+
+    button.setVariant(ButtonVariant::Secondary);
+    button.setIconRole(IconRole::ChevronDown);
+    button.setIconOnly(true);
+
+    const int extent = DesignTokens::controlHeight(ControlSize::Medium);
+    QCOMPARE(button.iconOnly(), true);
+    QCOMPARE(button.property("ngstdIconOnly").toBool(), true);
+    QCOMPARE(button.sizeHint(), QSize(extent, extent));
+    QCOMPARE(button.minimumSizeHint(), QSize(extent, extent));
+    QCOMPARE(button.sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
+    QCOMPARE(button.sizePolicy().verticalPolicy(), QSizePolicy::Fixed);
+    QCOMPARE(button.iconRole(), IconRole::ChevronDown);
+    QVERIFY(!iconPixmap(IconRole::ChevronDown).isNull());
+    QVERIFY(!iconPixmap(IconRole::ChevronUp).isNull());
+
+    button.setIconRole(IconRole::ChevronUp);
+    QCOMPARE(button.iconRole(), IconRole::ChevronUp);
+    button.setIconOnly(false);
+    QCOMPARE(button.iconOnly(), false);
+    QCOMPARE(button.property("ngstdIconOnly").toBool(), false);
+    QVERIFY(button.sizePolicy().horizontalPolicy() != QSizePolicy::Fixed);
+    QCOMPARE(button.sizePolicy().verticalPolicy(), QSizePolicy::Fixed);
+    QCOMPARE(iconOnlySpy.count(), 2);
 }
 
 void ComponentsTest::loadingButtonPreservesIcon()
@@ -951,11 +1314,9 @@ void ComponentsTest::dataButtonUsesRippleMotion()
     button.setProperty("_ngstdAnimationPolicy", QStringLiteral("enabled"));
     button.resize(180, 48);
     button.show();
-    QTest::mousePress(&button, Qt::LeftButton, Qt::NoModifier,
-                      QPoint(40, 24));
-    QVariantAnimation *rippleAnimation =
-        button.findChild<QVariantAnimation *>(
-            QStringLiteral("_ngstdButtonRippleAnimation"));
+    QTest::mousePress(&button, Qt::LeftButton, Qt::NoModifier, QPoint(40, 24));
+    QVariantAnimation *rippleAnimation = button.findChild<QVariantAnimation *>(
+        QStringLiteral("_ngstdButtonRippleAnimation"));
     QVariantAnimation *opacityAnimation =
         button.findChild<QVariantAnimation *>(
             QStringLiteral("_ngstdButtonRippleOpacityAnimation"));
@@ -1075,8 +1436,8 @@ void ComponentsTest::comboBoxPopupFitsAllVisibleRows()
     comboBox.showPopup();
     QCoreApplication::processEvents();
 
-    QFrame *popup = comboBox.findChild<QFrame *>(
-        QStringLiteral("_ngstdComboBoxPopup"));
+    QFrame *popup =
+        comboBox.findChild<QFrame *>(QStringLiteral("_ngstdComboBoxPopup"));
     QListView *view = comboBox.findChild<QListView *>(
         QStringLiteral("_ngstdComboBoxPopupView"));
     QVERIFY(popup);
@@ -1105,6 +1466,43 @@ void ComponentsTest::comboBoxPopupFitsAllVisibleRows()
             comboBox.mapToGlobal(QPoint(0, comboBox.height())).y());
     comboBox.hidePopup();
     controller->detach();
+}
+
+void ComponentsTest::comboBoxSecondClickClosesPopup()
+{
+    QWidget root;
+    root.resize(360, 220);
+    ComboBox comboBox(&root);
+    comboBox.setGeometry(32, 24, 260, 42);
+    comboBox.addItems({QStringLiteral("LTS"), QStringLiteral("Release")});
+    ThemeOptions options;
+    options.setAnimationPolicy(AnimationPolicy::Disabled);
+    ThemeController *controller = ThemeController::attach(&root, options);
+    QVERIFY(controller);
+    root.show();
+    QCoreApplication::processEvents();
+
+    QTest::mouseClick(&comboBox, Qt::LeftButton);
+    QFrame *popup =
+        comboBox.findChild<QFrame *>(QStringLiteral("_ngstdComboBoxPopup"));
+    QVERIFY(popup);
+    QTRY_VERIFY(popup->isVisible());
+    QTest::mouseClick(&comboBox, Qt::LeftButton);
+    QTRY_VERIFY(!popup->isVisible());
+    controller->detach();
+}
+
+void ComponentsTest::comboBoxSizeHintFitsLongestItem()
+{
+    ComboBox comboBox;
+    const QString longest =
+        QStringLiteral("Use the system language and regional settings");
+    comboBox.addItems({QStringLiteral("English"), longest});
+    const int chrome =
+        DesignTokens::componentMetric(ComponentMetric::ComboBoxDropDownWidth) +
+        DesignTokens::spacing(3) * 2;
+    QVERIFY(comboBox.sizeHint().width() >=
+            comboBox.fontMetrics().horizontalAdvance(longest) + chrome);
 }
 
 void ComponentsTest::spinnerUsesElapsedTime()
@@ -1176,10 +1574,9 @@ void ComponentsTest::tableCellContentFitsHost()
         4, QHeaderView::ResizeToContents);
     Button *actionButton = nullptr;
     for (int row = 0; row < table.rowCount(); ++row) {
-        table.setCellContent(
-            row, 0,
-            new QLabel(row == 0 ? QStringLiteral("districts")
-                                : QStringLiteral("roads")));
+        table.setCellContent(row, 0,
+                             new QLabel(row == 0 ? QStringLiteral("districts")
+                                                 : QStringLiteral("roads")));
         QCheckBox *enabled = new QCheckBox;
         enabled->setChecked(row == 0);
         table.setCellContent(row, 1, enabled, Qt::AlignCenter);
@@ -1224,8 +1621,7 @@ void ComponentsTest::tableCellContentFitsHost()
             .toUtf8();
     QVERIFY2(available.contains(actionButton->geometry()),
              geometryMessage.constData());
-    QVERIFY(actionButton->width() >=
-            actionButton->minimumSizeHint().width());
+    QVERIFY(actionButton->width() >= actionButton->minimumSizeHint().width());
     QVERIFY(actionButton->height() >=
             actionButton->minimumSizeHint().height());
     QVERIFY(actionButton->geometry().bottom() < host->rect().bottom());
@@ -1267,9 +1663,8 @@ void ComponentsTest::themeSwitchUsesPulseMotion()
     themeSwitch.setThemeMode(ThemeMode::System);
     themeSwitch.show();
     themeSwitch.setThemeMode(ThemeMode::Light);
-    QVariantAnimation *animation =
-        themeSwitch.findChild<QVariantAnimation *>(
-            QStringLiteral("_ngstdThemeSwitchAnimation"));
+    QVariantAnimation *animation = themeSwitch.findChild<QVariantAnimation *>(
+        QStringLiteral("_ngstdThemeSwitchAnimation"));
     QVERIFY(animation);
     QCOMPARE(animation->duration(),
              DesignTokens::duration(MotionDuration::Normal));

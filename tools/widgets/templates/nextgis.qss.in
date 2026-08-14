@@ -1,4 +1,4 @@
-/* Generated NextGIS UI Style Reference for Qt 5.15, {{theme}} theme. */
+/* Generated NextGIS UI Style Reference for Qt Widgets, {{theme}} theme. */
 
 QWidget {
     color: {{text}};
@@ -9,6 +9,12 @@ QWidget {
 
 QLabel {
     background: transparent;
+}
+
+QLabel:disabled,
+QCheckBox:disabled,
+QRadioButton:disabled {
+    color: {{textDisabled}};
 }
 
 QToolButton {
@@ -567,6 +573,21 @@ QWidget[_ngstdRole="card"][ngstdCardVariant="panel"] {
     border-radius: {{panelRadius}}px;
 }
 
+QFrame[_ngstdRole="card"][ngstdCardVariant="background"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="background"] {
+    background: {{background}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="surfaceBrand"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="surfaceBrand"] {
+    background: {{surfaceBrand}};
+}
+
+QFrame[_ngstdRole="card"][ngstdCardVariant="surfaceMuted"],
+QWidget[_ngstdRole="card"][ngstdCardVariant="surfaceMuted"] {
+    background: {{surfaceMuted}};
+}
+
 QFrame[_ngstdRole="card"][ngstdSelected="true"],
 QWidget[_ngstdRole="card"][ngstdSelected="true"] {
     background: {{surfaceBrand}};
@@ -736,12 +757,12 @@ QLabel[_ngstdRole="heading2"] {
     font-weight: {{qtHeading2Weight}};
 }
 
-QLabel[ngstdTypographyRole="display"] {
+QLabel[ngstdTypographyRole="title"] {
     background: transparent;
     color: {{text}};
     font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
-    font-size: {{typeDisplaySize}}px;
-    font-weight: {{typeDisplayWeight}};
+    font-size: {{typeTitleSize}}px;
+    font-weight: {{typeTitleWeight}};
 }
 
 QLabel[ngstdTypographyRole="heading1"] {
@@ -750,6 +771,15 @@ QLabel[ngstdTypographyRole="heading1"] {
     font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
     font-size: {{typeHeading1Size}}px;
     font-weight: {{typeHeading1Weight}};
+}
+
+QLabel[ngstdTypographyRole="heading1Subtitle"] {
+    min-height: {{typeHeading1SubtitleLineHeight}}px;
+    background: transparent;
+    color: {{textSecondary}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeHeading1SubtitleSize}}px;
+    font-weight: {{typeHeading1SubtitleWeight}};
 }
 
 QLabel[ngstdTypographyRole="heading2"] {
@@ -776,6 +806,22 @@ QLabel[ngstdTypographyRole="bodyLarge"] {
     font-weight: {{typeBodyLargeWeight}};
 }
 
+QLabel[ngstdTypographyRole="heading4"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtHeadingFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeHeading4Size}}px;
+    font-weight: {{typeHeading4Weight}};
+}
+
+QLabel[ngstdTypographyRole="bodySmall"] {
+    background: transparent;
+    color: {{text}};
+    font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
+    font-size: {{typeBodySmallSize}}px;
+    font-weight: {{typeBodySmallWeight}};
+}
+
 QLabel[ngstdTypographyRole="body"] {
     background: transparent;
     color: {{text}};
@@ -790,6 +836,22 @@ QLabel[ngstdTypographyRole="control"] {
     font-family: "{{qtBodyFamily}}", "Segoe UI", sans-serif;
     font-size: {{typeControlSize}}px;
     font-weight: {{typeControlWeight}};
+}
+
+QLabel[ngstdTextColorRole="text"] {
+    color: {{text}};
+}
+
+QLabel[ngstdTextColorRole="secondary"] {
+    color: {{textSecondary}};
+}
+
+QLabel[ngstdTextColorRole="muted"] {
+    color: {{textMuted}};
+}
+
+QLabel[ngstdTextColorRole="disabled"] {
+    color: {{textDisabled}};
 }
 
 QLabel[ngstdTypographyRole="caption"] {
@@ -807,6 +869,11 @@ QWidget[ngstdTypographyRole="mono"] {
     font-family: "{{qtMonoFamily}}", "Consolas", monospace;
     font-size: {{qtMonoSize}}px;
     font-weight: {{qtMonoWeight}};
+}
+
+QLabel[ngstdTypographyRole]:disabled,
+QLabel[ngstdTextColorRole]:disabled {
+    color: {{textDisabled}};
 }
 
 QLabel[_ngstdRole="muted"] {
@@ -1176,10 +1243,11 @@ QPushButton:checked:pressed {
 }
 
 QToolButton[_ngstdRole="iconButton"],
-QPushButton[ngstdButtonVariant="icon"] {
-    min-width: {{controlHeightMedium}}px;
-    max-width: {{controlHeightMedium}}px;
-    min-height: {{controlContentHeightMedium}}px;
+QPushButton[ngstdButtonVariant="icon"],
+QPushButton[ngstdIconOnly="true"] {
+    min-width: {{controlContentHeightMedium}}px;
+    max-width: {{controlContentHeightMedium}}px;
+    min-height: {{controlHeightMedium}}px;
     max-height: {{controlHeightMedium}}px;
     padding: 0;
     border-radius: {{buttonRadius}}px;
@@ -1304,6 +1372,10 @@ QPlainTextEdit[ngstdError="true"] {
     background: {{dangerSoft}};
 }
 
+QLabel[ngstdError="true"] {
+    color: {{danger}};
+}
+
 QTextEdit:disabled,
 QPlainTextEdit:disabled {
     border-color: {{border}};
@@ -1319,6 +1391,7 @@ QComboBox QAbstractItemView {
     outline: 0;
     selection-background-color: transparent;
     selection-color: {{text}};
+    font-size: {{typeBodySmallSize}}px;
 }
 
 QComboBox QAbstractItemView::item {
@@ -1335,18 +1408,18 @@ QComboBox QAbstractItemView::item:disabled {
 
 QComboBox QAbstractItemView::item:hover {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
 }
 
 QComboBox QAbstractItemView::item:selected {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
     font-weight: 500;
 }
 
 QComboBox QAbstractItemView::item:selected:hover {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
 }
 
 QComboBoxPrivateContainer {
@@ -1369,6 +1442,26 @@ QAbstractItemView {
     outline: 0;
     selection-background-color: {{brandSoft}};
     selection-color: {{link}};
+}
+
+QAbstractScrollArea[ngstdSurfaceMode="embedded"] {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+QWidget[ngstdSurfaceMode="embeddedViewport"] {
+    border: 0;
+    background: transparent;
+}
+
+QListWidget[_ngstdRole="navigationList"] {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    alternate-background-color: transparent;
 }
 
 QListView {
@@ -1502,6 +1595,7 @@ QAbstractItemView[_ngstdComboBoxPopupView="true"] {
     selection-background-color: transparent;
     selection-color: {{text}};
     padding: 0;
+    font-size: {{typeBodySmallSize}}px;
 }
 
 QAbstractItemView[_ngstdComboBoxPopupView="true"]::item {
@@ -1518,18 +1612,18 @@ QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:disabled {
 
 QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:hover {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
 }
 
 QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
     font-weight: 500;
 }
 
 QAbstractItemView[_ngstdComboBoxPopupView="true"]::item:selected:hover {
     background: {{surfaceBrand}};
-    color: {{link}};
+    color: {{text}};
 }
 
 QFrame[_ngstdRole="notice"] {
@@ -1539,6 +1633,11 @@ QFrame[_ngstdRole="notice"] {
     border-radius: {{buttonRadius}}px;
     background: {{surfaceBrand}};
     color: {{textSecondary}};
+}
+
+QFrame[_ngstdRole="notice"][_ngstdPaintedNotice="true"] {
+    border: 0;
+    background: transparent;
 }
 
 QFrame[_ngstdRole="notice"][ngstdTone="success"] {
@@ -1571,13 +1670,20 @@ QProgressBar::chunk {
 }
 
 QWizard[_ngstdRole="wizard"] {
-    background-color: {{surface}};
-    border-color: {{border}};
+    background-color: {{background}};
+    border: 0;
+}
+
+QWidget[nextGisShellArea="root"],
+QWidget[nextGisShellArea="sidebar"],
+QFrame[nextGisShellArea="sidebar"] {
+    background-color: {{background}};
+    color: {{text}};
 }
 
 QWizard QWidget[_ngstdRole="wizardPage"],
 QWizard QWidget[_ngstdRole="wizardPageStack"] {
-    background-color: {{pageSoft}};
+    background-color: {{surfaceBrand}};
     color: {{text}};
 }
 
@@ -1586,8 +1692,12 @@ QWizard QFrame {
 }
 
 QWizardPage {
-    background-color: {{pageSoft}};
+    background-color: {{surfaceBrand}};
     color: {{text}};
+}
+
+QWizardPage[_ngstdTransparentWizardPage="true"] {
+    background: transparent;
 }
 
 QWizardPage QLabel {
@@ -1597,6 +1707,20 @@ QWizardPage QLabel {
 QWizard QPushButton,
 QDialogButtonBox QPushButton {
     min-width: {{wizardButtonMinimumWidth}}px;
+}
+
+QWizard QPushButton[ngstdButtonVariant="text"],
+QDialogButtonBox QPushButton[ngstdButtonVariant="text"] {
+    min-width: 0;
+}
+
+QWizard QPushButton[ngstdButtonVariant="icon"],
+QWizard QPushButton[ngstdIconOnly="true"],
+QDialogButtonBox QPushButton[ngstdButtonVariant="icon"],
+QDialogButtonBox QPushButton[ngstdIconOnly="true"] {
+    min-width: {{controlContentHeightMedium}}px;
+    max-width: {{controlContentHeightMedium}}px;
+    padding: 0;
 }
 
 QWizard QLabel,
@@ -1611,7 +1735,7 @@ QWidget[_ngstdRole="wizardHeader"] {
 }
 
 QWidget[_ngstdRole="wizardNavigation"] {
-    background-color: {{surface}};
+    background-color: {{background}};
     border: 0;
     border-top: 1px solid {{border}};
 }
@@ -1621,6 +1745,20 @@ QFrame[_ngstdRole="wizardRuler"] {
     max-height: 1px;
     border: 0;
     background: {{border}};
+}
+
+QFrame[_ngstdRole="divider"] {
+    min-height: 1px;
+    max-height: 1px;
+    border: 0;
+    background: {{border}};
+}
+
+QFrame[_ngstdRole="softDivider"] {
+    min-height: 1px;
+    max-height: 1px;
+    border: 0;
+    background: {{surfaceMuted}};
 }
 
 QFrame[_ngstdRole="assetCard"] {
@@ -1634,11 +1772,11 @@ QFrame[_ngstdRole="assetPreview"] {
     border-bottom: 1px solid {{border}};
     border-top-left-radius: {{cardRadius}}px;
     border-top-right-radius: {{cardRadius}}px;
-    background: #F6F8FA;
+    background: {{assetPreviewLight}};
 }
 
 QFrame[_ngstdRole="assetPreview"][dark="true"] {
-    background: #1B2A38;
+    background: {{assetPreviewDark}};
 }
 
 QFrame[_ngstdRole="assetPreview"][adaptive="true"] {
@@ -1667,16 +1805,16 @@ QLabel[_ngstdRole="tokenRowValue"] {
 
 QPlainTextEdit[_ngstdRole="codeBlock"] {
     padding: 18px;
-    border: 1px solid #2A3A49;
+    border: 1px solid {{borderStrong}};
     border-radius: {{cardRadius}}px;
-    background: #0F1822;
-    color: #D8E2EA;
+    background: {{codeBackground}};
+    color: {{codeText}};
     font-family: "NextGIS Roboto Mono", monospace;
     font-size: 13px;
 }
 
 QDialogButtonBox {
-    min-height: {{controlContentHeightMedium}}px;
+    min-height: {{controlHeightMedium}}px;
     background: transparent;
 }
 

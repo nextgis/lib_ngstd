@@ -12,9 +12,11 @@
 #include <ngstd/widgets/icons.h>
 
 #include <QAbstractButton>
+#include <QCheckBox>
 #include <QEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QResizeEvent>
 #include <QStyle>
 #include <QVariantAnimation>
 #include <QVBoxLayout>
@@ -44,6 +46,12 @@ public:
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         setFixedHeight(
             sectionMetric(ComponentMetric::ExpandableSectionHeaderHeight));
+        m_selection = new QCheckBox(this);
+        m_selection->setObjectName(
+            QStringLiteral("_ngstdExpandableSectionSelection"));
+        m_selection->setText(QString());
+        m_selection->setCursor(Qt::PointingHandCursor);
+        m_selection->setVisible(false);
         m_hoverAnimation->setObjectName(
             QStringLiteral("_ngstdExpandableSectionHoverAnimation"));
         connect(m_hoverAnimation, &QVariantAnimation::valueChanged, this,
@@ -106,6 +114,19 @@ public:
     qreal chevronProgress() const
     {
         return m_chevronProgress;
+    }
+
+    QCheckBox *selectionControl() const
+    {
+        return m_selection;
+    }
+
+    void setSelectionVisible(bool visible)
+    {
+        if (m_selection->isVisible() == visible) return;
+        m_selection->setVisible(visible);
+        updateSelectionGeometry();
+        update();
     }
 
     void setChevronProgress(qreal progress)
@@ -182,8 +203,13 @@ protected:
             sectionMetric(ComponentMetric::ExpandableSectionIconGlyphSize);
         const int chevronSize =
             sectionMetric(ComponentMetric::ExpandableSectionChevronSize);
+        const int selectionExtent = m_selection->isVisible()
+            ? sectionMetric(ComponentMetric::SelectionIndicatorSize) +
+                  contentSpacing
+            : 0;
         const QRect logicalIconRect(
-            horizontalPadding, (height() - iconSize) / 2, iconSize, iconSize);
+            horizontalPadding + selectionExtent, (height() - iconSize) / 2,
+            iconSize, iconSize);
         const QRect iconRect =
             style()->visualRect(layoutDirection(), rect(), logicalIconRect);
         painter.setPen(Qt::NoPen);
@@ -210,7 +236,8 @@ protected:
             painter.drawText(iconRect, Qt::AlignCenter, m_iconText);
         }
 
-        const int textLeft = horizontalPadding + iconSize + contentSpacing;
+        const int textLeft = horizontalPadding + selectionExtent + iconSize +
+            contentSpacing;
         const int textWidth = qMax(
             0, width() - textLeft - horizontalPadding - chevronSize -
                    contentSpacing);
@@ -233,15 +260,20 @@ protected:
             layoutDirection(), rect(), logicalDescriptionRect);
         const Qt::Alignment alignment = QStyle::visualAlignment(
             layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter);
-        painter.setFont(DesignTokens::font(TypographyRole::Heading2));
+        painter.setFont(DesignTokens::font(TypographyRole::Heading4));
         painter.setPen(DesignTokens::color(
             isEnabled() ? ColorRole::Text : ColorRole::TextDisabled, scheme));
-        painter.drawText(titleRect, alignment, m_title);
-        painter.setFont(DesignTokens::font(TypographyRole::QtBody));
+        painter.drawText(titleRect, alignment,
+                         painter.fontMetrics().elidedText(
+                             m_title, Qt::ElideRight, titleRect.width()));
+        painter.setFont(DesignTokens::font(TypographyRole::BodySmall));
         painter.setPen(DesignTokens::color(
             isEnabled() ? ColorRole::TextMuted : ColorRole::TextDisabled,
             scheme));
-        painter.drawText(descriptionRect, alignment, m_description);
+        painter.drawText(descriptionRect, alignment,
+                         painter.fontMetrics().elidedText(
+                             m_description, Qt::ElideRight,
+                             descriptionRect.width()));
 
         const QRect logicalChevronRect(
             width() - horizontalPadding - chevronSize,
@@ -267,6 +299,12 @@ protected:
         painter.restore();
     }
 
+    void resizeEvent(QResizeEvent *event) override
+    {
+        QAbstractButton::resizeEvent(event);
+        updateSelectionGeometry();
+    }
+
 private:
     void updateAccessibleName()
     {
@@ -276,10 +314,24 @@ private:
                                     .arg(m_title, m_description));
     }
 
+    void updateSelectionGeometry()
+    {
+        if (!m_selection->isVisible()) return;
+        const int size = sectionMetric(
+            ComponentMetric::SelectionIndicatorSize);
+        const int horizontalPadding = sectionMetric(
+            ComponentMetric::ExpandableSectionHeaderPaddingHorizontal);
+        const QRect logicalRectangle(horizontalPadding,
+                                     (height() - size) / 2, size, size);
+        m_selection->setGeometry(style()->visualRect(
+            layoutDirection(), rect(), logicalRectangle));
+    }
+
     QString m_title;
     QString m_description;
     QString m_iconText;
     IconRole m_iconRole = IconRole::Information;
+    QCheckBox *m_selection = nullptr;
     QVariantAnimation *m_hoverAnimation = nullptr;
     qreal m_hoverProgress = 0.0;
     qreal m_chevronProgress = 0.0;
@@ -370,6 +422,8 @@ ExpandableSection::ExpandableSection(const QString &title,
                 update();
                 emit expandedChanged(expanded);
             });
+    connect(d->header->selectionControl(), &QAbstractButton::toggled, this,
+            [this](bool selected) { emit selectedChanged(selected); });
 }
 
 ExpandableSection::~ExpandableSection() = default;
@@ -447,6 +501,28 @@ void ExpandableSection::setExpanded(bool expanded, bool animated)
 void ExpandableSection::collapse()
 {
     setExpanded(false);
+}
+
+bool ExpandableSection::isSelectionVisible() const
+{
+    return d->header->selectionControl()->isVisible();
+}
+
+void ExpandableSection::setSelectionVisible(bool visible)
+{
+    if (isSelectionVisible() == visible) return;
+    d->header->setSelectionVisible(visible);
+    emit selectionVisibleChanged(visible);
+}
+
+bool ExpandableSection::isSelected() const
+{
+    return d->header->selectionControl()->isChecked();
+}
+
+void ExpandableSection::setSelected(bool selected)
+{
+    d->header->selectionControl()->setChecked(selected);
 }
 
 QVBoxLayout *ExpandableSection::contentLayout() const

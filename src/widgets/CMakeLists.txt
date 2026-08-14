@@ -15,6 +15,7 @@ set(NGSTD_WIDGETS_PUBLIC_HEADERS
     include/ngstd/widgets/expandable_section.h
     include/ngstd/widgets/icons.h
     include/ngstd/widgets/motion_adapter.h
+    include/ngstd/widgets/navigation_components.h
     include/ngstd/widgets/page_background.h
     include/ngstd/widgets/proxy_style.h
     include/ngstd/widgets/theme.h
@@ -48,6 +49,7 @@ set(NGSTD_WIDGETS_SOURCES
     src/motion_adapter.cpp
     src/motion_controller.cpp
     src/motion_controller_p.h
+    src/navigation_components.cpp
     src/page_background.cpp
     src/proxy_style.cpp
     src/resources.cpp

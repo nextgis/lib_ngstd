@@ -43,6 +43,9 @@ public:
     void setPopupAlignment(ComboBoxPopupAlignment alignment);
     void resetPopupAlignment();
 
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+
 public slots:
     void hidePopup() override;
     void showPopup() override;
@@ -57,6 +60,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
+    NGSTD_WIDGETS_LOCAL QSize contentAwareSizeHint(const QSize &base) const;
     NGSTD_WIDGETS_LOCAL void animateArrow(qreal target);
     NGSTD_WIDGETS_LOCAL void animatePopup(qreal target, bool hideWhenDone);
 

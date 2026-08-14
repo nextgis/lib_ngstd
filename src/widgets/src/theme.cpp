@@ -17,6 +17,7 @@
 #include <QPalette>
 #include <QPointer>
 #include <QScopedValueRollback>
+#include <QToolTip>
 #include <QVariant>
 #include <QVector>
 #include <QWidget>
@@ -85,6 +86,8 @@ public:
     bool applicationWide = false;
     QPointer<QFocusFrame> focusFrame;
     QMetaObject::Connection rootDestroyedConnection;
+    QPalette originalToolTipPalette;
+    bool toolTipPaletteCaptured = false;
     std::unique_ptr<internal::StateJournal> journal;
     std::vector<std::unique_ptr<internal::WidgetDecorator>> decorators =
         internal::createWidgetDecorators();
@@ -133,6 +136,8 @@ ThemeController::ThemeController(QApplication *application,
     d->manager = manager;
     d->options = options;
     d->applicationWide = true;
+    d->originalToolTipPalette = QToolTip::palette();
+    d->toolTipPaletteCaptured = true;
     manager->registerController(this);
     manager->apply(this);
 }
@@ -232,6 +237,8 @@ void ThemeController::detach()
         QScopedValueRollback<bool> guard(d->manager->m_applying, true);
         d->manager->unregisterController(this);
         d->journal.reset();
+        if (wasApplicationWide && d->toolTipPaletteCaptured)
+            QToolTip::setPalette(d->originalToolTipPalette);
         if (detachedRoot || wasApplicationWide) d->manager->reapplyAll();
     }
     else {
@@ -346,6 +353,7 @@ void ThemeController::applyState()
             animationPolicyName(d->options.animationPolicy()));
         d->application->setPalette(themePalette);
         d->application->setFont(themeFont);
+        QToolTip::setPalette(themePalette);
         const QVector<QPointer<QWidget>> widgets =
             guardedWidgets(d->application->allWidgets());
         for (const QPointer<QWidget> &widget : widgets) {
@@ -392,8 +400,8 @@ void ThemeController::decorateWidget(QWidget *widget)
         !widget->property("_ngstdThemeStyleApplied").toBool()) {
         d->journal->setProperty(
             widget, QByteArrayLiteral("_ngstdThemeStyleApplied"), true);
-        widget->setStyleSheet(combinedStyleSheet(widget->styleSheet(),
-                                                 styleSheet(d->colorScheme)));
+        widget->setStyleSheet(combinedStyleSheet(
+            widget->styleSheet(), styleSheet(d->colorScheme)));
     }
     for (const std::unique_ptr<internal::WidgetDecorator> &decorator :
          d->decorators) {
@@ -414,6 +422,13 @@ void ThemeController::setKeyboardFocus(QWidget *widget, bool focused)
                             focused);
     if (focused) {
         QWidget *frameParent = widget->parentWidget();
+        if (!frameParent) {
+            if (d->focusFrame) {
+                d->focusFrame->setWidget(nullptr);
+                d->focusFrame->hide();
+            }
+            return;
+        }
         if (!d->focusFrame || d->focusFrame->parentWidget() != frameParent) {
             delete d->focusFrame.data();
             d->focusFrame = new QFocusFrame(frameParent);

@@ -29,6 +29,10 @@ adds a section header, description, semantic icon, reveal motion, and a content
 layout for assembling larger corporate screens. Mutable properties provide
 notification signals and resets where a default exists.
 
+`Button::setLogoRole()` renders a published NextGIS logo at an explicit logical
+size, contributes that size and token padding to the button size hint, and
+selects the on-dark logo automatically with the active theme.
+
 Changing `PageBackground::variant` restores the decoration, grid, and gradient
 defaults owned by the new product variant; the individual properties remain
 overridable afterwards. `PageBackgroundCornerMode` exposes square, fully

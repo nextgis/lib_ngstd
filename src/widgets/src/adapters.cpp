@@ -4,6 +4,8 @@
  *****************************************************************************/
 #include <ngstd/widgets/adapters.h>
 
+#include <ngstd/widgets/motion_adapter.h>
+
 #include "component_utils_p.h"
 #include "state_journal_p.h"
 
@@ -14,11 +16,13 @@
 #include <QComboBox>
 #include <QEvent>
 #include <QFrame>
+#include <QGraphicsOpacityEffect>
 #include <QLayout>
 #include <QListView>
 #include <QPointer>
 #include <QTimer>
 #include <QVariant>
+#include <QVariantAnimation>
 #include <QWizard>
 #include <QWizardPage>
 
@@ -55,7 +59,7 @@ QString comboPopupStyleSheet(const QWidget *widget)
         DesignTokens::color(ColorRole::TextDisabled, scheme);
     const QColor selectedSurface =
         DesignTokens::color(ColorRole::SurfaceBrand, scheme);
-    const QColor selectedText = DesignTokens::color(ColorRole::Link, scheme);
+    const QColor selectedText = DesignTokens::color(ColorRole::Text, scheme);
     const int popupRadius = internal::tokenInteger(
         QStringLiteral("desktop.component.comboBox.popupRadiusPx"));
     const int popupBorder = internal::tokenInteger(
@@ -172,14 +176,14 @@ void ComboBoxAdapter::apply()
     d->viewMouseTracking = view->hasMouseTracking();
     d->viewportMouseTracking = view->viewport()->hasMouseTracking();
     d->viewportHover = view->viewport()->testAttribute(Qt::WA_Hover);
+    d->journal->captureWidget(view);
+    d->journal->captureWidget(view->viewport());
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setMouseTracking(true);
     view->viewport()->setMouseTracking(true);
     view->viewport()->setAttribute(Qt::WA_Hover, true);
     d->comboBox->installEventFilter(this);
     view->installEventFilter(this);
-    d->journal->captureWidget(view);
-    d->journal->captureWidget(view->viewport());
     d->journal->setProperty(d->comboBox.data(),
                             QByteArrayLiteral("_ngstdComboBoxAdapter"), true);
     d->journal->setProperty(view, QByteArrayLiteral("_ngstdComboBoxPopupView"),
@@ -239,13 +243,13 @@ void ComboBoxAdapter::refreshPopup(bool position)
         d->viewMouseTracking = view->hasMouseTracking();
         d->viewportMouseTracking = view->viewport()->hasMouseTracking();
         d->viewportHover = view->viewport()->testAttribute(Qt::WA_Hover);
+        d->journal->captureWidget(view);
+        d->journal->captureWidget(view->viewport());
         view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view->setMouseTracking(true);
         view->viewport()->setMouseTracking(true);
         view->viewport()->setAttribute(Qt::WA_Hover, true);
         d->view->installEventFilter(this);
-        d->journal->captureWidget(view);
-        d->journal->captureWidget(view->viewport());
         d->journal->setProperty(
             view, QByteArrayLiteral("_ngstdComboBoxPopupView"), true);
     }
@@ -347,6 +351,10 @@ void ComboBoxAdapter::refreshPopup(bool position)
             child->hide();
         }
     }
+    // Polishing the popup style sheet can replace an item view palette on
+    // Windows. Reapply the semantic palette after the popup is fully styled.
+    view->setPalette(popupPalette);
+    view->viewport()->setPalette(popupPalette);
     view->update();
     popup->update();
 
@@ -369,8 +377,10 @@ void ComboBoxAdapter::detach()
     if (!d->attached) return;
     d->attached = false;
     if (d->comboBox) d->comboBox->removeEventFilter(this);
+    if (d->view) d->view->removeEventFilter(this);
+    if (d->popup) d->popup->removeEventFilter(this);
+    d->journal.reset();
     if (d->view) {
-        d->view->removeEventFilter(this);
         if (d->horizontalScrollBarPolicyCaptured) {
             d->view->setHorizontalScrollBarPolicy(
                 d->horizontalScrollBarPolicy);
@@ -380,7 +390,6 @@ void ComboBoxAdapter::detach()
         d->view->viewport()->setAttribute(Qt::WA_Hover, d->viewportHover);
     }
     if (d->popup) {
-        d->popup->removeEventFilter(this);
         d->popup->setAttribute(Qt::WA_TranslucentBackground,
                                d->popupTranslucent);
         if (d->popupLayoutMarginsCaptured && d->popup->layout()) {
@@ -396,7 +405,6 @@ void ComboBoxAdapter::detach()
         if (state.widget) state.widget->setVisible(state.visible);
     }
     d->scrollers.clear();
-    d->journal.reset();
     emit attachedChanged(false);
 }
 
@@ -407,6 +415,9 @@ public:
     std::unique_ptr<internal::StateJournal> journal;
     QWizard::WizardStyle originalStyle = QWizard::ClassicStyle;
     QMetaObject::Connection pageAddedConnection;
+    QPointer<QVariantAnimation> pageAnimation;
+    QPointer<QWidget> animatedPage;
+    QPointer<QGraphicsOpacityEffect> opacityEffect;
     bool changeWizardStyle = false;
     bool attached = true;
 };
@@ -506,11 +517,79 @@ void WizardAdapter::apply()
     }
 }
 
+void WizardAdapter::animatePageEntrance(QWidget *page)
+{
+    if (!d->attached || !page) return;
+
+    if (d->pageAnimation) {
+        d->pageAnimation->stop();
+        d->pageAnimation->deleteLater();
+    }
+    if (d->animatedPage &&
+        d->animatedPage->graphicsEffect() == d->opacityEffect) {
+        d->animatedPage->setGraphicsEffect(nullptr);
+    }
+
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(page);
+    effect->setOpacity(0.0);
+    page->setGraphicsEffect(effect);
+
+    QVariantAnimation *animation = new QVariantAnimation(this);
+    animation->setObjectName(
+        QStringLiteral("_ngstdWizardPageEntranceAnimation"));
+    animation->setStartValue(0.0);
+    animation->setEndValue(1.0);
+    const MotionSpec motion = {
+        MotionDuration::Normal,
+        MotionEasing::Enter,
+    };
+    if (!MotionAdapter::configure(animation, page, motion)) {
+        page->setGraphicsEffect(nullptr);
+        animation->deleteLater();
+        d->pageAnimation.clear();
+        d->animatedPage.clear();
+        d->opacityEffect.clear();
+        return;
+    }
+
+    d->pageAnimation = animation;
+    d->animatedPage = page;
+    d->opacityEffect = effect;
+    connect(animation, &QVariantAnimation::valueChanged, effect,
+            [effect](const QVariant &value) {
+                effect->setOpacity(value.toReal());
+            });
+    connect(animation, &QVariantAnimation::finished, this,
+            [this, animation]() {
+                if (d->animatedPage &&
+                    d->animatedPage->graphicsEffect() == d->opacityEffect) {
+                    d->animatedPage->setGraphicsEffect(nullptr);
+                }
+                if (d->pageAnimation == animation)
+                    d->pageAnimation.clear();
+                d->animatedPage.clear();
+                d->opacityEffect.clear();
+                animation->deleteLater();
+            });
+    animation->start();
+}
+
 void WizardAdapter::detach()
 {
     if (!d->attached) return;
     d->attached = false;
     QObject::disconnect(d->pageAddedConnection);
+    if (d->pageAnimation) {
+        d->pageAnimation->stop();
+        d->pageAnimation->deleteLater();
+    }
+    if (d->animatedPage &&
+        d->animatedPage->graphicsEffect() == d->opacityEffect) {
+        d->animatedPage->setGraphicsEffect(nullptr);
+    }
+    d->pageAnimation.clear();
+    d->animatedPage.clear();
+    d->opacityEffect.clear();
     d->journal.reset();
     if (d->wizard && d->changeWizardStyle)
         d->wizard->setWizardStyle(d->originalStyle);

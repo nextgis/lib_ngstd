@@ -10,6 +10,8 @@
 #include <QString>
 
 class QAbstractButton;
+class QAbstractScrollArea;
+class QLabel;
 class QWidget;
 
 namespace ngstd {
@@ -24,6 +26,7 @@ public:
 
     static void setTone(QWidget *widget, SemanticTone tone);
     static SemanticTone tone(const QWidget *widget);
+    static void setNoticeTone(QWidget *widget, SemanticTone tone);
 
     static void setCardVariant(QWidget *widget, CardVariant variant);
     static CardVariant cardVariant(const QWidget *widget);
@@ -35,6 +38,12 @@ public:
     static void setError(QWidget *widget, bool error);
     static void setSelected(QWidget *widget, bool selected);
     static void setTypographyRole(QWidget *widget, TypographyRole role);
+    static void setTextColorRole(QWidget *widget, ColorRole role);
+    static void setDivider(QWidget *widget);
+    static void setSoftDivider(QWidget *widget);
+    static void setEmbeddedSurface(QWidget *surface);
+    static void applyWizardPageLayout(QWidget *page);
+    static void applyWizardPageHeader(QLabel *title, QLabel *subtitle);
     static void refresh(QWidget *widget);
     static void refreshVisual(QWidget *widget);
 
@@ -43,6 +52,7 @@ public:
     static QString cardVariantName(CardVariant variant);
     static QString pageBackgroundVariantName(PageBackgroundVariant variant);
     static QString typographyRoleName(TypographyRole role);
+    static QString textColorRoleName(ColorRole role);
 };
 
 } // namespace widgets

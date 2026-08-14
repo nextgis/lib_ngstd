@@ -73,6 +73,12 @@ class NGSTD_WIDGETS_EXPORT CardButton : public QAbstractButton
         WRITE setVariant
         RESET resetVariant
         NOTIFY variantChanged)
+    Q_PROPERTY(
+        bool expanded
+        READ isExpanded
+        WRITE setExpanded
+        RESET collapse
+        NOTIFY expandedChanged)
 
 public:
     explicit CardButton(QWidget *parent = nullptr);
@@ -90,6 +96,16 @@ public:
     void setBodyWidget(QWidget *widget);
     QWidget *takeBodyWidget();
 
+    QWidget *expandedBodyWidget() const;
+    void setExpandedBodyWidget(QWidget *widget);
+    QWidget *takeExpandedBodyWidget();
+    bool isExpanded() const;
+    void setExpanded(bool expanded);
+    void collapse();
+
+    QWidget *selectionIndicatorAnchor() const;
+    void setSelectionIndicatorAnchor(QWidget *widget);
+
     QPixmap backgroundPixmap() const;
     void setBackgroundPixmap(const QPixmap &pixmap);
     void clearBackgroundPixmap();
@@ -99,6 +115,7 @@ public:
 
 signals:
     void variantChanged(ngstd::widgets::CardVariant variant);
+    void expandedChanged(bool expanded);
 
 protected:
     bool event(QEvent *event) override;

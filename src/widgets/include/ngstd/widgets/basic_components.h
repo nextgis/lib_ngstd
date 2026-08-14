@@ -19,9 +19,67 @@ namespace ngstd {
 namespace widgets {
 
 class SearchFieldPrivate;
+class IconLabelPrivate;
 class ToastPrivate;
 class TagPrivate;
 class NoticePrivate;
+
+class NGSTD_WIDGETS_EXPORT IconLabel : public QLabel
+{
+    Q_OBJECT
+    Q_PROPERTY(
+        ngstd::widgets::IconRole iconRole
+        READ iconRole
+        WRITE setIconRole
+        NOTIFY iconRoleChanged)
+    Q_PROPERTY(
+        ngstd::widgets::ColorRole colorRole
+        READ colorRole
+        WRITE setColorRole
+        NOTIFY colorRoleChanged)
+    Q_PROPERTY(bool iconVisible READ hasIconRole NOTIFY iconVisibilityChanged)
+    Q_PROPERTY(
+        int iconSize
+        READ iconSize
+        WRITE setIconSize
+        RESET resetIconSize
+        NOTIFY iconSizeChanged)
+
+public:
+    explicit IconLabel(QWidget *parent = nullptr);
+    explicit IconLabel(IconRole iconRole, QWidget *parent = nullptr);
+    ~IconLabel() override;
+
+    IconRole iconRole() const;
+    bool hasIconRole() const;
+    void setIconRole(IconRole iconRole);
+    void clearIconRole();
+
+    ColorRole colorRole() const;
+    void setColorRole(ColorRole colorRole);
+
+    int iconSize() const;
+    void setIconSize(int iconSize);
+    void resetIconSize();
+
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+
+signals:
+    void iconRoleChanged(ngstd::widgets::IconRole iconRole);
+    void iconVisibilityChanged(bool visible);
+    void colorRoleChanged(ngstd::widgets::ColorRole colorRole);
+    void iconSizeChanged(int iconSize);
+
+protected:
+    void changeEvent(QEvent *event) override;
+
+private:
+    NGSTD_WIDGETS_LOCAL void updateIcon();
+
+    Q_DISABLE_COPY(IconLabel)
+    QScopedPointer<IconLabelPrivate> d;
+};
 
 class NGSTD_WIDGETS_EXPORT SearchField : public QLineEdit
 {
@@ -142,6 +200,7 @@ signals:
 
 protected:
     void changeEvent(QEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     NGSTD_WIDGETS_LOCAL void updateText();

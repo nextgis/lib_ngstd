@@ -59,10 +59,13 @@ void drawButtonLabel(const QStyleOptionButton &option, QPainter *painter,
     const int groupWidth = iconWidth + gap + textWidth;
     const int groupLeft =
         contents.left() + qMax(0, (contents.width() - groupWidth) / 2);
+    const bool trailingIcon =
+        widget && widget->property("_ngstdButtonIconPlacement").toString() ==
+                      QStringLiteral("trailing");
 
     if (hasIcon) {
         const QRect logicalIconRect(
-            groupLeft,
+            trailingIcon ? groupLeft + textWidth + gap : groupLeft,
             contents.top() +
                 (contents.height() - option.iconSize.height()) / 2,
             option.iconSize.width(), option.iconSize.height());
@@ -79,9 +82,9 @@ void drawButtonLabel(const QStyleOptionButton &option, QPainter *painter,
     }
 
     if (hasText) {
-        const QRect logicalTextRect(groupLeft + iconWidth + gap,
-                                    contents.top(), textWidth,
-                                    contents.height());
+        const QRect logicalTextRect(
+            groupLeft + (trailingIcon ? 0 : iconWidth + gap), contents.top(),
+            textWidth, contents.height());
         const QRect textRect =
             style->visualRect(option.direction, contents, logicalTextRect);
         const Qt::Alignment alignment = QStyle::visualAlignment(

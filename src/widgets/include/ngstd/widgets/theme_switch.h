@@ -10,6 +10,7 @@
 #include <QFrame>
 #include <QScopedPointer>
 
+class QEvent;
 class QPaintEvent;
 class QToolButton;
 
@@ -53,12 +54,14 @@ signals:
     void colorSchemeChanged(ngstd::widgets::ColorScheme scheme);
 
 protected:
+    void changeEvent(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
 private:
     NGSTD_WIDGETS_LOCAL static int indexForMode(ThemeMode mode);
     NGSTD_WIDGETS_LOCAL static ThemeMode modeForIndex(int index);
     NGSTD_WIDGETS_LOCAL qreal selectionOpacity(int index) const;
+    NGSTD_WIDGETS_LOCAL void retranslate();
     NGSTD_WIDGETS_LOCAL void updateIcons();
 
     Q_DISABLE_COPY(ThemeSwitch)

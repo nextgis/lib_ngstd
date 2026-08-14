@@ -43,6 +43,12 @@ void TokensTest::providesTypedTokens()
              QFont::Normal);
     QCOMPARE(DesignTokens::typography(TypographyRole::Heading1).weight,
              QFont::Bold);
+    QCOMPARE(DesignTokens::typography(
+                 TypographyRole::Heading1Subtitle).pixelSize,
+             18);
+    QCOMPARE(DesignTokens::typography(
+                 TypographyRole::Heading1Subtitle).lineHeight,
+             24.0);
 }
 
 void TokensTest::registersPublicEnums()

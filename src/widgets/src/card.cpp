@@ -4,10 +4,12 @@
  *****************************************************************************/
 #include <ngstd/widgets/card.h>
 
+#include "accessibility_p.h"
 #include "component_utils_p.h"
 #include "motion_controller_p.h"
 
 #include <ngstd/widgets/design_tokens.h>
+#include <ngstd/widgets/disclosure.h>
 #include <ngstd/widgets/widget_style.h>
 
 #include <QButtonGroup>
@@ -250,6 +252,8 @@ const CardRenderer &rendererFor(CardVariant variant)
     case CardVariant::Default:
     case CardVariant::Media:
     case CardVariant::Selectable:
+    case CardVariant::SurfaceBrand:
+    case CardVariant::SurfaceMuted:
         return surfaceRenderer;
     }
     return surfaceRenderer;
@@ -261,7 +265,9 @@ void replaceWidget(QVBoxLayout *layout, QPointer<QWidget> *current,
     if (*current == replacement) return;
     QWidget *previous = current->data();
     if (previous) {
+        const int previousIndex = layout->indexOf(previous);
         layout->removeWidget(previous);
+        if (previousIndex >= 0 && previousIndex < index) --index;
         previous->deleteLater();
     }
     *current = replacement;
@@ -330,9 +336,12 @@ void paintSelectionIndicator(CardButton *card, qreal selectionProgress,
     const int padding =
         DesignTokens::componentMetric(ComponentMetric::CardContentPadding);
     int centerY = padding + size / 2;
-    QWidget *titleWidget = card->topWidget();
+    QWidget *titleWidget = card->selectionIndicatorAnchor();
+    if (!titleWidget) titleWidget = card->topWidget();
     if (titleWidget && titleWidget->geometry().isValid()) {
-        centerY = titleWidget->geometry().center().y();
+        const QRect titleGeometry(titleWidget->mapTo(card, QPoint(0, 0)),
+                                  titleWidget->size());
+        centerY = titleGeometry.center().y();
     }
     else if (card->contentLayout()->count() > 0) {
         const QRect titleGeometry =
@@ -446,6 +455,43 @@ void paintRipple(CardButton *card, const QPointF &origin, qreal progress,
     painter.drawEllipse(center, fullRadius * scale, fullRadius * scale);
 }
 
+void activateLayoutHierarchy(QWidget *widget, QLayout *contentLayout)
+{
+    if (!widget || !contentLayout) return;
+    contentLayout->invalidate();
+    contentLayout->activate();
+    widget->updateGeometry();
+    QWidget *container = widget->parentWidget();
+    while (container) {
+        if (QLayout *containerLayout = container->layout()) {
+            if (containerLayout->sizeConstraint() ==
+                QLayout::SetMinAndMaxSize) {
+                if (QBoxLayout *boxLayout =
+                        qobject_cast<QBoxLayout *>(containerLayout)) {
+                    const int widgetIndex = boxLayout->indexOf(widget);
+                    if (widgetIndex >= 0) {
+                        const int stretch = boxLayout->stretch(widgetIndex);
+                        const Qt::Alignment alignment =
+                            boxLayout->itemAt(widgetIndex)->alignment();
+                        boxLayout->removeWidget(widget);
+                        boxLayout->insertWidget(widgetIndex, widget, stretch,
+                                                alignment);
+                    }
+                }
+            }
+            containerLayout->invalidate();
+            containerLayout->activate();
+            if (containerLayout->sizeConstraint() ==
+                QLayout::SetMinAndMaxSize) {
+                container->adjustSize();
+                containerLayout->setGeometry(container->rect());
+            }
+        }
+        container->updateGeometry();
+        container = container->parentWidget();
+    }
+}
+
 } // namespace
 
 class CardPrivate final
@@ -554,6 +600,8 @@ public:
     QVBoxLayout *contentLayout = nullptr;
     QPointer<QWidget> topWidget;
     QPointer<QWidget> bodyWidget;
+    QPointer<RevealWidget> expandedBodyReveal;
+    QPointer<QWidget> selectionIndicatorAnchor;
     QPixmap backgroundPixmap;
     QVariantAnimation *interactionAnimation = nullptr;
     QVariantAnimation *selectionAnimation = nullptr;
@@ -570,11 +618,14 @@ public:
     quint64 rippleGeneration = 0;
     bool rippleReleaseScheduled = false;
     CardVariant variant = CardVariant::Selectable;
+    QAccessible::Id accessibleIdentifier = 0;
 };
 
 CardButton::CardButton(QWidget *parent)
     : QAbstractButton(parent), d(new CardButtonPrivate)
 {
+    d->accessibleIdentifier =
+        internal::registerCardButtonAccessibility(this);
     setProperty("_ngstdRole", QStringLiteral("card"));
     setProperty("_ngstdPaintedCard", true);
     setProperty("interactive", true);
@@ -654,7 +705,10 @@ CardButton::CardButton(QWidget *parent)
     });
 }
 
-CardButton::~CardButton() = default;
+CardButton::~CardButton()
+{
+    internal::unregisterAccessibility(d->accessibleIdentifier);
+}
 
 CardVariant CardButton::variant() const
 {
@@ -705,13 +759,87 @@ QWidget *CardButton::bodyWidget() const
 
 void CardButton::setBodyWidget(QWidget *widget)
 {
+    const int insertionIndex =
+        d->expandedBodyReveal
+            ? d->contentLayout->indexOf(d->expandedBodyReveal.data())
+            : d->contentLayout->count();
     replaceWidget(d->contentLayout, &d->bodyWidget, widget,
-                  d->contentLayout->count());
+                  insertionIndex);
 }
 
 QWidget *CardButton::takeBodyWidget()
 {
     return takeWidget(d->contentLayout, &d->bodyWidget);
+}
+
+QWidget *CardButton::expandedBodyWidget() const
+{
+    return d->expandedBodyReveal
+               ? d->expandedBodyReveal->contentWidget()
+               : nullptr;
+}
+
+void CardButton::setExpandedBodyWidget(QWidget *widget)
+{
+    if (expandedBodyWidget() == widget) return;
+    if (!d->expandedBodyReveal) {
+        QSizePolicy expandableSizePolicy = sizePolicy();
+        expandableSizePolicy.setVerticalPolicy(QSizePolicy::Minimum);
+        setSizePolicy(expandableSizePolicy);
+        d->expandedBodyReveal = new RevealWidget(this);
+        d->expandedBodyReveal->setObjectName(
+            QStringLiteral("_ngstdCardExpandedBody"));
+        d->contentLayout->addWidget(d->expandedBodyReveal.data());
+        const auto refreshCardGeometry =
+            [this]() { activateLayoutHierarchy(this, d->contentLayout); };
+        connect(d->expandedBodyReveal.data(),
+                &RevealWidget::expandedChanged, this, refreshCardGeometry);
+        connect(d->expandedBodyReveal.data(), &RevealWidget::expandedChanged,
+                this, &CardButton::expandedChanged);
+        connect(d->expandedBodyReveal.data(),
+                &RevealWidget::revealProgressChanged, this,
+                refreshCardGeometry);
+        connect(d->expandedBodyReveal.data(),
+                &RevealWidget::contentHeightChanged, this,
+                refreshCardGeometry);
+    }
+    d->expandedBodyReveal->setContentWidget(widget);
+}
+
+QWidget *CardButton::takeExpandedBodyWidget()
+{
+    return d->expandedBodyReveal
+               ? d->expandedBodyReveal->takeContentWidget()
+               : nullptr;
+}
+
+bool CardButton::isExpanded() const
+{
+    return d->expandedBodyReveal && d->expandedBodyReveal->isExpanded();
+}
+
+void CardButton::setExpanded(bool expanded)
+{
+    if (!d->expandedBodyReveal) return;
+    d->expandedBodyReveal->setExpanded(expanded);
+}
+
+void CardButton::collapse()
+{
+    setExpanded(false);
+}
+
+QWidget *CardButton::selectionIndicatorAnchor() const
+{
+    return d->selectionIndicatorAnchor.data();
+}
+
+void CardButton::setSelectionIndicatorAnchor(QWidget *widget)
+{
+    if (widget && widget != this && !isAncestorOf(widget)) return;
+    if (d->selectionIndicatorAnchor == widget) return;
+    d->selectionIndicatorAnchor = widget;
+    update();
 }
 
 QPixmap CardButton::backgroundPixmap() const

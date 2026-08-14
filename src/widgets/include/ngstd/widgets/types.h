@@ -135,12 +135,15 @@ Q_ENUM_NS(ControlSize)
 
 enum class TypographyRole : quint8
 {
-    Display,
+    Title,
     Heading1,
+    Heading1Subtitle,
     Heading2,
     Heading3,
+    Heading4,
     BodyLarge,
     Body,
+    BodySmall,
     Control,
     Caption,
     Mono,
@@ -211,6 +214,7 @@ enum class ComponentMetric : quint8
     SelectionFeedbackStrokeWidth,
     TabUnderlineHeight,
     ItemViewRowHeight,
+    CompactItemViewRowHeight,
     ItemViewIndentation,
     TableHeaderHeight,
     TableRowHeight,
@@ -229,6 +233,10 @@ enum class ComponentMetric : quint8
     WizardNavigationSpacing,
     WizardButtonMinimumWidth,
     WizardSidebarWidth,
+    WizardSidebarRowHeight,
+    WizardSidebarIconSize,
+    WizardSidebarIconExtent,
+    WizardCompletionIconSize,
     WizardTitleBottomSpacing,
     ToggleStateMinimumWidth,
     ToggleStateHeight,
@@ -284,7 +292,9 @@ enum class CardVariant : quint8
     Media,
     Background,
     Panel,
-    Selectable
+    Selectable,
+    SurfaceBrand,
+    SurfaceMuted
 };
 Q_ENUM_NS(CardVariant)
 
@@ -335,28 +345,51 @@ Q_ENUM_NS(ComboBoxPopupAlignment)
 enum class IconRole : quint8
 {
     AlertTriangle,
+    Blocks,
     Check,
     CheckCircle,
     ChevronDown,
+    ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     CloseCircle,
     Copy,
     Download,
     Ellipsis,
     Flame,
+    Folder,
+    FolderClock,
+    FolderInput,
     Gradient,
     Grid,
+    HardDrive,
+    Help,
     Information,
     Layers,
     Menu,
     Monitor,
+    MonitorCog,
     Moon,
+    Package,
     Search,
-    Sun
+    Settings,
+    Sun,
+    Undo,
+    User,
+    Users
 };
 Q_ENUM_NS(IconRole)
 
+enum class ButtonIconPlacement : quint8
+{
+    Leading,
+    Trailing
+};
+Q_ENUM_NS(ButtonIconPlacement)
+
 enum class LogoRole : quint8
 {
+    Data,
     Horizontal,
     HorizontalOnDark,
     Symbol,
@@ -374,6 +407,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(ngstd::widgets::ThemeFeatures)
 
 Q_DECLARE_METATYPE(ngstd::widgets::AnimationPolicy)
 Q_DECLARE_METATYPE(ngstd::widgets::ButtonVariant)
+Q_DECLARE_METATYPE(ngstd::widgets::ButtonIconPlacement)
 Q_DECLARE_METATYPE(ngstd::widgets::CardVariant)
 Q_DECLARE_METATYPE(ngstd::widgets::ColorScheme)
 Q_DECLARE_METATYPE(ngstd::widgets::ColorRole)

@@ -227,18 +227,24 @@ QString typographyName(ngstd::widgets::TypographyRole role)
     using ngstd::widgets::TypographyRole;
 
     switch (role) {
-    case TypographyRole::Display:
-        return QStringLiteral("display");
+    case TypographyRole::Title:
+        return QStringLiteral("title");
     case TypographyRole::Heading1:
         return QStringLiteral("h1");
+    case TypographyRole::Heading1Subtitle:
+        return QStringLiteral("h1Subtitle");
     case TypographyRole::Heading2:
         return QStringLiteral("h2");
     case TypographyRole::Heading3:
         return QStringLiteral("h3");
+    case TypographyRole::Heading4:
+        return QStringLiteral("h4");
     case TypographyRole::BodyLarge:
         return QStringLiteral("bodyLarge");
     case TypographyRole::Body:
         return QStringLiteral("body");
+    case TypographyRole::BodySmall:
+        return QStringLiteral("bodySmall");
     case TypographyRole::Control:
         return QStringLiteral("control");
     case TypographyRole::Caption:
@@ -376,6 +382,9 @@ QString componentMetricPath(ngstd::widgets::ComponentMetric metric)
         return QStringLiteral("desktop.component.tab.underlineHeightPx");
     case ComponentMetric::ItemViewRowHeight:
         return QStringLiteral("desktop.component.itemView.rowHeightPx");
+    case ComponentMetric::CompactItemViewRowHeight:
+        return QStringLiteral(
+            "desktop.component.itemView.compactRowHeightPx");
     case ComponentMetric::ItemViewIndentation:
         return QStringLiteral("desktop.component.itemView.indentationPx");
     case ComponentMetric::TableHeaderHeight:
@@ -413,6 +422,14 @@ QString componentMetricPath(ngstd::widgets::ComponentMetric metric)
         return QStringLiteral("desktop.component.wizard.buttonMinimumWidthPx");
     case ComponentMetric::WizardSidebarWidth:
         return QStringLiteral("desktop.component.wizard.sidebarWidthPx");
+    case ComponentMetric::WizardSidebarRowHeight:
+        return QStringLiteral("desktop.component.wizard.sidebarRowHeightPx");
+    case ComponentMetric::WizardSidebarIconSize:
+        return QStringLiteral("desktop.component.wizard.sidebarIconSizePx");
+    case ComponentMetric::WizardSidebarIconExtent:
+        return QStringLiteral("desktop.component.wizard.sidebarIconExtentPx");
+    case ComponentMetric::WizardCompletionIconSize:
+        return QStringLiteral("desktop.component.wizard.completionIconSizePx");
     case ComponentMetric::WizardTitleBottomSpacing:
         return QStringLiteral("desktop.component.wizard.titleBottomSpacingPx");
     case ComponentMetric::ToggleStateMinimumWidth:
@@ -635,8 +652,9 @@ TypographyToken DesignTokens::typography(TypographyRole role)
                          role == TypographyRole::QtHeading1 ||
                          role == TypographyRole::QtHeading2;
     const bool heading =
-        role == TypographyRole::Display || role == TypographyRole::Heading1 ||
+        role == TypographyRole::Title || role == TypographyRole::Heading1 ||
         role == TypographyRole::Heading2 || role == TypographyRole::Heading3 ||
+        role == TypographyRole::Heading4 ||
         role == TypographyRole::QtHeading1 ||
         role == TypographyRole::QtHeading2;
     const QString familyName =

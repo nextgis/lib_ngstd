@@ -43,6 +43,16 @@ class NGSTD_WIDGETS_EXPORT ExpandableSection : public QFrame
         WRITE setExpanded
         RESET collapse
         NOTIFY expandedChanged)
+    Q_PROPERTY(
+        bool selectionVisible
+        READ isSelectionVisible
+        WRITE setSelectionVisible
+        NOTIFY selectionVisibleChanged)
+    Q_PROPERTY(
+        bool selected
+        READ isSelected
+        WRITE setSelected
+        NOTIFY selectedChanged)
 
 public:
     explicit ExpandableSection(QWidget *parent = nullptr);
@@ -67,6 +77,12 @@ public:
     void setExpanded(bool expanded, bool animated);
     void collapse();
 
+    bool isSelectionVisible() const;
+    void setSelectionVisible(bool visible);
+
+    bool isSelected() const;
+    void setSelected(bool selected);
+
     QVBoxLayout *contentLayout() const;
 
 signals:
@@ -75,6 +91,8 @@ signals:
     void iconRoleChanged(ngstd::widgets::IconRole iconRole);
     void iconTextChanged(const QString &iconText);
     void expandedChanged(bool expanded);
+    void selectionVisibleChanged(bool visible);
+    void selectedChanged(bool selected);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

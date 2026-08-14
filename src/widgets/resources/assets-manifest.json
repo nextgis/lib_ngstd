@@ -314,6 +314,12 @@
       "source": "assets/icons/lucide/alert-triangle.svg"
     },
     {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/blocks.svg",
+      "license": "ISC AND MIT",
+      "sha256": "96fe00c835d13b340eb0844e03b17db905217b6bdbeefd7af192fc42a1f0dbe6",
+      "source": "assets/icons/lucide/blocks.svg"
+    },
+    {
       "alias": ":/ngstd/widgets/assets/icons/lucide/check-circle.svg",
       "license": "ISC AND MIT",
       "sha256": "69bc3c7716f64dd40cf2366a8042176c2782973ac3f2e4b7525bbcfa0828ac7e",
@@ -330,6 +336,30 @@
       "license": "ISC AND MIT",
       "sha256": "233b6f745eaaa9127419a1c5d03f748ef2905797a08ae0192365cb7a28fdd1a1",
       "source": "assets/icons/lucide/chevron-down.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/chevron-left.svg",
+      "license": "ISC AND MIT",
+      "sha256": "1a3db31d090bce6c795dbcbd1a95cb6bb074d0b2fcd8d26e5610211e10c8291f",
+      "source": "assets/icons/lucide/chevron-left.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/chevron-right.svg",
+      "license": "ISC AND MIT",
+      "sha256": "a513f13adf5dcbb5c76f70190b41d5387f171846e404f397f5cdb618f99d2526",
+      "source": "assets/icons/lucide/chevron-right.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/chevron-up.svg",
+      "license": "ISC AND MIT",
+      "sha256": "3af2d5df1412cf201b4ff070704103e29602f9147e49b08a470280d1cdac6b7e",
+      "source": "assets/icons/lucide/chevron-up.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/circle-help.svg",
+      "license": "ISC AND MIT",
+      "sha256": "3278866f8b414a4a29f039459177526bbcc8266d879c41365e80ee436dd651d0",
+      "source": "assets/icons/lucide/circle-help.svg"
     },
     {
       "alias": ":/ngstd/widgets/assets/icons/lucide/copy.svg",
@@ -350,10 +380,34 @@
       "source": "assets/icons/lucide/flame.svg"
     },
     {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/folder-clock.svg",
+      "license": "ISC AND MIT",
+      "sha256": "c39561adce28ee216a06af60a1e88d64787583839bf93af08bef279f9e3b803a",
+      "source": "assets/icons/lucide/folder-clock.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/folder-input.svg",
+      "license": "ISC AND MIT",
+      "sha256": "687d71429c2f67415c5dd6b32bf9f4edb821d8924f304654c5ec8872a737542c",
+      "source": "assets/icons/lucide/folder-input.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/folder.svg",
+      "license": "ISC AND MIT",
+      "sha256": "abe45d2a4ad512550d3efe69f83cfebf5634217dbed8afe83811e9d788d5389a",
+      "source": "assets/icons/lucide/folder.svg"
+    },
+    {
       "alias": ":/ngstd/widgets/assets/icons/lucide/gradient.svg",
       "license": "ISC AND MIT",
       "sha256": "e5bfe54e22ac61ec3f97885463817274e5900c0d543cfcbb26a7fe9bd1432a7e",
       "source": "assets/icons/lucide/gradient.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/hard-drive.svg",
+      "license": "ISC AND MIT",
+      "sha256": "6fd463261a6fd70d1751d6d8cb43cb86abf016c5748878863dfbe43c097fef76",
+      "source": "assets/icons/lucide/hard-drive.svg"
     },
     {
       "alias": ":/ngstd/widgets/assets/icons/lucide/info.svg",
@@ -368,6 +422,12 @@
       "source": "assets/icons/lucide/layers.svg"
     },
     {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/monitor-cog.svg",
+      "license": "ISC AND MIT",
+      "sha256": "dded0a56799193a463c6bc51f67118c2b6df07d39c629910712d3441a638ca2d",
+      "source": "assets/icons/lucide/monitor-cog.svg"
+    },
+    {
       "alias": ":/ngstd/widgets/assets/icons/lucide/monitor.svg",
       "license": "ISC AND MIT",
       "sha256": "7c75f110df190876a3181662ed0c85ee85c7b9d4b0dd51be982200cf7ea716b2",
@@ -380,10 +440,40 @@
       "source": "assets/icons/lucide/moon.svg"
     },
     {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/package.svg",
+      "license": "ISC AND MIT",
+      "sha256": "0d89e6185eeeeb66e6018f38ac09967a545759cb57cff17f83c2fc09a0f11d21",
+      "source": "assets/icons/lucide/package.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/settings.svg",
+      "license": "ISC AND MIT",
+      "sha256": "a544fbdd270c125df451c309096bc1ced77f6f5c261d19f183d9ebcb15f7ab1b",
+      "source": "assets/icons/lucide/settings.svg"
+    },
+    {
       "alias": ":/ngstd/widgets/assets/icons/lucide/sun.svg",
       "license": "ISC AND MIT",
       "sha256": "40393f2d88f5339f5e65e3c36842a2dbd9a8cb4ad84e2c5ff0fe2536cbb2b722",
       "source": "assets/icons/lucide/sun.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/undo.svg",
+      "license": "ISC AND MIT",
+      "sha256": "d4a604d1eb72be000acd8e2d49237382b76ccfc2dd2110dcf570781d91d6fe54",
+      "source": "assets/icons/lucide/undo.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/user.svg",
+      "license": "ISC AND MIT",
+      "sha256": "aebd15adc4c9d590eae5896f4ed24df00f9873126cfc4812d2046cf833553d3a",
+      "source": "assets/icons/lucide/user.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/icons/lucide/users.svg",
+      "license": "ISC AND MIT",
+      "sha256": "49329ecc5947837adcdb39f35260b2af4aa7265635772102043445c138cd01ae",
+      "source": "assets/icons/lucide/users.svg"
     },
     {
       "alias": ":/ngstd/widgets/assets/icons/lucide/x-circle.svg",
@@ -402,6 +492,12 @@
       "license": "Apache-2.0",
       "sha256": "a0e1305ce8e40bc015e4f2a6e17011dc4f5d6cf67eb00ad22ca89e7cd734dcd4",
       "source": "assets/icons/mdi/menu.svg"
+    },
+    {
+      "alias": ":/ngstd/widgets/assets/logos/nextgis-data.svg",
+      "license": "GPL-2.0-only",
+      "sha256": "4fad3eefb4c31c31eb2f808168fc06f32b8e8d6b3ea7c80cfd16d50674c4fdfb",
+      "source": "assets/logos/nextgis-data.svg"
     },
     {
       "alias": ":/ngstd/widgets/assets/logos/nextgis-horizontal-on-dark.svg",
@@ -448,13 +544,13 @@
     {
       "alias": ":/ngstd/widgets/qt/nextgis-dark.qss",
       "license": "GPL-2.0-only",
-      "sha256": "7e796730350e1bbd78cce1cd11bfd5c04d694134d4d80556979085daf511ecb4",
+      "sha256": "6172b64b8ce197f5bf721a50b1600cd6ee6563f97b7e39c7fa7d1543a7cd358a",
       "source": "themes/nextgis-dark.qss"
     },
     {
       "alias": ":/ngstd/widgets/qt/nextgis-light.qss",
       "license": "GPL-2.0-only",
-      "sha256": "d0feb5b747c0f1c123f1d505e798fac5316a1867698fd45951e1941e6de5c98c",
+      "sha256": "31477232b7d045cf8e4fa747807e52f0d19bb2533ce7c653599ac0f398507305",
       "source": "themes/nextgis-light.qss"
     }
   ]

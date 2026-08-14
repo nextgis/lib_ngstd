@@ -5,11 +5,13 @@
 #include "accessibility_p.h"
 
 #include <ngstd/widgets/button.h>
+#include <ngstd/widgets/card.h>
 #include <ngstd/widgets/combo_box.h>
 #include <ngstd/widgets/disclosure.h>
 
 #include <QAccessible>
 #include <QAccessibleWidget>
+#include <QButtonGroup>
 
 namespace {
 
@@ -53,6 +55,64 @@ public:
         auto *button = qobject_cast<ngstd::widgets::Button *>(object());
         if (button && !button->isLoading() &&
             actionName == QAccessibleActionInterface::pressAction()) {
+            button->click();
+            return;
+        }
+        QAccessibleWidget::doAction(actionName);
+    }
+};
+
+class CardButtonAccessible final : public QAccessibleWidget
+{
+public:
+    explicit CardButtonAccessible(ngstd::widgets::CardButton *button)
+        : QAccessibleWidget(button, QAccessible::CheckBox)
+    {}
+
+    QAccessible::Role role() const override
+    {
+        const auto *button =
+            qobject_cast<const ngstd::widgets::CardButton *>(object());
+        if (!button) return QAccessible::CheckBox;
+        const QButtonGroup *group = button->group();
+        return button->autoExclusive() || (group && group->exclusive())
+                   ? QAccessible::RadioButton
+                   : QAccessible::CheckBox;
+    }
+
+    QAccessible::State state() const override
+    {
+        QAccessible::State result = QAccessibleWidget::state();
+        const auto *button =
+            qobject_cast<const ngstd::widgets::CardButton *>(object());
+        if (!button) return result;
+        result.focusable = true;
+        result.checkable = button->isCheckable();
+        result.checked = button->isChecked();
+        return result;
+    }
+
+    QStringList actionNames() const override
+    {
+        return {QAccessibleActionInterface::toggleAction()};
+    }
+
+    QString text(QAccessible::Text textType) const override
+    {
+        const auto *button =
+            qobject_cast<const ngstd::widgets::CardButton *>(object());
+        if (button && textType == QAccessible::Value)
+            return button->isChecked() ? QStringLiteral("checked")
+                                       : QStringLiteral("unchecked");
+        return QAccessibleWidget::text(textType);
+    }
+
+    void doAction(const QString &actionName) override
+    {
+        auto *button =
+            qobject_cast<ngstd::widgets::CardButton *>(object());
+        if (button && button->isEnabled() && button->isCheckable() &&
+            actionName == QAccessibleActionInterface::toggleAction()) {
             button->click();
             return;
         }
@@ -178,6 +238,14 @@ QAccessible::Id registerButtonAccessibility(Button *button)
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return QAccessible::registerAccessibleInterface(
         new ButtonAccessible(button));
+}
+
+QAccessible::Id registerCardButtonAccessibility(CardButton *button)
+{
+    // QAccessible owns the interface until deleteAccessibleInterface().
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
+    return QAccessible::registerAccessibleInterface(
+        new CardButtonAccessible(button));
 }
 
 QAccessible::Id registerDisclosureAccessibility(Disclosure *disclosure)

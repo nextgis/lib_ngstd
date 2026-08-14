@@ -1007,7 +1007,7 @@ ExpandableSection *GalleryWindow::createTypographySection()
     QLabel *display =
         makeLabel(QStringLiteral("Spatial data\nwithout visual noise"),
                   QStringLiteral("typeStageDisplay"));
-    QFont stageDisplayFont = DesignTokens::font(TypographyRole::Display);
+    QFont stageDisplayFont = DesignTokens::font(TypographyRole::Title);
     stageDisplayFont.setPixelSize(
         GalleryTokens::metric(GalleryMetric::TypeStageDisplaySize));
     stageDisplayFont.setWeight(QFont::Bold);
@@ -1035,7 +1035,7 @@ ExpandableSection *GalleryWindow::createTypographySection()
         const char *sample;
         const char *metadata;
     } entries[] = {
-        {TypographyRole::Display, "display", "Spatial data",
+        {TypographyRole::Title, "title", "Spatial data",
          "48 / 1.12 · 700 · Ubuntu"},
         {TypographyRole::Heading1, "h1", "Dataset catalog",
          "34 / 1.2 · 700 · Ubuntu"},
@@ -1043,7 +1043,7 @@ ExpandableSection *GalleryWindow::createTypographySection()
          "24 / 1.25 · 700 · Ubuntu"},
         {TypographyRole::Heading3, "h3", "Sources and filters",
          "18 / 1.35 · 500 · Ubuntu"},
-        {TypographyRole::BodyLarge, "body-lg",
+        {TypographyRole::BodyLarge, "body-large",
          "Publish maps, connect data, and share results.",
          "18 / 1.55 · 400 · Roboto"},
         {TypographyRole::Body, "body",
